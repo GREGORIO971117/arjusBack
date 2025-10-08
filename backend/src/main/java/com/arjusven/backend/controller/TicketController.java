@@ -2,18 +2,16 @@ package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.service.TicketService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/tickets") // URI base para todos los endpoints de tickets
-@CrossOrigin(origins = "*") // Permite peticiones desde cualquier origen (ajustar en producción)
+@RequestMapping("/api/tickets")
 public class TicketController {
 
     private final TicketService ticketService;
@@ -24,78 +22,51 @@ public class TicketController {
     }
 
     // ====================================================================
-    // 1. ENDPOINT DE CREACIÓN DE TICKETS (POST)
+    // MÉTODOS GET
     // ====================================================================
 
-    /**
-     * Crea un nuevo ticket y realiza las validaciones de roles de Técnico y Supervisor 
-     * definidas en la capa de Service.
-     * * Ejemplo de uso: 
-     * POST /api/tickets?tecnicoId=1&supervisorId=5
-     * con el cuerpo JSON del Ticket.
-     */
-    @PostMapping
-    public ResponseEntity<Tickets> crearTicket(
-            // Obtenemos los IDs desde los parámetros de la URL
-            @RequestParam Long tecnicoId,
-            @RequestParam Long supervisorId,
-            // Obtenemos los datos del ticket desde el cuerpo de la petición (JSON)
-            @RequestBody Tickets nuevoTicket) 
-    {
-        try {
-            Tickets ticketCreado = ticketService.crearNuevoTicket(tecnicoId, supervisorId, nuevoTicket);
-            // Devuelve el ticket creado con el estado 201 CREATED
-            return new ResponseEntity<>(ticketCreado, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            // Manejo de errores de negocio (ej. rol incorrecto)
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException e) {
-            // Manejo de errores (ej. técnico/supervisor no encontrado)
-            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+    @GetMapping
+    public ResponseEntity<List<Tickets>> getAllTickets() {
+        List<Tickets> tickets = ticketService.findAll();
+        if (tickets.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Código 204
+        }
+        return new ResponseEntity<>(tickets, HttpStatus.OK); // Código 200
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Tickets> getTicketById(@PathVariable Integer id) {
+        Optional<Tickets> ticket = ticketService.findById(id);
+        
+        if (ticket.isPresent()) {
+            return new ResponseEntity<>(ticket.get(), HttpStatus.OK); // Código 200
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Código 404
         }
     }
-
-
-    // ====================================================================
-    // 2. ENDPOINT DE BÚSQUEDA Y FILTRADO DE TICKETS (GET)
-    // ====================================================================
-
-    /**
-     * Busca tickets aplicando múltiples criterios de filtrado. 
-     * Todos los parámetros son opcionales y se pasan vía query parameters.
-     * * Ejemplo de uso: 
-     * GET /api/tickets/buscar?estadoGeneral=CERRADO&nombreTecnico=Juan Perez&sla=24
-     */
-    @GetMapping("/buscar")
-    public ResponseEntity<List<Tickets>> buscarTickets(
-            @RequestParam(required = false) String estadoGeneral, 
-            @RequestParam(required = false) String nombreTecnico, 
-            @RequestParam(required = false) String ciudad, 
-            @RequestParam(required = false) String tipoServicio,
-            @RequestParam(required = false) Integer sla,
-            @RequestParam(required = false) LocalDate fechaAsignacion,
-            @RequestParam(required = false) LocalDate fechaEnvio,
-            @RequestParam(required = false) String situacionActual) 
-    {
-        
-        List<Tickets> ticketsEncontrados = ticketService.buscarTicketsPorCriterios(
-            estadoGeneral, 
-            nombreTecnico, 
-            ciudad, 
-            tipoServicio,
-            sla,
-            fechaAsignacion,
-            fechaEnvio,
-            situacionActual
-        );
-        
-        // Devuelve la lista de tickets encontrados con el estado 200 OK
-        return new ResponseEntity<>(ticketsEncontrados, HttpStatus.OK);
-    }
     
-    // Si quieres un endpoint para ver TODOS los tickets sin filtros
-    @GetMapping
-    public ResponseEntity<List<Tickets>> obtenerTodos() {
-        return new ResponseEntity<>(ticketService.findAll(), HttpStatus.OK);
+    // ====================================================================
+    // MÉTODO POST
+    // ====================================================================
+
+    @PostMapping
+    public ResponseEntity<Tickets> createTicket(@RequestBody Tickets nuevoTicket) {
+        try {
+            // Llama al servicio, que maneja la validación de los 4 IDs de Usuario.
+            Tickets ticketGuardado = ticketService.crearNuevoTicket(nuevoTicket);
+            
+            // Retorna el ticket creado con el ID generado por la DB.
+            return new ResponseEntity<>(ticketGuardado, HttpStatus.CREATED); // Código 201
+
+        } catch (IllegalArgumentException e) {
+            // Error de lógica, como rol incorrecto o ID nulo
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Código 400
+        } catch (RuntimeException e) {
+            // Error de DB, como usuario no encontrado
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Código 404
+        } catch (Exception e) {
+            // Error inesperado
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Código 500
+        }
     }
 }

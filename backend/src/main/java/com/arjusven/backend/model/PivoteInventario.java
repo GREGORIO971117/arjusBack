@@ -1,5 +1,7 @@
 package com.arjusven.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 
@@ -9,17 +11,18 @@ import jakarta.persistence.*;
 public class PivoteInventario {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "Cantidad_Usada")
 	private Long cantidad;
 	
 	// CLAVE FORÁNEA (Foreign Key)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Tickets_idTickets_FK", nullable = false)
+    @JoinColumn(name = "Tickets_idTickets_FK", referencedColumnName = "idTickets") 
+    @JsonIgnore
     private Tickets ticket;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Inventario_idInventario_FK", nullable = false)
+    @JsonIgnore
     private Inventario inventario;
 
 	public PivoteInventario() {

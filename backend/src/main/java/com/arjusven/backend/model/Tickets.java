@@ -12,7 +12,7 @@ public class Tickets {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idTickets")
-    private Long id;
+    private Long idTickets;
     
     @Column(name = "Fecha_Creacion")
     private LocalDateTime fechaCreacion;
@@ -36,7 +36,7 @@ public class Tickets {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "AdminID_FK")
-    private Usuarios admin;
+    private Usuarios administrador;
 
     // --- RELACIONES 1:N (Uno-a-Muchos) a Hijos ---
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -52,11 +52,11 @@ public class Tickets {
 	}
 
 	public Long getId() {
-		return id;
+		return idTickets;
 	}
 
 	public void setId(Long id) {
-		this.id = id;
+		this.idTickets = id;
 	}
 
 	public LocalDateTime getFechaCreacion() {
@@ -99,12 +99,12 @@ public class Tickets {
 		this.supervisor = supervisor;
 	}
 
-	public Usuarios getAdmin() {
-		return admin;
+	public Usuarios getAdministrador() {
+		return administrador;
 	}
 
-	public void setAdmin(Usuarios admin) {
-		this.admin = admin;
+	public void setAdmininistrador(Usuarios admin) {
+		this.administrador = admin;
 	}
 
 	public List<Servicio> getServicios() {
@@ -133,8 +133,8 @@ public class Tickets {
 
 	@Override
 	public String toString() {
-		return "Tickets [id=" + id + ", fechaCreacion=" + fechaCreacion + ", estado=" + estado + ", cliente=" + cliente
-				+ ", tecnico=" + tecnico + ", supervisor=" + supervisor + ", admin=" + admin + ", servicios="
+		return "Tickets [id=" + idTickets + ", fechaCreacion=" + fechaCreacion + ", estado=" + estado + ", cliente=" + cliente
+				+ ", tecnico=" + tecnico + ", supervisor=" + supervisor + ", admin=" + administrador + ", servicios="
 				+ servicios + ", adicionales=" + adicionales + ", pivoteInventario=" + pivoteInventario + "]";
 	}    
 }

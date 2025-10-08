@@ -10,7 +10,7 @@ public class Inventario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idInventario")
-    private Long id;
+    private Long idInventario;
  
     @Column(name = "Titulo")
     private String titulo;
@@ -68,11 +68,11 @@ public class Inventario {
 	}
 
 	public Long getId() {
-		return id;
+		return idInventario;
 	}
 
 	public void setId(Long id) {
-		this.id = id;
+		this.idInventario = id;
 	}
 
 	public String getTitulo() {
@@ -213,7 +213,7 @@ public class Inventario {
 
 	@Override
 	public String toString() {
-		return "Inventario [id=" + id + ", titulo=" + titulo + ", numeroDeSerie=" + numeroDeSerie + ", equipo=" + equipo
+		return "Inventario [id=" + idInventario + ", titulo=" + titulo + ", numeroDeSerie=" + numeroDeSerie + ", equipo=" + equipo
 				+ ", estado=" + estado + ", responsable=" + responsable + ", cliente=" + cliente + ", plaza=" + plaza
 				+ ", tecnico=" + tecnico + ", numeroDeIncidencia=" + numeroDeIncidencia + ", codigoEmail=" + codigoEmail
 				+ ", guias=" + guias + ", fechaDeInicioPrevista=" + fechaDeInicioPrevista + ", fechaDeFinPrevista="

@@ -1,5 +1,7 @@
 package com.arjusven.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -9,9 +11,8 @@ public class Adicional {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idAdicionales")
-    private Long id;
+    private Long idAdicionales;
 
-   
     // Atributos mapeados de la tabla SQL
     @Column(name = "Ciudad")
     private String ciudad;
@@ -106,7 +107,8 @@ public class Adicional {
 
     // CLAVE FORÁNEA (Foreign Key)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Tickets_idTickets1", nullable = false)
+    @JoinColumn(name = "Tickets_idTickets_FK", referencedColumnName = "idTickets") 
+    @JsonIgnore
     private Tickets ticket;
 
 	public Adicional() {
@@ -114,11 +116,11 @@ public class Adicional {
 	}
 
 	public Long getId() {
-		return id;
+		return idAdicionales;
 	}
 
 	public void setId(Long id) {
-		this.id = id;
+		this.idAdicionales = id;
 	}
 
 	public String getCiudad() {
@@ -371,7 +373,7 @@ public class Adicional {
 
 	@Override
 	public String toString() {
-		return "Adicional [id=" + id + ", ciudad=" + ciudad + ", cerroEnPuntoClave=" + cerroEnPuntoClave + ", tarjeta="
+		return "Adicional [id=" + idAdicionales + ", ciudad=" + ciudad + ", cerroEnPuntoClave=" + cerroEnPuntoClave + ", tarjeta="
 				+ tarjeta + ", marcaEntra=" + marcaEntra + ", sim=" + sim + ", modeloSale=" + modeloSale
 				+ ", serieFisicaSale=" + serieFisicaSale + ", eliminadorSale=" + eliminadorSale
 				+ ", tipoDeComunicacion=" + tipoDeComunicacion + ", ordenDeServicio=" + ordenDeServicio

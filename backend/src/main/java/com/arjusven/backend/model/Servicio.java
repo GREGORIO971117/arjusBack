@@ -3,6 +3,8 @@ package com.arjusven.backend.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "servicios")
 public class Servicio {
@@ -10,7 +12,7 @@ public class Servicio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idServicios")
-    private Long id;
+    private Long idServicios;
     
     // Atributos mapeados de la tabla SQL
     @Column(name = "Fecha_de_asignacion")
@@ -67,7 +69,8 @@ public class Servicio {
     
  // CLAVE FORÁNEA (Foreign Key)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Tickets_idTickets_FK", nullable = false)
+    @JoinColumn(name = "Tickets_idTickets_FK", referencedColumnName = "idTickets") 
+    @JsonIgnore
     private Tickets ticket;
 
 
@@ -77,12 +80,12 @@ public Servicio() {
 
 
 public Long getId() {
-	return id;
+	return idServicios;
 }
 
 
 public void setId(Long id) {
-	this.id = id;
+	this.idServicios = id;
 }
 
 
@@ -268,7 +271,7 @@ public void setTicket(Tickets ticket) {
 
 @Override
 public String toString() {
-	return "Servicio [id=" + id + ", fechaDeAsignacion=" + fechaDeAsignacion + ", resolucion=" + resolucion
+	return "Servicio [id=" + idServicios + ", fechaDeAsignacion=" + fechaDeAsignacion + ", resolucion=" + resolucion
 			+ ", situacionActual=" + situacionActual + ", nombreDeEss=" + nombreDeEss + ", incidencia=" + incidencia
 			+ ", codigoDeAfiliado=" + codigoDeAfiliado + ", supervidor=" + supervidor + ", idMerchant=" + idMerchant
 			+ ", tipoDeServicio=" + tipoDeServicio + ", motivoDeServicio=" + motivoDeServicio + ", motivoReal="

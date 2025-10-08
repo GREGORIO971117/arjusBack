@@ -10,7 +10,7 @@ public class Usuarios {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idUsuarios")
-    private Long id;
+    private Long idUsuarios;
 
     @Column(name = "Nombre", nullable = false)
     private String nombreCompleto;
@@ -45,11 +45,11 @@ public class Usuarios {
 	public Usuarios() {}
 
 	public Long getId() {
-		return id;
+		return idUsuarios;
 	}
 
 	public void setId(Long id) {
-		this.id = id;
+		this.idUsuarios = id;
 	}
 
 	public String getNombreCompleto() {
@@ -126,7 +126,7 @@ public class Usuarios {
 
 	@Override
 	public String toString() {
-		return "Usuarios [id=" + id + ", nombreCompleto=" + nombreCompleto + ", correo=" + correo
+		return "Usuarios [id=" + idUsuarios + ", nombreCompleto=" + nombreCompleto + ", correo=" + correo
 				+ ", estadoDeResidencia=" + estadoDeResidencia + ", edad=" + edad + ", rol=" + rol + ", ticketsCliente="
 				+ ticketsCliente + ", ticketsTecnico=" + ticketsTecnico + ", ticketsSupervisor=" + ticketsSupervisor
 				+ ", ticketsAdministrador=" + ticketsAdministrador + "]";
