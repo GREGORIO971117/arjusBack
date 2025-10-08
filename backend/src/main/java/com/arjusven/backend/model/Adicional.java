@@ -1,4 +1,4 @@
-package com.arjusven.model;
+package com.arjusven.backend.model;
 
 import jakarta.persistence.*;
 
@@ -11,11 +11,7 @@ public class Adicional {
     @Column(name = "idAdicionales")
     private Long id;
 
-    // CLAVE FORÁNEA (Foreign Key)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Tickets_idTickets1", nullable = false)
-    private Tickets ticket;
-
+   
     // Atributos mapeados de la tabla SQL
     @Column(name = "Ciudad")
     private String ciudad;
@@ -108,20 +104,21 @@ public class Adicional {
     @Column(name = "SIM que queda de stock")
     private String simQueQuedaDeStock;
 
+    // CLAVE FORÁNEA (Foreign Key)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Tickets_idTickets1", nullable = false)
+    private Tickets ticket;
+
+	public Adicional() {
+	
+	}
+
 	public Long getId() {
 		return id;
 	}
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Tickets getTicket() {
-		return ticket;
-	}
-
-	public void setTicket(Tickets ticket) {
-		this.ticket = ticket;
 	}
 
 	public String getCiudad() {
@@ -364,12 +361,20 @@ public class Adicional {
 		this.simQueQuedaDeStock = simQueQuedaDeStock;
 	}
 
+	public Tickets getTicket() {
+		return ticket;
+	}
+
+	public void setTicket(Tickets ticket) {
+		this.ticket = ticket;
+	}
+
 	@Override
 	public String toString() {
-		return "Adicional [id=" + id + ", ticket=" + ticket + ", ciudad=" + ciudad + ", cerroEnPuntoClave="
-				+ cerroEnPuntoClave + ", tarjeta=" + tarjeta + ", marcaEntra=" + marcaEntra + ", sim=" + sim
-				+ ", modeloSale=" + modeloSale + ", serieFisicaSale=" + serieFisicaSale + ", eliminadorSale="
-				+ eliminadorSale + ", tipoDeComunicacion=" + tipoDeComunicacion + ", ordenDeServicio=" + ordenDeServicio
+		return "Adicional [id=" + id + ", ciudad=" + ciudad + ", cerroEnPuntoClave=" + cerroEnPuntoClave + ", tarjeta="
+				+ tarjeta + ", marcaEntra=" + marcaEntra + ", sim=" + sim + ", modeloSale=" + modeloSale
+				+ ", serieFisicaSale=" + serieFisicaSale + ", eliminadorSale=" + eliminadorSale
+				+ ", tipoDeComunicacion=" + tipoDeComunicacion + ", ordenDeServicio=" + ordenDeServicio
 				+ ", modeloDeStock=" + modeloDeStock + ", plaza=" + plaza + ", atencionEnPunto=" + atencionEnPunto
 				+ ", cantidadTpv=" + cantidadTpv + ", serieLogicaEntra=" + serieLogicaEntra + ", ptidEntra=" + ptidEntra
 				+ ", marcaSale=" + marcaSale + ", simSale=" + simSale + ", versionDeBrowser=" + versionDeBrowser
@@ -377,9 +382,8 @@ public class Adicional {
 				+ serieQueQuedaDeStock + ", tecnico=" + tecnico + ", firmaEnEstacion=" + firmaEnEstacion
 				+ ", modeloEntra=" + modeloEntra + ", serieFisicaEntra=" + serieFisicaEntra + ", eliminadorEntra="
 				+ eliminadorEntra + ", serieLogicaSale=" + serieLogicaSale + ", ptidSale=" + ptidSale + ", estado="
-				+ estado + ", simQueQuedaDeStock=" + simQueQuedaDeStock + "]";
+				+ estado + ", simQueQuedaDeStock=" + simQueQuedaDeStock + ", ticket=" + ticket + "]";
 	}
-	
 
    
 }
