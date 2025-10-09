@@ -2,11 +2,15 @@ package com.arjusven.backend.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "tickets")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Tickets {
 
     @Id
@@ -14,28 +18,35 @@ public class Tickets {
     @Column(name = "idTickets")
     private Long idTickets;
     
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "Fecha_Creacion")
-    private LocalDateTime fechaCreacion;
+    private LocalDate fechaCreacion=LocalDate.now();;
     
     @Column(name = "Estado")
     private String estado;
 
     // --- RELACIONES N:1 (Muchos-a-Uno) a Personal ---
     // Mapean a las FKs: Usuarios_Tecnico_ID y Usuarios_Supervisor_ID en la DB
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ClienteID_FK") 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Usuarios cliente; 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TecnicoID_FK") 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Usuarios tecnico;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SupervisorID_FK")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Usuarios supervisor;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "AdminID_FK")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Usuarios administrador;
 
     // --- RELACIONES 1:N (Uno-a-Muchos) a Hijos ---
@@ -51,19 +62,19 @@ public class Tickets {
 	public Tickets() {
 	}
 
-	public Long getId() {
+	public Long getIdTickets() {
 		return idTickets;
 	}
 
-	public void setId(Long id) {
+	public void setIdTickets(Long id) {
 		this.idTickets = id;
 	}
 
-	public LocalDateTime getFechaCreacion() {
+	public LocalDate getFechaCreacion() {
 		return fechaCreacion;
 	}
 
-	public void setFechaCreacion(LocalDateTime fechaCreacion) {
+	public void setFechaCreacion(LocalDate fechaCreacion) {
 		this.fechaCreacion = fechaCreacion;
 	}
 
@@ -103,7 +114,7 @@ public class Tickets {
 		return administrador;
 	}
 
-	public void setAdmininistrador(Usuarios admin) {
+	public void setAdministrador(Usuarios admin) {
 		this.administrador = admin;
 	}
 

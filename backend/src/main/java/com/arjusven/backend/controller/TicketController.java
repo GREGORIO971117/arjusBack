@@ -35,7 +35,7 @@ public class TicketController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Tickets> getTicketById(@PathVariable Integer id) {
+    public ResponseEntity<Tickets> getTicketById(@PathVariable("id") Integer id) {
         Optional<Tickets> ticket = ticketService.findById(id);
         
         if (ticket.isPresent()) {

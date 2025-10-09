@@ -9,6 +9,4 @@ import com.arjusven.backend.model.Inventario;
 
 @Repository
 public interface InventarioRepository extends JpaRepository<Inventario, Long> {
-    // Útil para buscar un artículo antes de asignarlo
-    Optional<Inventario> findByNumeroDeSerie(String numeroDeSerie);
 }

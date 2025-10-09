@@ -1,6 +1,8 @@
 package com.arjusven.backend.model;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -13,7 +15,7 @@ public class Usuarios {
     private Long idUsuarios;
 
     @Column(name = "Nombre", nullable = false)
-    private String nombreCompleto;
+    private String nombre;
     
     @Column(name = "Correo")
     private String correo;
@@ -27,37 +29,41 @@ public class Usuarios {
     @Column(name = "Rol", nullable = false)
     private String rol;
     
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tickets> ticketsCliente;
     
     // 2. Tickets donde este Usuario aparece como TÉCNICO (TecnicoID_FK)
+    @JsonIgnore
     @OneToMany(mappedBy = "tecnico", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tickets> ticketsTecnico;
 
     // 3. Tickets donde este Usuario aparece como SUPERVISOR (SupervisorID_FK)
+    @JsonIgnore
     @OneToMany(mappedBy = "supervisor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tickets> ticketsSupervisor;
 
     // 4. Tickets donde este Usuario aparece como ADMINISTRADOR (AdminID_FK)
+    @JsonIgnore
     @OneToMany(mappedBy = "administrador", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tickets> ticketsAdministrador;
 
 	public Usuarios() {}
 
-	public Long getId() {
+	public Long getIdUsuarios() {
 		return idUsuarios;
 	}
 
-	public void setId(Long id) {
+	public void setIdUsuarios(Long id) {
 		this.idUsuarios = id;
 	}
 
-	public String getNombreCompleto() {
-		return nombreCompleto;
+	public String getNombre() {
+		return nombre;
 	}
 
-	public void setNombreCompleto(String nombreCompleto) {
-		this.nombreCompleto = nombreCompleto;
+	public void setNombre(String nombreCompleto) {
+		this.nombre = nombreCompleto;
 	}
 
 	public String getCorreo() {
@@ -126,7 +132,7 @@ public class Usuarios {
 
 	@Override
 	public String toString() {
-		return "Usuarios [id=" + idUsuarios + ", nombreCompleto=" + nombreCompleto + ", correo=" + correo
+		return "Usuarios [id=" + idUsuarios + ", nombreCompleto=" + nombre + ", correo=" + correo
 				+ ", estadoDeResidencia=" + estadoDeResidencia + ", edad=" + edad + ", rol=" + rol + ", ticketsCliente="
 				+ ticketsCliente + ", ticketsTecnico=" + ticketsTecnico + ", ticketsSupervisor=" + ticketsSupervisor
 				+ ", ticketsAdministrador=" + ticketsAdministrador + "]";
