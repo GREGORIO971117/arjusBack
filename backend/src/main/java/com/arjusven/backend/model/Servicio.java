@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "servicios")
@@ -68,215 +69,206 @@ public class Servicio {
     
     
  // CLAVE FORÁNEA (Foreign Key)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Tickets_idTickets_FK", referencedColumnName = "idTickets") 
-    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name = "Tickets_idTickets", nullable = false) 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","servicio"}) 
     private Tickets ticket;
 
 
-public Servicio() {
-	
-}
-
-
-public Long getId() {
-	return idServicios;
-}
-
-
-public void setId(Long id) {
-	this.idServicios = id;
-}
-
-
-public LocalDate getFechaDeAsignacion() {
-	return fechaDeAsignacion;
-}
-
-
-public void setFechaDeAsignacion(LocalDate fechaDeAsignacion) {
-	this.fechaDeAsignacion = fechaDeAsignacion;
-}
-
-
-public String getResolucion() {
-	return resolucion;
-}
-
-
-public void setResolucion(String resolucion) {
-	this.resolucion = resolucion;
-}
-
-
-public String getSituacionActual() {
-	return situacionActual;
-}
-
-
-public void setSituacionActual(String situacionActual) {
-	this.situacionActual = situacionActual;
-}
-
-
-public String getNombreDeEss() {
-	return nombreDeEss;
-}
-
-
-public void setNombreDeEss(String nombreDeEss) {
-	this.nombreDeEss = nombreDeEss;
-}
-
-
-public String getIncidencia() {
-	return incidencia;
-}
-
-
-public void setIncidencia(String incidencia) {
-	this.incidencia = incidencia;
-}
-
-
-public String getCodigoDeAfiliado() {
-	return codigoDeAfiliado;
-}
-
-
-public void setCodigoDeAfiliado(String codigoDeAfiliado) {
-	this.codigoDeAfiliado = codigoDeAfiliado;
-}
-
-
-public String getSupervidor() {
-	return supervidor;
-}
-
-
-public void setSupervidor(String supervidor) {
-	this.supervidor = supervidor;
-}
-
-
-public String getIdMerchant() {
-	return idMerchant;
-}
-
-
-public void setIdMerchant(String idMerchant) {
-	this.idMerchant = idMerchant;
-}
-
-
-public String getTipoDeServicio() {
-	return tipoDeServicio;
-}
-
-
-public void setTipoDeServicio(String tipoDeServicio) {
-	this.tipoDeServicio = tipoDeServicio;
-}
-
-
-public String getMotivoDeServicio() {
-	return motivoDeServicio;
-}
-
-
-public void setMotivoDeServicio(String motivoDeServicio) {
-	this.motivoDeServicio = motivoDeServicio;
-}
-
-
-public String getMotivoReal() {
-	return motivoReal;
-}
-
-
-public void setMotivoReal(String motivoReal) {
-	this.motivoReal = motivoReal;
-}
-
-
-public String getObservaciones() {
-	return observaciones;
-}
-
-
-public void setObservaciones(String observaciones) {
-	this.observaciones = observaciones;
-}
-
-
-public String getGuiaDeEncomienda() {
-	return guiaDeEncomienda;
-}
-
-
-public void setGuiaDeEncomienda(String guiaDeEncomienda) {
-	this.guiaDeEncomienda = guiaDeEncomienda;
-}
-
-
-public LocalDate getFechaDeEnvio() {
-	return fechaDeEnvio;
-}
-
-
-public void setFechaDeEnvio(LocalDate fechaDeEnvio) {
-	this.fechaDeEnvio = fechaDeEnvio;
-}
-
-
-public String getDireccion() {
-	return direccion;
-}
-
-
-public void setDireccion(String direccion) {
-	this.direccion = direccion;
-}
-
-
-public String getTecnico() {
-	return tecnico;
-}
-
-
-public void setTecnico(String tecnico) {
-	this.tecnico = tecnico;
-}
-
-
-public Integer getSla() {
-	return sla;
-}
-
-
-public void setSla(Integer sla) {
-	this.sla = sla;
-}
-
-
-public Tickets getTicket() {
-	return ticket;
-}
-
-
-public void setTicket(Tickets ticket) {
-	this.ticket = ticket;
-}
-
-
-@Override
-public String toString() {
-	return "Servicio [id=" + idServicios + ", fechaDeAsignacion=" + fechaDeAsignacion + ", resolucion=" + resolucion
-			+ ", situacionActual=" + situacionActual + ", nombreDeEss=" + nombreDeEss + ", incidencia=" + incidencia
-			+ ", codigoDeAfiliado=" + codigoDeAfiliado + ", supervidor=" + supervidor + ", idMerchant=" + idMerchant
-			+ ", tipoDeServicio=" + tipoDeServicio + ", motivoDeServicio=" + motivoDeServicio + ", motivoReal="
-			+ motivoReal + ", observaciones=" + observaciones + ", guiaDeEncomienda=" + guiaDeEncomienda
-			+ ", fechaDeEnvio=" + fechaDeEnvio + ", direccion=" + direccion + ", tecnico=" + tecnico + ", sla=" + sla
-			+ ", ticket=" + ticket + "]";
+	public Long getIdServicios() {
+		return idServicios;
 	}
+
+
+	public void setIdServicios(Long idServicios) {
+		this.idServicios = idServicios;
+	}
+
+
+	public LocalDate getFechaDeAsignacion() {
+		return fechaDeAsignacion;
+	}
+
+
+	public void setFechaDeAsignacion(LocalDate fechaDeAsignacion) {
+		this.fechaDeAsignacion = fechaDeAsignacion;
+	}
+
+
+	public String getResolucion() {
+		return resolucion;
+	}
+
+
+	public void setResolucion(String resolucion) {
+		this.resolucion = resolucion;
+	}
+
+
+	public String getSituacionActual() {
+		return situacionActual;
+	}
+
+
+	public void setSituacionActual(String situacionActual) {
+		this.situacionActual = situacionActual;
+	}
+
+
+	public String getNombreDeEss() {
+		return nombreDeEss;
+	}
+
+
+	public void setNombreDeEss(String nombreDeEss) {
+		this.nombreDeEss = nombreDeEss;
+	}
+
+
+	public String getIncidencia() {
+		return incidencia;
+	}
+
+
+	public void setIncidencia(String incidencia) {
+		this.incidencia = incidencia;
+	}
+
+
+	public String getCodigoDeAfiliado() {
+		return codigoDeAfiliado;
+	}
+
+
+	public void setCodigoDeAfiliado(String codigoDeAfiliado) {
+		this.codigoDeAfiliado = codigoDeAfiliado;
+	}
+
+
+	public String getSupervidor() {
+		return supervidor;
+	}
+
+
+	public void setSupervidor(String supervidor) {
+		this.supervidor = supervidor;
+	}
+
+
+	public String getIdMerchant() {
+		return idMerchant;
+	}
+
+
+	public void setIdMerchant(String idMerchant) {
+		this.idMerchant = idMerchant;
+	}
+
+
+	public String getTipoDeServicio() {
+		return tipoDeServicio;
+	}
+
+
+	public void setTipoDeServicio(String tipoDeServicio) {
+		this.tipoDeServicio = tipoDeServicio;
+	}
+
+
+	public String getMotivoDeServicio() {
+		return motivoDeServicio;
+	}
+
+
+	public void setMotivoDeServicio(String motivoDeServicio) {
+		this.motivoDeServicio = motivoDeServicio;
+	}
+
+
+	public String getMotivoReal() {
+		return motivoReal;
+	}
+
+
+	public void setMotivoReal(String motivoReal) {
+		this.motivoReal = motivoReal;
+	}
+
+
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+
+
+	public String getGuiaDeEncomienda() {
+		return guiaDeEncomienda;
+	}
+
+
+	public void setGuiaDeEncomienda(String guiaDeEncomienda) {
+		this.guiaDeEncomienda = guiaDeEncomienda;
+	}
+
+
+	public LocalDate getFechaDeEnvio() {
+		return fechaDeEnvio;
+	}
+
+
+	public void setFechaDeEnvio(LocalDate fechaDeEnvio) {
+		this.fechaDeEnvio = fechaDeEnvio;
+	}
+
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+
+	public String getTecnico() {
+		return tecnico;
+	}
+
+
+	public void setTecnico(String tecnico) {
+		this.tecnico = tecnico;
+	}
+
+
+	public Integer getSla() {
+		return sla;
+	}
+
+
+	public void setSla(Integer sla) {
+		this.sla = sla;
+	}
+
+
+	public Tickets getTicket() {
+		return ticket;
+	}
+
+
+	public void setTicket(Tickets ticket) {
+		this.ticket = ticket;
+	}
+
+
+	public Servicio() {
+	}
+    
+    
+
+
 }

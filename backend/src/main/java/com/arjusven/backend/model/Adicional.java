@@ -1,6 +1,7 @@
 package com.arjusven.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 
@@ -13,7 +14,6 @@ public class Adicional {
     @Column(name = "idAdicionales")
     private Long idAdicionales;
 
-    // Atributos mapeados de la tabla SQL
     @Column(name = "Ciudad")
     private String ciudad;
     
@@ -56,7 +56,6 @@ public class Adicional {
     @Column(name = "Cantidad TPV")
     private String cantidadTpv;
     
-    // NOTA: Tu SQL tiene 2 veces "Serie logica entra" y "Eliminador entra". Mapeamos la primera ocurrencia.
     @Column(name = "Serie logica entra")
     private String serieLogicaEntra; 
     
@@ -79,7 +78,7 @@ public class Adicional {
     private String serieQueQuedaDeStock;
     
     @Column(name = "Tecnico")
-    private String tecnico; // Nota: Si el técnico es un usuario, esta columna de texto es redundante.
+    private String tecnico; 
     
     @Column(name = "Firma en estacion")
     private String firmaEnEstacion;
@@ -106,21 +105,21 @@ public class Adicional {
     private String simQueQuedaDeStock;
 
     // CLAVE FORÁNEA (Foreign Key)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Tickets_idTickets_FK", referencedColumnName = "idTickets") 
-    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name = "Tickets_idTickets", referencedColumnName = "idTickets")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","adicionales"}) 
     private Tickets ticket;
 
 	public Adicional() {
 	
 	}
 
-	public Long getId() {
+	public Long getIdAdicionales() {
 		return idAdicionales;
 	}
 
-	public void setId(Long id) {
-		this.idAdicionales = id;
+	public void setIdAdicionales(Long idAdicionales) {
+		this.idAdicionales = idAdicionales;
 	}
 
 	public String getCiudad() {
@@ -370,22 +369,5 @@ public class Adicional {
 	public void setTicket(Tickets ticket) {
 		this.ticket = ticket;
 	}
-
-	@Override
-	public String toString() {
-		return "Adicional [id=" + idAdicionales + ", ciudad=" + ciudad + ", cerroEnPuntoClave=" + cerroEnPuntoClave + ", tarjeta="
-				+ tarjeta + ", marcaEntra=" + marcaEntra + ", sim=" + sim + ", modeloSale=" + modeloSale
-				+ ", serieFisicaSale=" + serieFisicaSale + ", eliminadorSale=" + eliminadorSale
-				+ ", tipoDeComunicacion=" + tipoDeComunicacion + ", ordenDeServicio=" + ordenDeServicio
-				+ ", modeloDeStock=" + modeloDeStock + ", plaza=" + plaza + ", atencionEnPunto=" + atencionEnPunto
-				+ ", cantidadTpv=" + cantidadTpv + ", serieLogicaEntra=" + serieLogicaEntra + ", ptidEntra=" + ptidEntra
-				+ ", marcaSale=" + marcaSale + ", simSale=" + simSale + ", versionDeBrowser=" + versionDeBrowser
-				+ ", tipoDeComunicacionSale=" + tipoDeComunicacionSale + ", serieQueQuedaDeStock="
-				+ serieQueQuedaDeStock + ", tecnico=" + tecnico + ", firmaEnEstacion=" + firmaEnEstacion
-				+ ", modeloEntra=" + modeloEntra + ", serieFisicaEntra=" + serieFisicaEntra + ", eliminadorEntra="
-				+ eliminadorEntra + ", serieLogicaSale=" + serieLogicaSale + ", ptidSale=" + ptidSale + ", estado="
-				+ estado + ", simQueQuedaDeStock=" + simQueQuedaDeStock + ", ticket=" + ticket + "]";
-	}
-
    
 }

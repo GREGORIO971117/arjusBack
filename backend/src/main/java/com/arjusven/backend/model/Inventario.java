@@ -64,15 +64,15 @@ public class Inventario {
     private List<PivoteInventario> pivoteInventario;
 
 	public Inventario() {
-		super();
+		
 	}
 
-	public Long getId() {
+	public Long getIdInventario() {
 		return idInventario;
 	}
 
-	public void setId(Long id) {
-		this.idInventario = id;
+	public void setIdInventario(Long idInventario) {
+		this.idInventario = idInventario;
 	}
 
 	public String getTitulo() {
@@ -210,17 +210,4 @@ public class Inventario {
 	public void setPivoteInventario(List<PivoteInventario> pivoteInventario) {
 		this.pivoteInventario = pivoteInventario;
 	}
-
-	@Override
-	public String toString() {
-		return "Inventario [id=" + idInventario + ", titulo=" + titulo + ", numeroDeSerie=" + numeroDeSerie + ", equipo=" + equipo
-				+ ", estado=" + estado + ", responsable=" + responsable + ", cliente=" + cliente + ", plaza=" + plaza
-				+ ", tecnico=" + tecnico + ", numeroDeIncidencia=" + numeroDeIncidencia + ", codigoEmail=" + codigoEmail
-				+ ", guias=" + guias + ", fechaDeInicioPrevista=" + fechaDeInicioPrevista + ", fechaDeFinPrevista="
-				+ fechaDeFinPrevista + ", fechaDeFin=" + fechaDeFin + ", ultimaActualizacion=" + ultimaActualizacion
-				+ ", descripcion=" + descripcion + ", pivoteInventario=" + pivoteInventario + "]";
-	}
-
-	
-    
 }

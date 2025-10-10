@@ -25,9 +25,9 @@ public class AdicionalController {
     // Purpose: Retrieve a user by ID (reads data from the database)
     @GetMapping("/{id}")
     public ResponseEntity<Adicional> getUsuario(@PathVariable("id") Long id) {
-    	Adicional usuario = adicionalService.getAdicionalById(id);
-        if (usuario != null) {
-            return new ResponseEntity<>(usuario, HttpStatus.OK);
+    	Adicional adicional = adicionalService.getAdicionalById(id);
+        if (adicional != null) {
+            return new ResponseEntity<>(adicional, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

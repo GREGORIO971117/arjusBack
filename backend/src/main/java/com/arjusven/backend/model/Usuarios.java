@@ -29,6 +29,9 @@ public class Usuarios {
     @Column(name = "Rol", nullable = false)
     private String rol;
     
+    @Column(name ="Contraseña" , nullable =false)
+    private String contraseña;
+    
     @JsonIgnore
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tickets> ticketsCliente;
@@ -48,22 +51,24 @@ public class Usuarios {
     @OneToMany(mappedBy = "administrador", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tickets> ticketsAdministrador;
 
-	public Usuarios() {}
+	public Usuarios() {
+		super();
+	}
 
 	public Long getIdUsuarios() {
 		return idUsuarios;
 	}
 
-	public void setIdUsuarios(Long id) {
-		this.idUsuarios = id;
+	public void setIdUsuarios(Long idUsuarios) {
+		this.idUsuarios = idUsuarios;
 	}
 
 	public String getNombre() {
 		return nombre;
 	}
 
-	public void setNombre(String nombreCompleto) {
-		this.nombre = nombreCompleto;
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 	public String getCorreo() {
@@ -98,6 +103,14 @@ public class Usuarios {
 		this.rol = rol;
 	}
 
+	public String getContraseña() {
+		return contraseña;
+	}
+
+	public void setContraseña(String contraseña) {
+		this.contraseña = contraseña;
+	}
+
 	public List<Tickets> getTicketsCliente() {
 		return ticketsCliente;
 	}
@@ -129,12 +142,5 @@ public class Usuarios {
 	public void setTicketsAdministrador(List<Tickets> ticketsAdministrador) {
 		this.ticketsAdministrador = ticketsAdministrador;
 	}
-
-	@Override
-	public String toString() {
-		return "Usuarios [id=" + idUsuarios + ", nombreCompleto=" + nombre + ", correo=" + correo
-				+ ", estadoDeResidencia=" + estadoDeResidencia + ", edad=" + edad + ", rol=" + rol + ", ticketsCliente="
-				+ ticketsCliente + ", ticketsTecnico=" + ticketsTecnico + ", ticketsSupervisor=" + ticketsSupervisor
-				+ ", ticketsAdministrador=" + ticketsAdministrador + "]";
-	}  
+	
 }

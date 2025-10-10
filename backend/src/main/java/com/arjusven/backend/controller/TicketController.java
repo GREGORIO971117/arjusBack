@@ -27,7 +27,7 @@ public class TicketController {
 
     @GetMapping
     public ResponseEntity<List<Tickets>> getAllTickets() {
-        List<Tickets> tickets = ticketService.findAll();
+        List<Tickets> tickets = ticketService.getAllTickets();
         if (tickets.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Código 204
         }
@@ -35,8 +35,8 @@ public class TicketController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Tickets> getTicketById(@PathVariable("id") Integer id) {
-        Optional<Tickets> ticket = ticketService.findById(id);
+    public ResponseEntity<Tickets> getTicketById(@PathVariable("id") Long id) {
+        Optional<Tickets> ticket = ticketService.getTicketsById(id);
         
         if (ticket.isPresent()) {
             return new ResponseEntity<>(ticket.get(), HttpStatus.OK); // Código 200
@@ -53,7 +53,7 @@ public class TicketController {
     public ResponseEntity<Tickets> createTicket(@RequestBody Tickets nuevoTicket) {
         try {
             // Llama al servicio, que maneja la validación de los 4 IDs de Usuario.
-            Tickets ticketGuardado = ticketService.crearNuevoTicket(nuevoTicket);
+            Tickets ticketGuardado = ticketService.saveTickets(nuevoTicket);
             
             // Retorna el ticket creado con el ID generado por la DB.
             return new ResponseEntity<>(ticketGuardado, HttpStatus.CREATED); // Código 201
