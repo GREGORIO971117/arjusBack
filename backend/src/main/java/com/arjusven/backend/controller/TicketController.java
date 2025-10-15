@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -36,10 +35,10 @@ public class TicketController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Tickets> getTicketById(@PathVariable("id") Long id) {
-        Optional<Tickets> ticket = ticketService.getTicketsById(id);
+        Tickets ticket = ticketService.getTicketsById(id);
         
-        if (ticket.isPresent()) {
-            return new ResponseEntity<>(ticket.get(), HttpStatus.OK); // Código 200
+        if (ticket!=null) {
+            return new ResponseEntity<>(ticket, HttpStatus.OK); // Código 200
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Código 404
         }
@@ -69,4 +68,10 @@ public class TicketController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Código 500
         }
     }
+    
+    
+    @DeleteMapping(path="{idTickets}")
+	public Tickets deleteUsuario(@PathVariable ("idTickets") Long id) {
+		return ticketService.deleteTickets(id);
+	}
 }

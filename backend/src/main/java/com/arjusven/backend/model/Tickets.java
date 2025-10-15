@@ -17,9 +17,6 @@ public class Tickets {
     @Column(name = "idTickets")
     private Long idTickets;
 
-    // --- RELACIONES N:1 (Muchos-a-Uno) a Personal ---
-    // Mapean a las FKs: Usuarios_Tecnico_ID y Usuarios_Supervisor_ID en la DB
-    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Usuarios_idAdministrador", referencedColumnName = "idUsuarios", nullable = false) 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})

@@ -4,6 +4,8 @@ package com.arjusven.backend.controller;
 import com.arjusven.backend.model.Usuarios;
 import com.arjusven.backend.service.UsuariosService;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,16 @@ public class UsuariosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    @GetMapping
+    public ResponseEntity<List<Usuarios>> getAllUsuario() {
+        List<Usuarios> adicional = usuariosService.getAllUsuarios();
+        if (adicional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Código 204
+        }
+        return new ResponseEntity<>(adicional, HttpStatus.OK); // Código 200
+    }
+    
+    
     
     @DeleteMapping(path="{idUsuarios}")
 	public Usuarios deleteUsuario(@PathVariable ("idUsuarios") Long id) {

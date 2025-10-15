@@ -8,26 +8,39 @@ import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.repository.TicketRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TicketService {
-
-    @Autowired
+    
     private TicketRepository ticketsRepository;
+    
+    @Autowired
+    public TicketService(TicketRepository ticketsRepository) {
+		this.ticketsRepository = ticketsRepository;
+	}
 
-    // Method to save a new user
+	// Method to save a new user
     public Tickets saveTickets(Tickets tickets) {
         return ticketsRepository.save(tickets);
     }
 
     // Method to find a user by ID
-    public Optional<Tickets> getTicketsById(Long id) { // <-- Change return type to Optional<Tickets>
-        return ticketsRepository.findById(id); // <-- Simply return the result of findById
+    public Tickets getTicketsById(Long id) { // <-- Change return type to Optional<Tickets>
+        return ticketsRepository.findById(id).orElseThrow(
+        		()->new IllegalArgumentException("El ticket con el id" + id+ "no existe")
+        		); 
     }
 
-    // Method to get all users (optional but good for testing)
     public List<Tickets> getAllTickets() {
         return ticketsRepository.findAll();
+    }
+    
+    public Tickets deleteTickets(Long id) {
+    	Tickets ticket=null;
+    	if(ticketsRepository.existsById(id)) {
+    		ticket=ticketsRepository.findById(id).get();
+    		ticketsRepository.deleteById(id);
+    	}
+    	return ticket;
     }
 }
