@@ -3,6 +3,7 @@ package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.Usuarios;
 import com.arjusven.backend.service.UsuariosService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,4 +35,19 @@ public class UsuariosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    
+    @DeleteMapping(path="{idUsuarios}")
+	public Usuarios deleteUsuario(@PathVariable ("idUsuarios") Long id) {
+		return usuariosService.deleteUsuario(id);
+	}
+
+    @PatchMapping(path="{idUsuarios}")
+    public Usuarios patchUsuario(
+        @PathVariable("idUsuarios") Long id,
+        @RequestBody Usuarios usuarioDetails) {	
+        return usuariosService.patchUsuario(id, usuarioDetails);
+    }
+    
+    
+
 }

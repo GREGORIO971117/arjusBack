@@ -119,7 +119,4 @@ public class Tickets {
 	public void setPivoteInventario(List<PivoteInventario> pivoteInventario) {
 		this.pivoteInventario = pivoteInventario;
 	}
-
-	
-	
 }

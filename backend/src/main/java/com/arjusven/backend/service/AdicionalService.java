@@ -11,18 +11,26 @@ import com.arjusven.backend.repository.AdicionalRepository;
 @Service
 public class AdicionalService {
 
-	@Autowired
+	
 	private AdicionalRepository adicionalRepository;
 	
-	public Adicional saveAdicional(Adicional adicionales) {
-		return adicionalRepository.save(adicionales);
-	}
-	
-	public Adicional getAdicionalById(Long id) {
-		return adicionalRepository.findById(id).orElse(null);
+	@Autowired
+	public AdicionalService(AdicionalRepository adicionalRepository) {
+		this.adicionalRepository = adicionalRepository;
 	}
 	
 	public List<Adicional> getAllAdicional(){
 		return adicionalRepository.findAll();
 	}
+	public Adicional getAdicionalById(Long id) {
+		return adicionalRepository.findById(id).orElse(null);
+	}
+
+	public Adicional saveAdicional(Adicional adicionales) {
+		return adicionalRepository.save(adicionales);
+	}
+	
+	
+	
+	
 }
