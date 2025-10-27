@@ -1,4 +1,5 @@
 package com.arjusven.backend.model;
+import java.time.LocalDate;
 
 import jakarta.persistence.*;
 import java.util.List;
@@ -9,55 +10,56 @@ public class Inventario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idInventario")
+    @Column(name = "idinventario") // CORREGIDO: Usar el nombre de la columna de la DB (id_inventario)
     private Long idInventario;
  
-    @Column(name = "Titulo")
+    @Column(name = "titulo") // CORREGIDO: Usar el nombre de la columna de la DB (titulo)
     private String titulo;
 
-    @Column(name = "Numero_de_serie", unique = true, nullable = false)
+    @Column(name = "numero_de_serie", unique = true, nullable = false) // CORREGIDO: Usar el nombre de la columna de la DB (numero_de_serie)
     private String numeroDeSerie;
 
-    @Column(name = "Equipo")
+    @Column(name = "equipo") // CORREGIDO: Usar el nombre de la columna de la DB (equipo)
     private String equipo;
 
-    @Column(name = "Estado")
-    private String estado; // Ejemplo: 'ALMACEN', 'ASIGNADO', 'REPARACION'
+    @Column(name = "estado") // CORREGIDO: Usar el nombre de la columna de la DB (estado)
+    private String estado;
 
-    @Column(name = "Responsable")
+    @Column(name = "responsable") // CORREGIDO: Usar el nombre de la columna de la DB (responsable)
     private String responsable;
 
-    @Column(name = "Cliente")
+    @Column(name = "cliente") // CORREGIDO: Usar el nombre de la columna de la DB (cliente)
     private String cliente;
 
-    @Column(name = "Plaza")
+    @Column(name = "plaza") // CORREGIDO: Usar el nombre de la columna de la DB (plaza)
     private String plaza;
 
-    @Column(name = "Tecnico")
-    private String tecnico; // Nota: Si este Técnico es un usuario, esta columna de texto es redundante.
+    @Column(name = "tecnico") // CORREGIDO: Usar el nombre de la columna de la DB (tecnico)
+    private String tecnico;
 
-    @Column(name = "Numero_de_incidencia")
+    @Column(name = "numero_de_incidencia") // CORREGIDO: Usar el nombre de la columna de la DB (numero_de_incidencia)
     private String numeroDeIncidencia;
 
-    @Column(name = "Codigo_email")
+    @Column(name = "codigo_email") // CORREGIDO: Usar el nombre de la columna de la DB (codigo_email)
     private String codigoEmail;
 
-    @Column(name = "Guias")
+    @Column(name = "guias") // CORREGIDO: Usar el nombre de la columna de la DB (guias)
     private String guias;
 
-    @Column(name = "Fecha_de_inicio_prevista")
-    private String fechaDeInicioPrevista;
+    // Propiedades de fecha
+    @Column(name = "fecha_de_inicio_prevista") // CORREGIDO: Usar el nombre de la columna de la DB (fecha_de_inicio_prevista)
+    private LocalDate fechaDeInicioPrevista;
 
-    @Column(name = "Fecha_de_fin_prevista")
-    private String fechaDeFinPrevista;
+    @Column(name = "fecha_de_fin_prevista") // CORREGIDO: Usar el nombre de la columna de la DB (fecha_de_fin_prevista)
+    private LocalDate fechaDeFinPrevista;
 
-    @Column(name = "Fecha_de_fin")
-    private String fechaDeFin;
+    @Column(name = "fecha_de_fin") // CORREGIDO: Usar el nombre de la columna de la DB (fecha_de_fin)
+    private LocalDate fechaDeFin;
 
-    @Column(name = "Ultima_actualizacion")
-    private String ultimaActualizacion;
+    @Column(name = "ultima_actualizacion") // CORREGIDO: Usar el nombre de la columna de la DB (ultima_actualizacion)
+    private LocalDate ultimaActualizacion;
 
-    @Column(name = "Descripcion")
+    @Column(name = "descripcion") // CORREGIDO: Usar el nombre de la columna de la DB (descripcion)
     private String descripcion;
 
     @OneToMany(mappedBy = "inventario", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -66,148 +68,78 @@ public class Inventario {
 	public Inventario() {
 		
 	}
+	
+	public Long getIdInventario() { return idInventario; }
+	public void setIdInventario(Long idInventario) { this.idInventario = idInventario; }
 
-	public Long getIdInventario() {
-		return idInventario;
-	}
+	public String getTitulo() { return titulo; }
+	public void setTitulo(String titulo) { this.titulo = titulo; }
 
-	public void setIdInventario(Long idInventario) {
-		this.idInventario = idInventario;
-	}
+	public String getNumeroDeSerie() { return numeroDeSerie; }
+	public void setNumeroDeSerie(String numeroDeSerie) { this.numeroDeSerie = numeroDeSerie; }
 
-	public String getTitulo() {
-		return titulo;
-	}
+	public String getEquipo() { return equipo; }
+	public void setEquipo(String equipo) { this.equipo = equipo; }
 
-	public void setTitulo(String titulo) {
-		this.titulo = titulo;
-	}
+	public String getEstado() { return estado; }
+	public void setEstado(String estado) { this.estado = estado; }
 
-	public String getNumeroDeSerie() {
-		return numeroDeSerie;
-	}
+	public String getResponsable() { return responsable; }
+	public void setResponsable(String responsable) { this.responsable = responsable; }
 
-	public void setNumeroDeSerie(String numeroDeSerie) {
-		this.numeroDeSerie = numeroDeSerie;
-	}
+	public String getCliente() { return cliente; }
+	public void setCliente(String cliente) { this.cliente = cliente; }
 
-	public String getEquipo() {
-		return equipo;
-	}
+	public String getPlaza() { return plaza; }
+	public void setPlaza(String plaza) { this.plaza = plaza; }
 
-	public void setEquipo(String equipo) {
-		this.equipo = equipo;
-	}
+	public String getTecnico() { return tecnico; }
+	public void setTecnico(String tecnico) { this.tecnico = tecnico; }
 
-	public String getEstado() {
-		return estado;
-	}
+	public String getNumeroDeIncidencia() { return numeroDeIncidencia; }
+	public void setNumeroDeIncidencia(String numeroDeIncidencia) { this.numeroDeIncidencia = numeroDeIncidencia; }
 
-	public void setEstado(String estado) {
-		this.estado = estado;
-	}
+	public String getCodigoEmail() { return codigoEmail; }
+	public void setCodigoEmail(String codigoEmail) { this.codigoEmail = codigoEmail; }
 
-	public String getResponsable() {
-		return responsable;
-	}
+	public String getGuias() { return guias; }
+	public void setGuias(String guias) { this.guias = guias; }
 
-	public void setResponsable(String responsable) {
-		this.responsable = responsable;
-	}
-
-	public String getCliente() {
-		return cliente;
-	}
-
-	public void setCliente(String cliente) {
-		this.cliente = cliente;
-	}
-
-	public String getPlaza() {
-		return plaza;
-	}
-
-	public void setPlaza(String plaza) {
-		this.plaza = plaza;
-	}
-
-	public String getTecnico() {
-		return tecnico;
-	}
-
-	public void setTecnico(String tecnico) {
-		this.tecnico = tecnico;
-	}
-
-	public String getNumeroDeIncidencia() {
-		return numeroDeIncidencia;
-	}
-
-	public void setNumeroDeIncidencia(String numeroDeIncidencia) {
-		this.numeroDeIncidencia = numeroDeIncidencia;
-	}
-
-	public String getCodigoEmail() {
-		return codigoEmail;
-	}
-
-	public void setCodigoEmail(String codigoEmail) {
-		this.codigoEmail = codigoEmail;
-	}
-
-	public String getGuias() {
-		return guias;
-	}
-
-	public void setGuias(String guias) {
-		this.guias = guias;
-	}
-
-	public String getFechaDeInicioPrevista() {
+	public LocalDate getFechaDeInicioPrevista() {
 		return fechaDeInicioPrevista;
 	}
 
-	public void setFechaDeInicioPrevista(String fechaDeInicioPrevista) {
+	public void setFechaDeInicioPrevista(LocalDate fechaDeInicioPrevista) {
 		this.fechaDeInicioPrevista = fechaDeInicioPrevista;
 	}
 
-	public String getFechaDeFinPrevista() {
+	public LocalDate getFechaDeFinPrevista() {
 		return fechaDeFinPrevista;
 	}
 
-	public void setFechaDeFinPrevista(String fechaDeFinPrevista) {
+	public void setFechaDeFinPrevista(LocalDate fechaDeFinPrevista) {
 		this.fechaDeFinPrevista = fechaDeFinPrevista;
 	}
 
-	public String getFechaDeFin() {
+	public LocalDate getFechaDeFin() {
 		return fechaDeFin;
 	}
 
-	public void setFechaDeFin(String fechaDeFin) {
+	public void setFechaDeFin(LocalDate fechaDeFin) {
 		this.fechaDeFin = fechaDeFin;
 	}
 
-	public String getUltimaActualizacion() {
+	public LocalDate getUltimaActualizacion() {
 		return ultimaActualizacion;
 	}
 
-	public void setUltimaActualizacion(String ultimaActualizacion) {
+	public void setUltimaActualizacion(LocalDate ultimaActualizacion) {
 		this.ultimaActualizacion = ultimaActualizacion;
 	}
 
-	public String getDescripcion() {
-		return descripcion;
-	}
+	public String getDescripcion() { return descripcion; }
+	public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
-
-	public List<PivoteInventario> getPivoteInventario() {
-		return pivoteInventario;
-	}
-
-	public void setPivoteInventario(List<PivoteInventario> pivoteInventario) {
-		this.pivoteInventario = pivoteInventario;
-	}
+	public List<PivoteInventario> getPivoteInventario() { return pivoteInventario; }
+	public void setPivoteInventario(List<PivoteInventario> pivoteInventario) { this.pivoteInventario = pivoteInventario; }
 }
