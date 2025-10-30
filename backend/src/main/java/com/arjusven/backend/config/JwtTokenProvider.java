@@ -24,7 +24,7 @@ public class JwtTokenProvider {
     // Método de utilidad para obtener la clave de firma
     private SecretKey getSigningKey() {
         // Decodificamos la clave secreta (asumimos que está codificada en Base64 en el archivo de propiedades)
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        byte[] keyBytes = jwtSecret.getBytes();;
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
