@@ -37,7 +37,6 @@ public class InventarioService {
     }
     
     
-    //==========================================================================================
 	public Inventario deleteInventario(Long id) {
 			
 		Inventario inventario = null;
@@ -48,7 +47,6 @@ public class InventarioService {
 			return inventario;
 		}//deleteUsuarios
     
-	//=======================================================================================
 	
     public Inventario patchInventario(Long id, Inventario inventarioDetails) {
         // 1. Buscar la entidad existente o lanzar una excepción.

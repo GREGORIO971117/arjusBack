@@ -4,12 +4,17 @@ package com.arjusven.backend.service;
 import com.arjusven.backend.model.Usuarios;
 import com.arjusven.backend.repository.UsuariosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuariosService {
+	
+	@Autowired
+	private PasswordEncoder encoder;
 
     
     private UsuariosRepository usuariosRepository;
@@ -33,8 +38,15 @@ public class UsuariosService {
         }
 	// Method to save a new user
     public Usuarios saveUsuario(Usuarios usuario) {
-        return usuariosRepository.save(usuario);
-    }
+    	Optional<Usuarios> user = usuariosRepository.findByCorreo(usuario.getCorreo());
+		if(user.isEmpty()) {
+			usuario.setContraseña(encoder.encode(usuario.getContraseña()));
+			usuariosRepository.save(usuario);
+		} else {
+			usuario = null;
+		}
+		return usuario;    
+		}
     
     public Usuarios deleteUsuario(Long id) {
 		
@@ -80,10 +92,22 @@ public class UsuariosService {
             // En un caso real, aquí deberías HASHEAR la contraseña antes de guardarla.
             usuarioExistente.setContraseña(usuarioDetails.getContraseña());
         }
+        
 
         // 3. Guardar y devolver la entidad actualizada.
         return usuariosRepository.save(usuarioExistente);
     }
+    
+    public boolean validateUser(Usuarios usuarios) {
+		Optional<Usuarios> user = usuariosRepository.findByCorreo(usuarios.getCorreo());
+		if(user.isPresent()) {
+			Usuarios tmp = user.get();
+			if(encoder.matches(usuarios.getContraseña(), tmp.getContraseña())) {
+				return true;
+			}//matches
+		} //if isPresent
+		return false;
+	}//validateUser
     
     
     

@@ -1,8 +1,11 @@
-// UsuariosController.java
 package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.Usuarios;
 import com.arjusven.backend.service.UsuariosService;
+// 💡 Importaciones para JWT y DTOs
+import com.arjusven.backend.dto.LoginRequest; 
+import com.arjusven.backend.dto.JwtAuthResponse; 
+import com.arjusven.backend.config.JwtTokenProvider; // Asumiendo que esta es la ubicación
 
 import java.util.List;
 
@@ -12,16 +15,53 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/usuarios") // Base URL for all endpoints in this controller
+@RequestMapping("/api/usuarios") 
 public class UsuariosController {
 
+    // 💡 Usa 'final' para los servicios inyectados por constructor
+    private final UsuariosService usuariosService;
+    private final JwtTokenProvider jwtTokenProvider; 
+    
+    // 🛑 CONSTRUCTOR PARA INYECCIÓN DE DEPENDENCIAS 🛑
+    // Se recomienda usar inyección por constructor en lugar de @Autowired en el campo
     @Autowired
-    private UsuariosService usuariosService;
+    public UsuariosController(UsuariosService usuariosService, JwtTokenProvider jwtTokenProvider) {
+    	this.usuariosService = usuariosService;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
-    // ENDPOINT: POST /api/usuarios
+    // --- 🛑 NUEVO ENDPOINT PARA INICIAR SESIÓN Y GENERAR JWT 🛑 ---
+    // Mapeado a POST /api/usuarios/login
+    @PostMapping("/login")
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        
+        // 1. Crear el objeto temporal para el Service (el Service espera un objeto Usuarios)
+        Usuarios tempUser = new Usuarios();
+        tempUser.setCorreo(loginRequest.getCorreo());
+        tempUser.setContraseña(loginRequest.getContraseña());
+        
+        // 2. Ejecutar la validación de credenciales (búsqueda y comparación)
+        if (usuariosService.validateUser(tempUser)) {
+            
+            // 3. 🔑 Generar el Token JWT
+            // El 'subject' del token es el correo del usuario
+            String token = jwtTokenProvider.generateToken(loginRequest.getCorreo());
+            
+            // 4. Devolver la respuesta con el token (código 200 OK)
+            return new ResponseEntity<>(new JwtAuthResponse(token), HttpStatus.OK);
+
+        } else {
+            // Fallo: Código 401 Unauthorized
+            return new ResponseEntity<>("Credenciales inválidas", HttpStatus.UNAUTHORIZED);
+        }
+    }
+    // ------------------------------------------------------------------
+
+    // ENDPOINT: POST /api/usuarios (Se mantiene para CREAR/REGISTRAR)
     // Purpose: Create a new user (saves data to the database)
     @PostMapping
     public ResponseEntity<Usuarios> createUsuario(@RequestBody Usuarios usuario) {
+        // Asegúrate de que usuariosService.saveUsuario encripte la contraseña antes de guardarla!
         Usuarios savedUsuario = usuariosService.saveUsuario(usuario);
         return new ResponseEntity<>(savedUsuario, HttpStatus.CREATED);
     }
@@ -37,6 +77,7 @@ public class UsuariosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
     @GetMapping
     public ResponseEntity<List<Usuarios>> getAllUsuario() {
         List<Usuarios> adicional = usuariosService.getAllUsuarios();
@@ -45,7 +86,6 @@ public class UsuariosController {
         }
         return new ResponseEntity<>(adicional, HttpStatus.OK); // Código 200
     }
-    
     
     
     @DeleteMapping(path="{idUsuarios}")
@@ -59,7 +99,4 @@ public class UsuariosController {
         @RequestBody Usuarios usuarioDetails) {	
         return usuariosService.patchUsuario(id, usuarioDetails);
     }
-    
-    
-
 }

@@ -10,56 +10,55 @@ public class Inventario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idinventario") // CORREGIDO: Usar el nombre de la columna de la DB (id_inventario)
+    @Column(name = "idinventario") 
     private Long idInventario;
  
-    @Column(name = "titulo") // CORREGIDO: Usar el nombre de la columna de la DB (titulo)
+    @Column(name = "titulo")
     private String titulo;
 
-    @Column(name = "numero_de_serie", unique = true, nullable = false) // CORREGIDO: Usar el nombre de la columna de la DB (numero_de_serie)
+    @Column(name = "numero_de_serie", unique = true, nullable = false) 
     private String numeroDeSerie;
 
-    @Column(name = "equipo") // CORREGIDO: Usar el nombre de la columna de la DB (equipo)
+    @Column(name = "equipo") 
     private String equipo;
 
-    @Column(name = "estado") // CORREGIDO: Usar el nombre de la columna de la DB (estado)
+    @Column(name = "estado") 
     private String estado;
 
-    @Column(name = "responsable") // CORREGIDO: Usar el nombre de la columna de la DB (responsable)
+    @Column(name = "responsable") 
     private String responsable;
 
-    @Column(name = "cliente") // CORREGIDO: Usar el nombre de la columna de la DB (cliente)
+    @Column(name = "cliente") 
     private String cliente;
 
-    @Column(name = "plaza") // CORREGIDO: Usar el nombre de la columna de la DB (plaza)
+    @Column(name = "plaza") 
     private String plaza;
 
-    @Column(name = "tecnico") // CORREGIDO: Usar el nombre de la columna de la DB (tecnico)
+    @Column(name = "tecnico") 
     private String tecnico;
 
-    @Column(name = "numero_de_incidencia") // CORREGIDO: Usar el nombre de la columna de la DB (numero_de_incidencia)
+    @Column(name = "numero_de_incidencia") 
     private String numeroDeIncidencia;
 
-    @Column(name = "codigo_email") // CORREGIDO: Usar el nombre de la columna de la DB (codigo_email)
+    @Column(name = "codigo_email") 
     private String codigoEmail;
 
-    @Column(name = "guias") // CORREGIDO: Usar el nombre de la columna de la DB (guias)
+    @Column(name = "guias") 
     private String guias;
 
-    // Propiedades de fecha
-    @Column(name = "fecha_de_inicio_prevista") // CORREGIDO: Usar el nombre de la columna de la DB (fecha_de_inicio_prevista)
+    @Column(name = "fecha_de_inicio_prevista") 
     private LocalDate fechaDeInicioPrevista;
 
-    @Column(name = "fecha_de_fin_prevista") // CORREGIDO: Usar el nombre de la columna de la DB (fecha_de_fin_prevista)
+    @Column(name = "fecha_de_fin_prevista") 
     private LocalDate fechaDeFinPrevista;
 
-    @Column(name = "fecha_de_fin") // CORREGIDO: Usar el nombre de la columna de la DB (fecha_de_fin)
+    @Column(name = "fecha_de_fin") 
     private LocalDate fechaDeFin;
 
-    @Column(name = "ultima_actualizacion") // CORREGIDO: Usar el nombre de la columna de la DB (ultima_actualizacion)
+    @Column(name = "ultima_actualizacion") 
     private LocalDate ultimaActualizacion;
 
-    @Column(name = "descripcion") // CORREGIDO: Usar el nombre de la columna de la DB (descripcion)
+    @Column(name = "descripcion") 
     private String descripcion;
 
     @OneToMany(mappedBy = "inventario", cascade = CascadeType.ALL, orphanRemoval = true)
