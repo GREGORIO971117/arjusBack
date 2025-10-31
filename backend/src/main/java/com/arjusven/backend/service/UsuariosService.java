@@ -15,8 +15,6 @@ public class UsuariosService {
 	
 	@Autowired
 	private PasswordEncoder encoder;
-
-    
     private UsuariosRepository usuariosRepository;
 
     @Autowired
@@ -98,17 +96,26 @@ public class UsuariosService {
         return usuariosRepository.save(usuarioExistente);
     }
     
-    public boolean validateUser(Usuarios usuarios) {
-		Optional<Usuarios> user = usuariosRepository.findByCorreo(usuarios.getCorreo());
-		if(user.isPresent()) {
-			Usuarios tmp = user.get();
-			if(encoder.matches(usuarios.getContraseña(), tmp.getContraseña())) {
-				return true;
-			}//matches
-		} //if isPresent
-		return false;
-	}//validateUser
-    
+    public Usuarios validateUser(Usuarios usuarios) { // <-- Mantiene el nombre, cambia el tipo de retorno a 'Usuarios'
+        
+        // 1. Buscar el usuario por correo
+        Optional<Usuarios> user = usuariosRepository.findByCorreo(usuarios.getCorreo());
+        
+        if(user.isPresent()) {
+            Usuarios authenticatedUser = user.get();
+            
+            // 2. Comparar la contraseña ingresada con el hash de la BD
+            if(encoder.matches(usuarios.getContraseña(), authenticatedUser.getContraseña())) {
+                
+                // 🔑 Éxito: Devolver el objeto completo (en lugar de 'true')
+                return authenticatedUser; 
+                
+            } // matches: Fallo en la contraseña
+        } // if isPresent: Fallo en el correo
+        
+        // 3. Fallo: Usuario no encontrado o contraseña incorrecta
+        return null; // <-- Devolver null en caso de fallo (en lugar de 'false')
+    }
     
     
   

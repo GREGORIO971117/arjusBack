@@ -2,10 +2,10 @@ package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.Usuarios;
 import com.arjusven.backend.service.UsuariosService;
-// 💡 Importaciones para JWT y DTOs
+
 import com.arjusven.backend.dto.LoginRequest; 
 import com.arjusven.backend.dto.JwtAuthResponse; 
-import com.arjusven.backend.config.JwtTokenProvider; // Asumiendo que esta es la ubicación
+import com.arjusven.backend.config.JwtTokenProvider; 
 
 import java.util.List;
 
@@ -30,28 +30,35 @@ public class UsuariosController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    // --- 🛑 NUEVO ENDPOINT PARA INICIAR SESIÓN Y GENERAR JWT 🛑 ---
     // Mapeado a POST /api/usuarios/login
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         
-        // 1. Crear el objeto temporal para el Service (el Service espera un objeto Usuarios)
+        // 1. Crear el objeto temporal
         Usuarios tempUser = new Usuarios();
         tempUser.setCorreo(loginRequest.getCorreo());
         tempUser.setContraseña(loginRequest.getContraseña());
         
-        // 2. Ejecutar la validación de credenciales (búsqueda y comparación)
-        if (usuariosService.validateUser(tempUser)) {
+        // 2. Ejecutar la autenticación y OBTENER el objeto del usuario
+        Usuarios authenticatedUser = usuariosService.validateUser(tempUser); // <-- Se sigue llamando validateUser
+        
+        if (authenticatedUser != null) { // <-- La condición ahora revisa si el objeto es nulo o no
             
-            // 3. 🔑 Generar el Token JWT
-            // El 'subject' del token es el correo del usuario
-            String token = jwtTokenProvider.generateToken(loginRequest.getCorreo());
+            // 3. Generar el Token JWT
+            String token = jwtTokenProvider.generateToken(authenticatedUser.getCorreo());
             
-            // 4. Devolver la respuesta con el token (código 200 OK)
-            return new ResponseEntity<>(new JwtAuthResponse(token), HttpStatus.OK);
+            // 4. Devolver la respuesta con el token, ID y Nombre
+            // *Asegúrate de que JwtAuthResponse tenga el constructor de 3 parámetros*
+            JwtAuthResponse response = new JwtAuthResponse(
+                token,
+                authenticatedUser.getIdUsuarios(), // Obtenido del objeto
+                authenticatedUser.getNombre()      // Obtenido del objeto
+            );
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
 
         } else {
-            // Fallo: Código 401 Unauthorized
+            // Fallo: El método devolvió null
             return new ResponseEntity<>("Credenciales inválidas", HttpStatus.UNAUTHORIZED);
         }
     }
