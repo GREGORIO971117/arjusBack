@@ -116,6 +116,7 @@ public class UsuariosService {
         // 3. Fallo: Usuario no encontrado o contraseña incorrecta
         return null; // <-- Devolver null en caso de fallo (en lugar de 'false')
     }
+
     
     
   
