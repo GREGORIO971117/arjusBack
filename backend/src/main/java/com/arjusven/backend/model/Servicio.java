@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "Servicios")
+@JsonIgnoreProperties(ignoreUnknown = true) 
 public class Servicio {
 
     @Id

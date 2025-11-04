@@ -32,14 +32,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
          throws ServletException, IOException {
 
+
      // 1. Extraer el token JWT del encabezado 'Authorization'
      String token = getJwtFromRequest(request);
+     
+     
+     
+     
 
-     // 2. Validar el Token
      if (token != null && jwtTokenProvider.validateToken(token)) {
+    	 
+    	  
+    	 
          
          // 3. Obtener el correo (username) del token
          String username = jwtTokenProvider.getUsernameFromToken(token);
+         
+         try {
+   	      UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+   	      // Si llegas aquí, el usuario existe y tienes éxito.
+   	      System.out.println("✅ Usuario " + username + " cargado con éxito."); 
+   	      // ... luego se establece la autenticación
+   	  } catch (Exception e) {
+   	      // Si la carga falla por cualquier motivo (ej: usuario no encontrado), añade un log aquí.
+   	      System.err.println("❌ ERROR: No se pudo cargar el usuario " + username + ": " + e.getMessage());
+   	  }
 
          // 4. Cargar el usuario y la autenticación
          // Spring Security necesita cargar los UserDetails para establecer la sesión.

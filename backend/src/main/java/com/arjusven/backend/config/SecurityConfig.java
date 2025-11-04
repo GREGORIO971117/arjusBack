@@ -41,6 +41,7 @@ public class SecurityConfig {
                 // 2. RUTAS PÚBLICAS: Permitir el login y el registro
                 .requestMatchers(HttpMethod.POST, "/api/usuarios/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() 
+                .requestMatchers(HttpMethod.PATCH, "/api/servicio/**").authenticated()
                 
                 // 3. RUTAS PROTEGIDAS: Cualquier otra petición requiere autenticación (token)
                 .anyRequest().authenticated() 
