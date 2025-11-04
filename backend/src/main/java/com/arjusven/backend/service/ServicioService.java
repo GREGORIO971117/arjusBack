@@ -61,8 +61,8 @@ public class ServicioService {
             servicioExistente.setCodigoDeAfiliado(servicioDetails.getCodigoDeAfiliado());
         }
         
-        if (servicioDetails.getSupervidor() != null) {
-            servicioExistente.setSupervidor(servicioDetails.getSupervidor());
+        if (servicioDetails.getSupervisor() != null) {
+            servicioExistente.setSupervidor(servicioDetails.getSupervisor());
         }
         
         if (servicioDetails.getIdMerchant() != null) {

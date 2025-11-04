@@ -18,9 +18,6 @@ public class ServicioController {
     @Autowired
     private ServicioService servicioService;
 
-    // ENDPOINT: POST /api/usuarios
-    // Purpose: Create a new user (saves data to the database)
-    
     
     @PostMapping
     public ResponseEntity<Servicio> createServicio(@RequestBody Servicio servicio) {
@@ -28,10 +25,6 @@ public class ServicioController {
         return new ResponseEntity<>(savedServicio, HttpStatus.CREATED);
     }
 
-    // ENDPOINT: GET /api/usuarios/{id}
-    // Purpose: Retrieve a user by ID (reads data from the database)
-    
-    
     @GetMapping
     public ResponseEntity<List<Servicio>> getAllServicio() {
         List<Servicio> adicional = servicioService.getAllServicio();

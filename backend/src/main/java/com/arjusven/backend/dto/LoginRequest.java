@@ -1,13 +1,10 @@
 package com.arjusven.backend.dto;
 
-// Clase simple para transferir las credenciales de login
-// No necesita anotaciones de JPA/Hibernate, solo getters y setters.
 public class LoginRequest {
     
     // Correo (el campo que el front-end enviará como username)
     private String correo;
-    
-    // Contraseña
+   
     private String contraseña;
 
     // Constructor vacío (necesario para la deserialización de JSON por Spring)

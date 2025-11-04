@@ -2,12 +2,10 @@ package com.arjusven.backend.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "servicios")
+@Table(name = "Servicios")
 public class Servicio {
 
     @Id
@@ -34,8 +32,8 @@ public class Servicio {
     @Column(name = "Codigo_de_afiliado")
     private String codigoDeAfiliado;
     
-    @Column(name = "Supervidor")
-    private String supervidor;
+    @Column(name = "Supervisor")
+    private String supervisor;
     
     @Column(name = "ID_merchant")
     private String idMerchant;
@@ -62,7 +60,7 @@ public class Servicio {
     private String direccion;
     
     @Column(name = "Tecnico")
-    private String tecnico; // Nota: Si el técnico es un usuario, esta columna de texto es redundante.
+    private String tecnico;
     
     @Column(name = "SLA")
     private Integer sla;
@@ -70,10 +68,12 @@ public class Servicio {
     
  // CLAVE FORÁNEA (Foreign Key)
     @OneToOne
-    @JoinColumn(name = "Tickets_idTickets", nullable = false) 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","servicio"}) 
+    @JoinColumn(name = "Tickets_idTickets", referencedColumnName = "idTickets")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","adicionales"}) 
     private Tickets ticket;
-
+    
+    public Servicio() {
+	} 
 
 	public Long getIdServicios() {
 		return idServicios;
@@ -145,13 +145,13 @@ public class Servicio {
 	}
 
 
-	public String getSupervidor() {
-		return supervidor;
+	public String getSupervisor() {
+		return supervisor;
 	}
 
 
-	public void setSupervidor(String supervidor) {
-		this.supervidor = supervidor;
+	public void setSupervidor(String supervisor) {
+		this.supervisor = supervisor;
 	}
 
 
@@ -265,10 +265,6 @@ public class Servicio {
 	}
 
 
-	public Servicio() {
-	}
-    
-    
-
+	
 
 }

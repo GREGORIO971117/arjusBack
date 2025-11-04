@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "tickets")
@@ -20,7 +21,7 @@ public class Tickets {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Usuarios_idAdministrador", referencedColumnName = "idUsuarios", nullable = false) 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Usuarios administrador; 
+    private Usuarios administrador;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Usuarios_idSupervisor", referencedColumnName = "idUsuarios") 
@@ -39,11 +40,11 @@ public class Tickets {
 
     // --- RELACIONES 1:N (Uno-a-Muchos) a Hijos ---
     @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("ticket") // <-- ¡AÑADE ESTO!
+    @JsonIgnoreProperties("ticket") 
     private Servicio servicio;
     
     @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("ticket") // <-- ¡AÑADE ESTO!
+    @JsonIgnoreProperties("ticket") 
     private Adicional adicionales;
     
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -97,8 +98,12 @@ public class Tickets {
 		return servicio;
 	}
 
+	@JsonProperty("servicios") 
 	public void setServicio(Servicio servicio) {
-		this.servicio = servicio;
+	    if (servicio != null) {
+	        servicio.setTicket(this); 
+	    }
+	    this.servicio = servicio;
 	}
 
 	public Adicional getAdicionales() {
@@ -106,7 +111,11 @@ public class Tickets {
 	}
 
 	public void setAdicionales(Adicional adicionales) {
-		this.adicionales = adicionales;
+
+	    if (adicionales != null) {
+	        adicionales.setTicket(this); 
+	    }
+	    this.adicionales = adicionales;
 	}
 
 	public List<PivoteInventario> getPivoteInventario() {

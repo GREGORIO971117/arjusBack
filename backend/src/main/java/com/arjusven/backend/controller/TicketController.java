@@ -20,10 +20,6 @@ public class TicketController {
         this.ticketService = ticketService;
     }
 
-    // ====================================================================
-    // MÉTODOS GET
-    // ====================================================================
-
     @GetMapping
     public ResponseEntity<List<Tickets>> getAllTickets() {
         List<Tickets> tickets = ticketService.getAllTickets();
