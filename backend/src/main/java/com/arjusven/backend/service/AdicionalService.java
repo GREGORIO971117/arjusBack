@@ -111,8 +111,12 @@ public class AdicionalService {
 	        adicionalesExistentes.setSimSale(adicionalesDetails.getSimSale());
 	    }
 	    
-	    if (adicionalesDetails.getVersionDeBrowser() != null) {
-	        adicionalesExistentes.setVersionDeBrowser(adicionalesDetails.getVersionDeBrowser());
+	    if (adicionalesDetails.getVersionDeBrowserSale() != null) {
+	        adicionalesExistentes.setVersionDeBrowserSale(adicionalesDetails.getVersionDeBrowserSale());
+	    }
+	    
+	    if (adicionalesDetails.getVersionDeBrowserEntra() != null) {
+	        adicionalesExistentes.setVersionDeBrowserEntra(adicionalesDetails.getVersionDeBrowserEntra());
 	    }
 	    
 	    if (adicionalesDetails.getTipoDeComunicacionSale() != null) {

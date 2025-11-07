@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "Servicios")
-@JsonIgnoreProperties(ignoreUnknown = true) 
 public class Servicio {
 
     @Id
@@ -14,7 +13,6 @@ public class Servicio {
     @Column(name = "idServicios")
     private Long idServicios;
     
-    // Atributos mapeados de la tabla SQL
     @Column(name = "Fecha_de_asignacion")
     private LocalDate fechaDeAsignacion;
 
@@ -23,7 +21,6 @@ public class Servicio {
 
     @Column(name = "Situacion_Actual")
     private String situacionActual;
-    
     @Column(name = "Nombre_de_ESS")
     private String nombreDeEss;
     
@@ -64,13 +61,13 @@ public class Servicio {
     private String tecnico;
     
     @Column(name = "SLA")
-    private Integer sla;
+    private String sla;
     
     
  // CLAVE FORÁNEA (Foreign Key)
     @OneToOne
     @JoinColumn(name = "Tickets_idTickets", referencedColumnName = "idTickets")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","adicionales"}) 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","servicio"}) 
     private Tickets ticket;
     
     public Servicio() {
@@ -246,12 +243,12 @@ public class Servicio {
 	}
 
 
-	public Integer getSla() {
+	public String getSla() {
 		return sla;
 	}
 
 
-	public void setSla(Integer sla) {
+	public void setSla(String sla) {
 		this.sla = sla;
 	}
 
@@ -264,8 +261,4 @@ public class Servicio {
 	public void setTicket(Tickets ticket) {
 		this.ticket = ticket;
 	}
-
-
-	
-
 }

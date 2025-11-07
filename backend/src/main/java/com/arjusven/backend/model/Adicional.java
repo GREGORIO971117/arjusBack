@@ -66,8 +66,11 @@ public class Adicional {
     @Column(name = "SIM sale")
     private String simSale;
     
-    @Column(name = "Version de browser")
-    private String versionDeBrowser;
+    @Column(name = "Version de browser sale")
+    private String versionDeBrowserSale;
+    
+    @Column(name = "Version de browser entra")
+    private String versionDeBrowserEntra;
     
     @Column(name = "Tipo de comunicacion sale")
     private String tipoDeComunicacionSale;
@@ -196,6 +199,22 @@ public class Adicional {
 		return ordenDeServicio;
 	}
 
+	public String getVersionDeBrowserSale() {
+		return versionDeBrowserSale;
+	}
+
+	public void setVersionDeBrowserSale(String versionDeBrowserSale) {
+		this.versionDeBrowserSale = versionDeBrowserSale;
+	}
+
+	public String getVersionDeBrowserEntra() {
+		return versionDeBrowserEntra;
+	}
+
+	public void setVersionDeBrowserEntra(String versionDeBrowserEntra) {
+		this.versionDeBrowserEntra = versionDeBrowserEntra;
+	}
+
 	public void setOrdenDeServicio(String ordenDeServicio) {
 		this.ordenDeServicio = ordenDeServicio;
 	}
@@ -264,13 +283,6 @@ public class Adicional {
 		this.simSale = simSale;
 	}
 
-	public String getVersionDeBrowser() {
-		return versionDeBrowser;
-	}
-
-	public void setVersionDeBrowser(String versionDeBrowser) {
-		this.versionDeBrowser = versionDeBrowser;
-	}
 
 	public String getTipoDeComunicacionSale() {
 		return tipoDeComunicacionSale;
