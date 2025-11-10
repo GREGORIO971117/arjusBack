@@ -41,8 +41,7 @@ public class Tickets {
     // --- RELACIONES 1:N (Uno-a-Muchos) a Hijos ---
     @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("ticket") 
-	@JsonProperty("servicios") 
-    private Servicio servicio;
+    private Servicio servicios;
     
     @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("ticket") 
@@ -95,15 +94,15 @@ public class Tickets {
 		this.cliente = cliente;
 	}
 
-	public Servicio getServicio() {
-		return servicio;
+	public Servicio getServicios() {
+		return servicios;
 	}
 
-	public void setServicio(Servicio servicio) {
-	    if (servicio != null) {
-	        servicio.setTicket(this); 
+	public void setServicios(Servicio servicios) {
+	    if (servicios != null) {
+	        servicios.setTicket(this); 
 	    }
-	    this.servicio = servicio;
+	    this.servicios = servicios;
 	}
 
 	public Adicional getAdicionales() {
