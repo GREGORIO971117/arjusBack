@@ -28,6 +28,12 @@ public class PivoteInventarioController {
         PivoteInventario savedPivote = pivoteInventarioService.save(pivote);
         return new ResponseEntity<>(savedPivote, HttpStatus.CREATED);
     }
+    
+    @GetMapping("/{idInventario}")
+    public ResponseEntity<List<PivoteInventario>> getHistorialInventario(@PathVariable Long idInventario) {
+        List<PivoteInventario> historial = pivoteInventarioService.getHistorialByInventarioId(idInventario);
+        return ResponseEntity.ok(historial);
+    }
 
     @GetMapping
     public List<PivoteInventario> getAllPivotes() {

@@ -22,11 +22,13 @@ public class PivoteService {
 
     @Transactional
     public PivoteInventario save(PivoteInventario pivote) {
-        // Since you removed the complex validation, we save it directly. 
-        // Note: If the Ticket or Inventario IDs are invalid, the database will throw a foreign key error here.
         return pivoteInventarioRepository.save(pivote);
     }
 
+    @Transactional(readOnly = true) 
+    public List<PivoteInventario> getHistorialByInventarioId(Long idInventario) {
+        return pivoteInventarioRepository.findByInventario_IdInventarioOrderByFechaAsignacionDesc(idInventario);
+    }
     
     public List<PivoteInventario> findAll() {
         return pivoteInventarioRepository.findAll();

@@ -35,6 +35,14 @@ public class TicketService {
         return ticketsRepository.findAll();
     }
     
+    public List<Tickets> findTicketsByIncidencia(String incidencia) {
+        return ticketsRepository.findByServicios_Incidencia(incidencia);
+    }
+    
+    public Tickets saveTicketsOnly(Tickets tickets) {
+        return ticketsRepository.save(tickets);
+    }
+    
     public Tickets deleteTickets(Long id) {
     	Tickets ticket=null;
     	if(ticketsRepository.existsById(id)) {
@@ -43,4 +51,6 @@ public class TicketService {
     	}
     	return ticket;
     }
+    
+    
 }

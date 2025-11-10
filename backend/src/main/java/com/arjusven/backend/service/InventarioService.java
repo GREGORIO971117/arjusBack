@@ -1,29 +1,88 @@
 package com.arjusven.backend.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.arjusven.backend.model.Inventario;
+import com.arjusven.backend.model.PivoteInventario;
+import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.repository.InventarioRepository;
+import com.arjusven.backend.repository.TicketRepository;
 
 @Service
 public class InventarioService {
 	
     private InventarioRepository inventarioRepository;
+    private TicketService ticketService; 
+    private TicketRepository ticketRepository;
 	
 	
-	@Autowired
-    public InventarioService(InventarioRepository inventarioRepository) {
-		this.inventarioRepository = inventarioRepository;
-	}
-
-	// Method to save a new user
-    public Inventario saveInventario(Inventario inventario) {
-        return inventarioRepository.save(inventario);
+    @Autowired
+    public InventarioService(InventarioRepository inventarioRepository, 
+                             TicketService ticketService, 
+                             TicketRepository ticketRepository) {
+        this.inventarioRepository = inventarioRepository;
+        this.ticketService = ticketService;
+        this.ticketRepository = ticketRepository;
     }
+
+    @Transactional 
+    public Inventario saveInventario(Inventario inventario) {
+        Inventario inventarioGuardado = inventarioRepository.save(inventario);
+
+        String numeroIncidencia = inventarioGuardado.getNumeroDeIncidencia();
+
+        if (numeroIncidencia != null && !numeroIncidencia.isEmpty()) {
+            vincularTicketsExistentes(inventarioGuardado, numeroIncidencia);
+        }
+        
+        return inventarioGuardado;
+    }
+    
+ // Dentro de InventarioService.java
+
+ // Método privado para manejar la lógica de asignación
+ private void vincularTicketsExistentes(Inventario inventarioActualizado, String numeroIncidencia) {
+     
+     if (numeroIncidencia == null || numeroIncidencia.isEmpty()) {
+         return;
+     }
+     
+     // 1. BUSCAR TICKETS por la incidencia
+     List<Tickets> ticketsEncontrados = ticketService.findTicketsByIncidencia(numeroIncidencia);
+     
+     // 2. Iterar y Crear la Relación (PivoteInventario)
+     for (Tickets ticket : ticketsEncontrados) {
+         
+         // **IMPORTANTE: Evitar duplicados**
+         // Si ya hay un PivoteInventario para este ticket y este inventario, saltar.
+         boolean alreadyLinked = ticket.getPivoteInventario().stream()
+             .anyMatch(p -> p.getInventario() != null && 
+                            p.getInventario().getIdInventario().equals(inventarioActualizado.getIdInventario()));
+         
+         if (alreadyLinked) {
+             continue; // Ya están vinculados, pasa al siguiente ticket
+         }
+         
+         // Crea la entidad pivote
+         PivoteInventario pivote = new PivoteInventario();
+         pivote.setInventario(inventarioActualizado); 
+         pivote.setTicket(ticket);
+         pivote.setCantidad(1); 
+         pivote.setFechaAsignacion(LocalDate.now());
+
+         // 3. Añadir el pivote a la colección del Ticket
+         ticket.getPivoteInventario().add(pivote);
+
+         // 4. PERSISTIR el Ticket actualizado (Usando TicketRepository para evitar el ciclo)
+         ticketRepository.save(ticket);
+     }
+ }
 
     // Method to find a user by ID
     public Inventario getInventarioById(Long id) {
@@ -48,12 +107,21 @@ public class InventarioService {
 		}//deleteUsuarios
     
 	
-    public Inventario patchInventario(Long id, Inventario inventarioDetails) {
-        // 1. Buscar la entidad existente o lanzar una excepción.
-        Inventario inventarioExistente = inventarioRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("El item de Inventario con el ID [" + id + "] no fue encontrado para actualizar."));
+	@Transactional
+	public Inventario patchInventario(Long id, Inventario inventarioDetails) {
 
-       
+		Inventario inventarioExistente = inventarioRepository.findById(id)
+	            .orElseThrow(() -> new NoSuchElementException("El item de Inventario con el ID [" + id + "] no fue encontrado para actualizar."));
+
+	    String newIncidencia = inventarioDetails.getNumeroDeIncidencia();
+	    String oldIncidencia = inventarioExistente.getNumeroDeIncidencia();
+	    
+	    boolean incidenciaChanged = false;
+	    
+	    if (newIncidencia != null && !newIncidencia.equals(oldIncidencia)) {
+	        inventarioExistente.setNumeroDeIncidencia(newIncidencia);
+	        incidenciaChanged = true;
+	    }
 
         if (inventarioDetails.getTitulo() != null) {
             inventarioExistente.setTitulo(inventarioDetails.getTitulo());
@@ -120,11 +188,14 @@ public class InventarioService {
             inventarioExistente.setDescripcion(inventarioDetails.getDescripcion());
         }
         
-        // Nota: La lista 'pivoteInventario' (OneToMany) NO se actualiza directamente aquí. 
-        // Los elementos de colecciones se manejan típicamente en endpoints/lógica separada.
+        Inventario inventarioActualizado = inventarioRepository.save(inventarioExistente);
         
-        // 3. Guardar y devolver la entidad actualizada.
-        return inventarioRepository.save(inventarioExistente);
+        // 3. LÓGICA DE VINCULACIÓN: Solo si el campo de incidencia fue cambiado en esta operación.
+        if (incidenciaChanged) {
+            vincularTicketsExistentes(inventarioActualizado, inventarioActualizado.getNumeroDeIncidencia());
+        }
+        
+        return inventarioActualizado;
     }
     
     
