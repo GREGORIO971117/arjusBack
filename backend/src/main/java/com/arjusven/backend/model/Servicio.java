@@ -21,6 +21,7 @@ public class Servicio {
 
     @Column(name = "Situacion_Actual")
     private String situacionActual;
+    
     @Column(name = "Nombre_de_ESS")
     private String nombreDeEss;
     
@@ -64,7 +65,6 @@ public class Servicio {
     private String sla;
     
     
- // CLAVE FORÁNEA (Foreign Key)
     @OneToOne
     @JoinColumn(name = "Tickets_idTickets", referencedColumnName = "idTickets")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","servicio"}) 
