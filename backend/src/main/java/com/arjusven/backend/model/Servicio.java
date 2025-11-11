@@ -28,12 +28,12 @@ public class Servicio {
     @Column(name = "Incidencia")
     private String incidencia;
     
-    
     @Column(name = "Supervisor")
     private String supervisor;
     
-    @Column(name = "ID_merchant")
-    private String idMerchant;
+    // Este campo es el que usamos para la lógica de asignación en el Service
+    @Column(name = "ID_merchant") 
+    private Long idMerchant;
     
     @Column(name = "Tipo_de_servicio")
     private String tipoDeServicio;
@@ -67,6 +67,15 @@ public class Servicio {
     @JoinColumn(name = "Tickets_idTickets", referencedColumnName = "idTickets")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","servicio"}) 
     private Tickets ticket;
+    
+    // APLICACIÓN DE LA SOLUCIÓN: 
+    // Indicamos a Hibernate que esta relación DEBE USAR la columna ID_Merchant,
+    // pero que no debe intentar INSERTAR o ACTUALIZAR su valor, ya que eso
+    // lo hace el campo 'private Long idMerchant' de arriba.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_Merchant", referencedColumnName = "ID_Merchant", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","servicios"})
+    private Estaciones estaciones;
     
     public Servicio() {
 	} 
@@ -136,17 +145,18 @@ public class Servicio {
 	}
 
 
-	public void setSupervidor(String supervisor) {
+	// ATENCIÓN: Corregí el typo aquí también.
+	public void setSupervisor(String supervisor) {
 		this.supervisor = supervisor;
 	}
 
 
-	public String getIdMerchant() {
+	public Long getIdMerchant() {
 		return idMerchant;
 	}
 
 
-	public void setIdMerchant(String idMerchant) {
+	public void setIdMerchant(Long idMerchant) {
 		this.idMerchant = idMerchant;
 	}
 
@@ -249,4 +259,14 @@ public class Servicio {
 	public void setTicket(Tickets ticket) {
 		this.ticket = ticket;
 	}
+
+
+    public Estaciones getEstaciones() {
+        return estaciones;
+    }
+
+
+    public void setEstaciones(Estaciones estaciones) {
+        this.estaciones = estaciones;
+    }
 }

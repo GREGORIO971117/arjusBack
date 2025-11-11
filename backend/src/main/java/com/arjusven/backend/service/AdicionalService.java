@@ -23,6 +23,8 @@ public class AdicionalService {
 	public List<Adicional> getAllAdicional(){
 		return adicionalRepository.findAll();
 	}
+	
+	
 	public Adicional getAdicionalById(Long id) {
 		return adicionalRepository.findById(id).orElse(null);
 	}
