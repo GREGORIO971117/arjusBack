@@ -11,11 +11,11 @@ import jakarta.persistence.Embeddable;
 public class PivoteInventarioId implements Serializable {
 
     // FK de Tickets
-    @Column(name = "Tickets_idTickets")
+    @Column(name = "tickets_id_tickets")
     private Long idTickets;
 
     // FK de Inventario
-    @Column(name = "Inventario_idInventario")
+    @Column(name = "inventario_id_inventario")
     private Long idInventario;
 
     // --- Constructores ---

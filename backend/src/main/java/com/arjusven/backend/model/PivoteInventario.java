@@ -25,14 +25,13 @@ public class PivoteInventario implements Serializable {
     // 2. Mapeo a la entidad Tickets
     @ManyToOne
     @MapsId("idTickets") // Mapea este ManyToOne al campo 'idTickets' del @EmbeddedId
-    @JoinColumn(name = "Tickets_idTickets", referencedColumnName = "idTickets")
+    @JoinColumn(name = "tickets_id_tickets", referencedColumnName = "idTickets")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "pivoteInventario"})    
     private Tickets ticket;
 
-    // 3. Mapeo a la entidad Inventario
     @ManyToOne
-    @MapsId("idInventario") // Mapea este ManyToOne al campo 'idInventario' del @EmbeddedId
-    @JoinColumn(name = "Inventario_idInventario", referencedColumnName = "idInventario")
+    @MapsId("idInventario") 
+    @JoinColumn(name = "inventario_id_inventario", referencedColumnName = "idInventario")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "pivoteInventario"})
     private Inventario inventario;
     

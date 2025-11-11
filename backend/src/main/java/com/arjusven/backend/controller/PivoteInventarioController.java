@@ -18,19 +18,18 @@ public class PivoteInventarioController {
 
     @Autowired
     public PivoteInventarioController(PivoteService pivoteInventarioService) {
-        // Asignamos la instancia inyectada a la variable final.
-        this.pivoteInventarioService = pivoteInventarioService;
+    	this.pivoteInventarioService = pivoteInventarioService;
     }
 
     @PostMapping
     public ResponseEntity<PivoteInventario> createPivote(@RequestBody PivoteInventario pivote) {
-        // Usamos el servicio para guardar la entidad
-        PivoteInventario savedPivote = pivoteInventarioService.save(pivote);
+
+    	PivoteInventario savedPivote = pivoteInventarioService.save(pivote);
         return new ResponseEntity<>(savedPivote, HttpStatus.CREATED);
     }
     
     @GetMapping("/{idInventario}")
-    public ResponseEntity<List<PivoteInventario>> getHistorialInventario(@PathVariable Long idInventario) {
+    public ResponseEntity<List<PivoteInventario>> getHistorialInventario(@PathVariable("idInventario") Long idInventario) {
         List<PivoteInventario> historial = pivoteInventarioService.getHistorialByInventarioId(idInventario);
         return ResponseEntity.ok(historial);
     }
