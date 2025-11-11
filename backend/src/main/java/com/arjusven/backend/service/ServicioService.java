@@ -57,9 +57,6 @@ public class ServicioService {
             servicioExistente.setIncidencia(servicioDetails.getIncidencia());
         }
         
-        if (servicioDetails.getCodigoDeAfiliado() != null) {
-            servicioExistente.setCodigoDeAfiliado(servicioDetails.getCodigoDeAfiliado());
-        }
         
         if (servicioDetails.getSupervisor() != null) {
             servicioExistente.setSupervidor(servicioDetails.getSupervisor());

@@ -28,8 +28,6 @@ public class Servicio {
     @Column(name = "Incidencia")
     private String incidencia;
     
-    @Column(name = "Codigo_de_afiliado")
-    private String codigoDeAfiliado;
     
     @Column(name = "Supervisor")
     private String supervisor;
@@ -130,16 +128,6 @@ public class Servicio {
 
 	public void setIncidencia(String incidencia) {
 		this.incidencia = incidencia;
-	}
-
-
-	public String getCodigoDeAfiliado() {
-		return codigoDeAfiliado;
-	}
-
-
-	public void setCodigoDeAfiliado(String codigoDeAfiliado) {
-		this.codigoDeAfiliado = codigoDeAfiliado;
 	}
 
 
