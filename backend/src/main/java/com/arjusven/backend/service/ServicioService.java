@@ -17,7 +17,6 @@ public class ServicioService {
     private final ServicioRepository servicioRepository;
     private final EstacionesService estacionesService; // INYECCIÓN
 
-    // Constructor para inyección de dependencias
     @Autowired
     public ServicioService(ServicioRepository servicioRepository, EstacionesService estacionesService) {
         this.servicioRepository = servicioRepository;
@@ -48,9 +47,7 @@ public class ServicioService {
                 if (servicio.getTipoDeServicio() == null || servicio.getTipoDeServicio().trim().isEmpty()) {
                     servicio.setTipoDeServicio(estacion.getPlazaDeAtencion()); 
                 }
-                
-                // NOTA: Se pueden añadir más campos aquí (Dirección, Nombre_de_ESS, SLA, etc.)
-                
+                                
             } else {
                 System.out.println("Advertencia: ID Merchant [" + merchantId + "] no encontrado en Estaciones. No se asignaron datos preliminares.");
             }
@@ -60,7 +57,6 @@ public class ServicioService {
     // Método para guardar un nuevo servicio (Creación)
     @Transactional
     public Servicio saveServicio(Servicio servicio) {
-        // Ejecuta la asignación condicional antes de guardar (Crea la base preliminar)
         assignEstacionesDetails(servicio); 
         
         return servicioRepository.save(servicio);
@@ -68,7 +64,8 @@ public class ServicioService {
 
     // Método para encontrar un servicio por ID
     public Servicio getServicioById(Long id) {
-        return servicioRepository.findById(id).orElse(null);
+        return servicioRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Servicio con ID " + id + " no encontrado."));
     }
 
     // Método para obtener todos los servicios
@@ -76,22 +73,16 @@ public class ServicioService {
         return servicioRepository.findAll();
     }
     
-    // Método para actualizar parcialmente un servicio
     @Transactional
     public Servicio patchServicio(Long id, Servicio servicioDetails) {
         Servicio servicioExistente = servicioRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("El servicio con el ID [" + id + "] no fue encontrado para actualizar."));
 
-        // -----------------------------------------------------------
-        // LÓGICA DE ACTUALIZACIÓN DE DATOS PRELIMINARES
-        // -----------------------------------------------------------
+       
         if (servicioDetails.getIdMerchant() != null && !servicioDetails.getIdMerchant().equals(servicioExistente.getIdMerchant())) {
             
-            // 1. Si el ID_Merchant es modificado, se actualiza el ID
             servicioExistente.setIdMerchant(servicioDetails.getIdMerchant());
             
-            // 2. Se re-asignan los datos preliminares de la NUEVA Estación.
-            // Esto solo actualiza los campos que el usuario NO modificó en la solicitud actual.
             assignEstacionesDetails(servicioExistente); 
         }
         

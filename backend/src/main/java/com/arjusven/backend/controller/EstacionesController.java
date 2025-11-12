@@ -29,11 +29,11 @@ public class EstacionesController {
 
     
     @GetMapping("/{idMerchant}")
-    public ResponseEntity<Optional<Estaciones>> getEstacionesById(@PathVariable Long idMerchant) {
+    public ResponseEntity<Estaciones> getEstacionesById(@PathVariable Long idMerchant) {
         Optional<Estaciones> estacion = estacionesService.findById(idMerchant);
         
-        if (estacion != null) {
-            return ResponseEntity.ok(estacion);
+        if (estacion.isPresent()) { 
+            return ResponseEntity.ok(estacion.get()); 
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -61,23 +61,23 @@ public class EstacionesController {
             return ResponseEntity.notFound().build();
         }
     }
-
-   
+    
+    
     @DeleteMapping("/{idMerchant}")
     public ResponseEntity<Void> deleteEstaciones(@PathVariable Long idMerchant) {
         Optional<Estaciones> estacionOptional = estacionesService.findById(idMerchant);
 
         if (estacionOptional.isPresent()) {
-            
             try {
-                
+                // FALTA LLAMAR AL MÉTODO DE BORRADO DEL SERVICIO
                 return ResponseEntity.noContent().build();
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
+  
 }

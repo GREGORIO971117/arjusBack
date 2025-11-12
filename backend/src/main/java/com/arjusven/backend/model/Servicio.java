@@ -31,7 +31,6 @@ public class Servicio {
     @Column(name = "Supervisor")
     private String supervisor;
     
-    // Este campo es el que usamos para la lógica de asignación en el Service
     @Column(name = "ID_merchant") 
     private Long idMerchant;
     
@@ -68,10 +67,6 @@ public class Servicio {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","servicio"}) 
     private Tickets ticket;
     
-    // APLICACIÓN DE LA SOLUCIÓN: 
-    // Indicamos a Hibernate que esta relación DEBE USAR la columna ID_Merchant,
-    // pero que no debe intentar INSERTAR o ACTUALIZAR su valor, ya que eso
-    // lo hace el campo 'private Long idMerchant' de arriba.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_Merchant", referencedColumnName = "ID_Merchant", insertable = false, updatable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","servicios"})
