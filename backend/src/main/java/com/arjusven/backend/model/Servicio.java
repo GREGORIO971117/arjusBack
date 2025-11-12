@@ -37,13 +37,13 @@ public class Servicio {
     @Column(name = "Tipo_de_servicio")
     private String tipoDeServicio;
     
-    @Column(name = "Motivo_de_servicio")
+    @Column(name = "Motivo_de_servicio", length = 500)
     private String motivoDeServicio;
     
     @Column(name = "Motivo_real")
     private String motivoReal;
     
-    @Column(name = "Observaciones")
+    @Column(name = "Observaciones", length = 500)
     private String observaciones;
     
     @Column(name = "Guia_de_encomienda")
@@ -140,7 +140,6 @@ public class Servicio {
 	}
 
 
-	// ATENCIÓN: Corregí el typo aquí también.
 	public void setSupervisor(String supervisor) {
 		this.supervisor = supervisor;
 	}

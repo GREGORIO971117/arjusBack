@@ -1,6 +1,7 @@
 package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.Estaciones;
+import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.service.EstacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,7 +62,21 @@ public class EstacionesController {
             return ResponseEntity.notFound().build();
         }
     }
+  
     
+    @PatchMapping("/{idMerchant}")
+    public ResponseEntity<Estaciones> updateEstacionesPatch(
+    		@PathVariable("idMerchant") Long idMerchant, 
+            @RequestBody Estaciones updatedEstacion) {
+        
+        Estaciones result = estacionesService.updateEstacionesPatch(idMerchant, updatedEstacion);
+        
+        if (result != null) {
+            return ResponseEntity.ok(result); 
+        } else {
+            return ResponseEntity.notFound().build(); 
+        }
+    }
     
     @DeleteMapping("/{idMerchant}")
     public ResponseEntity<Void> deleteEstaciones(@PathVariable Long idMerchant) {

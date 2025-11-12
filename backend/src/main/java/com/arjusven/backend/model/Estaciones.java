@@ -100,7 +100,7 @@ public class Estaciones{
     private String supervisorArjus;
 
     @Column(name = "Rollos")
-    private Integer rollos; // Usamos Integer si es un conteo
+    private Integer rollos;
 
     @Column(name = "Trasporte")
     private Long transporte;
@@ -378,6 +378,4 @@ public class Estaciones{
 		this.tecnicoAsignado = tecnicoAsignado;
 	}
     
-    
-
 }
