@@ -63,6 +63,12 @@ public class ServicioService {
                 if (servicio.getTipoDeServicio() == null || servicio.getTipoDeServicio().trim().isEmpty()) {
                     servicio.setTipoDeServicio(estacion.getPlazaDeAtencion()); 
                 }
+                if(servicio.getDireccion()==null || servicio.getDireccion().trim().isEmpty()) {
+                	servicio.setDireccion(estacion.getDireccion());
+                }
+                if(servicio.getSla()==null || servicio.getSla().trim().isEmpty()) {
+                	servicio.setSla(estacion.getCobertura());
+                }
                 
                 // 6. Asignar la relación completa de JPA (si fuera necesario para manejo futuro)
                 // servicio.setEstaciones(estacion); 
