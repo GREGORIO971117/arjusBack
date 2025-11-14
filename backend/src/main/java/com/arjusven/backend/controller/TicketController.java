@@ -1,7 +1,5 @@
 package com.arjusven.backend.controller;
 
-import com.arjusven.backend.model.Adicional;
-import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.service.DocumentGenerationService;
 import com.arjusven.backend.service.TicketService;
@@ -26,40 +24,58 @@ public class TicketController {
     }
     
     @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> downloadTicketDocx(@PathVariable("id") Long id) {
+    public ResponseEntity<byte[]> downloadTicketDocx(
+            @PathVariable("id") Long id,
+            @RequestParam(name = "type", defaultValue = "intercambio") String type) { // Acepta el parámetro 'type'
         
         // 1. Obtener el Ticket principal
         Tickets ticket = ticketService.getTicketsById(id);
         
-        if (ticket == null) {
+        if (ticket == null || ticket.getServicios() == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        try {
-            // 2. Llamar al servicio para generar los bytes del documento (Esta parte se mantiene igual)
-            byte[] documentBytes = documentGenerationService.generateTicketDocument(ticket);
+        byte[] documentBytes;
+        String templateName;
 
-            // =========================================================================
-            // 3. CONFIGURACIÓN DEL NOMBRE Y ENCABEZADO (LA CORRECCIÓN ESTÁ AQUÍ)
-            // =========================================================================
+        try {
+            // 2. SELECCIÓN DE PLANTILLA Y GENERACIÓN DE BYTES
+            switch (type.toLowerCase()) {
+                case "mantenimiento":
+                    documentBytes = documentGenerationService.generateMantenimientoTicket(ticket);
+                    templateName = "Mantenimiento";
+                    break;
+                case "retiro":
+                    documentBytes = documentGenerationService.generateRetiroTicket(ticket);
+                    templateName = "Retiro";
+                    break;
+                case "ticket":
+                case "intercambio":
+                default:
+                    documentBytes = documentGenerationService.generateDefaultTicket(ticket);
+                    templateName = "Intercambio";
+                    break;
+            }
+
+            // 3. CONFIGURACIÓN DEL NOMBRE Y ENCABEZADO
             
             String incidencia = ticket.getServicios().getIncidencia();
             String nombreEss = ticket.getServicios().getNombreDeEss();
-
-            // 3.1. LIMPIEZA DEL NOMBRE: Eliminar o reemplazar caracteres no seguros para nombres de archivo
-            // Reemplazamos los espacios con guiones bajos y eliminamos cualquier otro carácter especial.
-            String nombreLimpio = incidencia + "_" + nombreEss;
-            nombreLimpio = nombreLimpio.replaceAll("[^a-zA-Z0-9\\s_-]", "").replaceAll("\\s+", "_");
             
-            // El nombre final que se intenta enviar.
+            // 3.1. Limpieza y Creación del nombre de archivo
+            // Incluimos el tipo de plantilla en el nombre
+            String baseName = incidencia + "_" + nombreEss + "_" + templateName; 
+            
+            // Eliminación y reemplazo de caracteres
+            String nombreLimpio = baseName.replaceAll("[^a-zA-Z0-9\\s_-]", "").replaceAll("\\s+", "_");
+            
             final String filename = nombreLimpio + ".docx"; 
 
-            // 3.2. CODIFICACIÓN: Se usa para el formato filename* (RFC 5987)
+            // 3.2. Codificación para el Content-Disposition
             String encodedFilename = java.net.URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
 
 
             HttpHeaders headers = new HttpHeaders();
-            // Tipo de contenido para .docx
             headers.setContentType(MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
             
             headers.add(HttpHeaders.CONTENT_DISPOSITION, 
@@ -74,7 +90,7 @@ public class TicketController {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); 
         }
-    }  
+    }
     
 
     @GetMapping
