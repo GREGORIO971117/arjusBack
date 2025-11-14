@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "tickets")
@@ -37,15 +36,17 @@ public class Tickets {
     @JoinColumn(name = "Usuarios_idCliente", referencedColumnName = "idUsuarios")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Usuarios cliente;
+    
+    @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("ticket") 
+    private Adicional adicionales;
+    
 
     // --- RELACIONES 1:N (Uno-a-Muchos) a Hijos ---
-    @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonIgnoreProperties("ticket") 
     private Servicio servicios;
     
-    @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("ticket") 
-    private Adicional adicionales;
     
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","ticket"}) 

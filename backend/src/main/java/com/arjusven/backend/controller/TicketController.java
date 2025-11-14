@@ -28,35 +28,43 @@ public class TicketController {
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadTicketDocx(@PathVariable("id") Long id) {
         
-        // 1. Obtener el Ticket principal que contiene Servicio y Adicional
+        // 1. Obtener el Ticket principal
         Tickets ticket = ticketService.getTicketsById(id);
         
         if (ticket == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404 si el ticket no existe
-        }
-        
-        // CRÍTICO: Obtener las entidades relacionadas desde el ticket
-        // Estos Getters deben existir en la clase Tickets (getServicio, getAdicionales)
-        Servicio servicio = ticket.getServicios();
-        Adicional adicional = ticket.getAdicionales(); 
-        
-        if (servicio == null || adicional == null) {
-             // 404 o 400 si faltan datos clave para generar la plantilla
-             return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         try {
-            // 2. Llamar al servicio para generar los bytes del documento
-            byte[] documentBytes = documentGenerationService.generateTicketDocument(servicio, adicional);
+            // 2. Llamar al servicio para generar los bytes del documento (Esta parte se mantiene igual)
+            byte[] documentBytes = documentGenerationService.generateTicketDocument(ticket);
 
-            // 3. Configurar la respuesta HTTP para la descarga
-            String filename = "Ticket_Servicio_" + servicio.getIncidencia() + ".docx";
+            // =========================================================================
+            // 3. CONFIGURACIÓN DEL NOMBRE Y ENCABEZADO (LA CORRECCIÓN ESTÁ AQUÍ)
+            // =========================================================================
+            
+            String incidencia = ticket.getServicios().getIncidencia();
+            String nombreEss = ticket.getServicios().getNombreDeEss();
+
+            // 3.1. LIMPIEZA DEL NOMBRE: Eliminar o reemplazar caracteres no seguros para nombres de archivo
+            // Reemplazamos los espacios con guiones bajos y eliminamos cualquier otro carácter especial.
+            String nombreLimpio = incidencia + "_" + nombreEss;
+            nombreLimpio = nombreLimpio.replaceAll("[^a-zA-Z0-9\\s_-]", "").replaceAll("\\s+", "_");
+            
+            // El nombre final que se intenta enviar.
+            final String filename = nombreLimpio + ".docx"; 
+
+            // 3.2. CODIFICACIÓN: Se usa para el formato filename* (RFC 5987)
+            String encodedFilename = java.net.URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
+
 
             HttpHeaders headers = new HttpHeaders();
             // Tipo de contenido para .docx
             headers.setContentType(MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
-            // Indicar al navegador que es una descarga
-            headers.setContentDispositionFormData("attachment", filename); 
+            
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, 
+                        "attachment; filename=\"" + filename + "\"; filename*=UTF-8''" + encodedFilename); 
+            
             headers.setContentLength(documentBytes.length);
 
             // 4. Devolver los bytes al navegador
@@ -64,11 +72,9 @@ public class TicketController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); // 500 en caso de error de generación
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); 
         }
-    }
-    
-    
+    }  
     
 
     @GetMapping
