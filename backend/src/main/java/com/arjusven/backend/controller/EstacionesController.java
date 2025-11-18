@@ -1,7 +1,6 @@
 package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.Estaciones;
-import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.service.EstacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -79,20 +78,27 @@ public class EstacionesController {
     }
     
     @DeleteMapping("/{idMerchant}")
-    public ResponseEntity<Void> deleteEstaciones(@PathVariable Long idMerchant) {
+    public ResponseEntity<Void> deleteEstaciones(@PathVariable("idMerchant") Long idMerchant) {
         Optional<Estaciones> estacionOptional = estacionesService.findById(idMerchant);
 
         if (estacionOptional.isPresent()) {
             try {
-                // FALTA LLAMAR AL MÉTODO DE BORRADO DEL SERVICIO
+                // Se realiza la llamada al método de borrado del servicio
+                estacionesService.deleteEstaciones(idMerchant); 
+                
+                // Retorna 204 No Content si el borrado fue exitoso
                 return ResponseEntity.noContent().build();
             } catch (Exception e) {
+                // Logear la excepción para debug (recomendado)
+                System.err.println("Error al intentar borrar la estación con ID: " + idMerchant + ". Causa: " + e.getMessage());
+                
+                // Retorna 500 Internal Server Error si falla el borrado
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
+            // Retorna 404 Not Found si la estación no existe
             return ResponseEntity.notFound().build();
         }
     }
-
   
 }

@@ -2,7 +2,6 @@
 package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.Adicional;
-import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.service.AdicionalService;
 
 import java.util.List;
