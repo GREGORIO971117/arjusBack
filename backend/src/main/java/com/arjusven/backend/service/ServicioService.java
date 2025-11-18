@@ -27,7 +27,7 @@ public class ServicioService {
      * Lógica central de asignación de detalles de Estación al Servicio,
      * SOLO si el campo de Servicio está nulo o vacío.
      */
-    private void assignEstacionesDetails(Servicio servicio) {
+    void assignEstacionesDetails(Servicio servicio) {
         Long merchantId = servicio.getIdMerchant(); 
 
         if (merchantId != null) {

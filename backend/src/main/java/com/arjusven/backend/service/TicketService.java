@@ -7,20 +7,28 @@ import org.springframework.stereotype.Service;
 import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.repository.TicketRepository;
 
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 
 @Service
 public class TicketService {
     
     private TicketRepository ticketsRepository;
+    private ServicioService servicioService;
     
     @Autowired
-    public TicketService(TicketRepository ticketsRepository) {
+    public TicketService(TicketRepository ticketsRepository, ServicioService servicioService) {
 		this.ticketsRepository = ticketsRepository;
+		this.servicioService = servicioService;
 	}
 
-	// Method to save a new user
+    @Transactional
     public Tickets saveTickets(Tickets tickets) {
+    	if(tickets.getServicios() != null) {
+    		servicioService.assignEstacionesDetails(tickets.getServicios());
+    	}
+    	
         return ticketsRepository.save(tickets);
     }
 
