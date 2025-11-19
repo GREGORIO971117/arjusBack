@@ -23,10 +23,6 @@ public class ServicioService {
         this.estacionesService = estacionesService;
     }
 
-    /**
-     * Lógica central de asignación de detalles de Estación al Servicio,
-     * SOLO si el campo de Servicio está nulo o vacío.
-     */
     void assignEstacionesDetails(Servicio servicio) {
         Long merchantId = servicio.getIdMerchant(); 
 
@@ -70,11 +66,6 @@ public class ServicioService {
                 	servicio.setSla(estacion.getCobertura());
                 }
                 
-                // 6. Asignar la relación completa de JPA (si fuera necesario para manejo futuro)
-                // servicio.setEstaciones(estacion); 
-                
-                // --- FIN DE ASIGNACIONES CONDICIONALES ---
-                
             } else {
                 // Mensaje de advertencia si no se encuentra la estación
                 System.out.println("Advertencia: ID Merchant [" + merchantId + "] no encontrado en Estaciones. No se asignaron datos preliminares.");
@@ -102,10 +93,7 @@ public class ServicioService {
         return servicioRepository.findAll();
     }
     
-    /**
-     * Actualiza parcialmente un servicio. Incluye corrección para forzar la reasignación
-     * de detalles de Estaciones si un campo queda nulo en el patch.
-     */
+   
     @Transactional
     public Servicio patchServicio(Long id, Servicio servicioDetails) {
         Servicio servicioExistente = servicioRepository.findById(id)
@@ -119,15 +107,9 @@ public class ServicioService {
         }
         
         // 2. Ejecutar la asignación de detalles. 
-        // Esto usa el ID_Merchant ACTUALIZADO o el ID EXISTENTE 
-        // para rellenar campos que no vienen en servicioDetails y que son nulos.
         assignEstacionesDetails(servicioExistente); 
         
         // --- APLICACIÓN DE DETALLES DEL USUARIO (SOBRESCRIBEN ASIGNACIÓN) ---
-        
-        // Si el usuario envió un valor (incluso un NULL explícito, pero aquí solo chequeamos != NULL)
-        // se sobrescribe lo que pudo haber asignado assignEstacionesDetails.
-        
         if (servicioDetails.getFechaDeAsignacion() != null) {
             servicioExistente.setFechaDeAsignacion(servicioDetails.getFechaDeAsignacion());
         }

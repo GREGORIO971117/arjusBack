@@ -6,6 +6,8 @@ import com.arjusven.backend.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import com.arjusven.backend.dto.TicketUploadResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +23,41 @@ public class TicketController {
     public TicketController(TicketService ticketService, DocumentGenerationService documentGenerationService) {
         this.ticketService = ticketService;
         this.documentGenerationService =documentGenerationService;
+    }
+    
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<TicketUploadResponse> uploadTickets(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("idAdministrador") Long idAdministrador) {
+
+        // Validaciones básicas
+        if (file.isEmpty()) {
+            TicketUploadResponse resp = new TicketUploadResponse();
+            resp.agregarError("El archivo está vacío.");
+            return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
+        }
+
+        if (idAdministrador == null) {
+             TicketUploadResponse resp = new TicketUploadResponse();
+             resp.agregarError("El ID del administrador es obligatorio.");
+             return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
+        }
+
+        // Llamar al servicio
+        TicketUploadResponse response = ticketService.uploadTicketsFromExcel(file, idAdministrador);
+
+        // Lógica de respuesta HTTP
+        if (response.getTotalExitosos() == 0 && !response.getErrores().isEmpty()) {
+            // Si todo falló
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } else if (!response.getErrores().isEmpty()) {
+            // Si hubo éxito parcial (mezcla de éxitos y errores) -> 207 Multi-Status o 200 OK con detalles
+            // Usaremos 200 OK para que el front lea el JSON y decida qué mostrar
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // Éxito total
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @GetMapping("/download/{id}")
