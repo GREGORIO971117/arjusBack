@@ -36,120 +36,135 @@ public class TicketService {
     
     @Autowired
     private UsuariosRepository usuariosRepository; 
-
+    
     public TicketUploadResponse uploadTicketsFromExcel(MultipartFile file, Long idAdministrador) {
         TicketUploadResponse response = new TicketUploadResponse();
-        
-        // 1. Validar existencia del Administrador
-        Usuarios administrador = usuariosRepository.findById(idAdministrador)
-                .orElse(null);
 
+        // 1. Validar Admin
+        Usuarios administrador = usuariosRepository.findById(idAdministrador).orElse(null);
         if (administrador == null) {
-            response.agregarError("No se encontró el usuario administrador con ID: " + idAdministrador + ". Proceso abortado.");
+            response.agregarError("No se encontró el usuario administrador con ID: " + idAdministrador);
             return response;
         }
 
         try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
-            Sheet sheet = workbook.getSheetAt(0); // Leemos la primera hoja
+            Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
 
-            // Mapas para guardar la posición de las columnas dinámicamente
             Map<String, Integer> headerMap = new HashMap<>();
+            boolean headersFound = false;
             
-            // Definimos los nombres esperados (normalizados a minúsculas para comparar mejor)
+            // Nombres de columnas esperados (en minúsculas para facilitar comparación)
             String COL_INCIDENCIA = "incidencia";
-            String COL_ID_MERCHANT = "id merchant";
+            String COL_ID_MERCHANT = "id merchant"; // Busca "id merchant" con espacio, ajusta si es "idmerchant"
             String COL_DETALLE = "detalle";
             String COL_OBSERVACIONES = "observaciones";
 
-            // 2. Leer Encabezados (Fila 0 o la primera que encuentre)
-            if (rowIterator.hasNext()) {
-                Row headerRow = rowIterator.next();
-                for (Cell cell : headerRow) {
-                    String headerValue = getCellValueAsString(cell).toLowerCase().trim();
-                    
-                    // Mapeo flexible
-                    if (headerValue.contains(COL_INCIDENCIA)) headerMap.put(COL_INCIDENCIA, cell.getColumnIndex());
-                    else if (headerValue.contains(COL_ID_MERCHANT)) headerMap.put(COL_ID_MERCHANT, cell.getColumnIndex());
-                    else if (headerValue.contains(COL_DETALLE)) headerMap.put(COL_DETALLE, cell.getColumnIndex());
-                    else if (headerValue.contains(COL_OBSERVACIONES)) headerMap.put(COL_OBSERVACIONES, cell.getColumnIndex());
-                }
-            }
+            int rowIndex = 0; // Contador real de filas del Excel
 
-            // Validar que encontramos todas las columnas necesarias
-            if (!headerMap.containsKey(COL_INCIDENCIA) || !headerMap.containsKey(COL_ID_MERCHANT)) {
-                response.agregarError("El archivo no contiene los encabezados obligatorios: Incidencia o ID Merchant.");
-                return response;
-            }
-
-            // 3. Iterar sobre los datos
-            int rowIndex = 1; // Solo para referencia en logs
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
-                rowIndex++;
+                rowIndex++; // Incrementamos fila actual (Excel empieza en 1 visualmente)
+
+                // --- FASE 1: BUSCANDO ENCABEZADOS ---
+                if (!headersFound) {
+                    // Recorremos las celdas de esta fila para ver si es la fila de encabezados
+                    for (Cell cell : row) {
+                        String cellValue = getCellValueAsString(cell).toLowerCase().trim();
+                        
+                        if (cellValue.contains(COL_INCIDENCIA)) headerMap.put(COL_INCIDENCIA, cell.getColumnIndex());
+                        else if (cellValue.contains(COL_ID_MERCHANT)) headerMap.put(COL_ID_MERCHANT, cell.getColumnIndex());
+                        else if (cellValue.contains(COL_DETALLE)) headerMap.put(COL_DETALLE, cell.getColumnIndex());
+                        else if (cellValue.contains(COL_OBSERVACIONES)) headerMap.put(COL_OBSERVACIONES, cell.getColumnIndex());
+                    }
+
+                    // Si encontramos AL MENOS Incidencia y ID Merchant en esta fila, bingo!
+                    if (headerMap.containsKey(COL_INCIDENCIA) && headerMap.containsKey(COL_ID_MERCHANT)) {
+                        headersFound = true;
+                        // Ya tenemos el mapa, pasamos a la siguiente iteración que ya será DATA
+                        continue; 
+                    }
+                    
+                    // Si no encontramos las columnas clave, asumimos que es una fila de logo/título y la ignoramos.
+                    // Limpiamos el mapa parcial para no mezclar basura de filas anteriores
+                    headerMap.clear();
+                    continue;
+                }
+
+                // --- FASE 2: PROCESANDO DATOS (Sólo llegamos aquí si headersFound es true) ---
                 
-                // Verificar si la fila está vacía
-                if (isRowEmpty(row)) continue; 
+                if (isRowEmpty(row)) continue; // Ignorar filas vacías entre datos
 
                 try {
-                    // Extracción de datos usando el mapa de índices
+                    // Extraer datos usando el mapa dinámico que creamos arriba
                     String incidencia = getCellValueAsString(row.getCell(headerMap.get(COL_INCIDENCIA)));
-                    String idMerchantStr = getCellValueAsString(row.getCell(headerMap.get(COL_ID_MERCHANT)));
+                    
+                    // ID Merchant a veces viene como texto o numérico, extraemos string seguro
+                    Integer idxMerchant = headerMap.get(COL_ID_MERCHANT);
+                    String idMerchantStr = (idxMerchant != null) ? getCellValueAsString(row.getCell(idxMerchant)) : "";
+                    
                     String motivoServicio = headerMap.containsKey(COL_DETALLE) ? getCellValueAsString(row.getCell(headerMap.get(COL_DETALLE))) : "";
                     String observaciones = headerMap.containsKey(COL_OBSERVACIONES) ? getCellValueAsString(row.getCell(headerMap.get(COL_OBSERVACIONES))) : "";
 
+                    // Validación básica de campos vacíos
                     if (incidencia.isEmpty() || idMerchantStr.isEmpty()) {
-                        response.agregarError("Fila " + rowIndex + ": Incidencia o ID Merchant vacíos.");
-                        continue;
+                        // Puede ser un pie de página o total, lo ignoramos o marcamos error leve
+                        continue; 
                     }
 
-                    // Parsear ID Merchant
+                    // Parsear ID Merchant y Validar
                     Long idMerchant = null;
                     try {
-                        idMerchant = Long.parseLong(idMerchantStr.replace(".0", "").trim());
+                        // Limpieza agresiva: quitar ".0", comas, espacios
+                        String limpio = idMerchantStr.replace(".0", "").replaceAll("[^0-9]", "").trim();
+                        if(limpio.isEmpty()) throw new NumberFormatException();
+                        idMerchant = Long.parseLong(limpio);
                     } catch (NumberFormatException e) {
-                        response.agregarError("Fila " + rowIndex + ": El ID Merchant '" + idMerchantStr + "' no es un número válido.");
+                        response.agregarError("Fila " + rowIndex + ": ID Merchant inválido ('" + idMerchantStr + "').");
                         continue;
                     }
 
-                    // 4. Verificar Duplicados (Generar Advertencia)
-                    List<Tickets> existentes = findTicketsByIncidencia(incidencia);
-                    if (!existentes.isEmpty()) {
-                        response.agregarAdvertencia("Fila " + rowIndex + ": La incidencia " + incidencia + " ya existía previamente. Se ha creado un duplicado.");
+                    // VALIDACIÓN EXISTENCIA ESTACIÓN (Foreign Key check)
+                    if (!estacionesRepository.existsById(idMerchant)) {
+                        response.agregarError("Fila " + rowIndex + ": La Estación con ID " + idMerchant + " no existe. Ticket omitido.");
+                        continue;
                     }
 
-                    // 5. Crear Entidades
+                    // ADVERTENCIA DUPLICADOS
+                    if (!findTicketsByIncidencia(incidencia).isEmpty()) {
+                        response.agregarAdvertencia("Fila " + rowIndex + ": La incidencia " + incidencia + " ya existe (Duplicado creado).");
+                    }
+
+                    // CREAR Y GUARDAR TICKET
                     Tickets nuevoTicket = new Tickets();
-                    nuevoTicket.setAdministrador(administrador); // Asignamos al usuario que sube el archivo
+                    nuevoTicket.setAdministrador(administrador);
 
                     Servicio nuevoServicio = new Servicio();
                     nuevoServicio.setIncidencia(incidencia);
                     nuevoServicio.setIdMerchant(idMerchant);
-                    nuevoServicio.setMotivoDeServicio(motivoServicio); // Viene de "Detalle"
+                    nuevoServicio.setMotivoDeServicio(motivoServicio);
                     nuevoServicio.setObservaciones(observaciones);
 
-                    // Vinculación bidireccional
                     nuevoTicket.setServicios(nuevoServicio);
-                    
-                    if (!estacionesRepository.existsById(idMerchant)) {
-                        response.agregarError("Fila " + rowIndex + ": El ID Merchant [" + idMerchant + "] no existe en la base de datos de Estaciones. No se puede crear el ticket.");
-                        continue; // Saltamos a la siguiente fila del Excel sin guardar esta
-                    }
-                    // 6. Guardar (Esto llama a tu lógica assignEstacionesDetails automáticamente)
+
                     saveTickets(nuevoTicket);
-                    
                     response.incrementarExito();
 
                 } catch (Exception e) {
-                    response.agregarError("Fila " + rowIndex + ": Error inesperado - " + e.getMessage());
+                    response.agregarError("Fila " + rowIndex + ": Error inesperado (" + e.getMessage() + ")");
                     e.printStackTrace();
                 }
             }
             
-            response.setTotalProcesados(rowIndex - 1); // Descontando encabezado
+            // Validación final: ¿Encontramos alguna vez los encabezados?
+            if (!headersFound) {
+                response.agregarError("No se encontró la fila de encabezados. Asegúrate que existan columnas llamadas 'Incidencia' e 'ID Merchant'.");
+            } else {
+                response.setTotalProcesados(rowIndex); // Informativo
+            }
 
         } catch (IOException e) {
-            response.agregarError("Error al leer el archivo: " + e.getMessage());
+            response.agregarError("Error crítico al leer archivo: " + e.getMessage());
         }
 
         return response;
