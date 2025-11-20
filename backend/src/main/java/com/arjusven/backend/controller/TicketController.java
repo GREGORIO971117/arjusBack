@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -157,9 +158,13 @@ public class TicketController {
     @PostMapping
     public ResponseEntity<Tickets> createTicket(@RequestBody Tickets nuevoTicket) {
         try {
+        	
+        	nuevoTicket.getServicios().setFechaDeAsignacion(LocalDate.now());
+            nuevoTicket.getServicios().setSituacionActual("Abierta");
             // Llama al servicio, que maneja la validación de los 4 IDs de Usuario.
             Tickets ticketGuardado = ticketService.saveTickets(nuevoTicket);
             
+            ;
             // Retorna el ticket creado con el ID generado por la DB.
             return new ResponseEntity<>(ticketGuardado, HttpStatus.CREATED); // Código 201
 

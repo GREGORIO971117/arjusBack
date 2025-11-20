@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.arjusven.backend.dto.TicketUploadResponse;
+import com.arjusven.backend.model.Adicional;
 import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.model.Usuarios;
@@ -17,6 +18,7 @@ import com.arjusven.backend.repository.UsuariosRepository;
 import jakarta.transaction.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -37,7 +39,7 @@ public class TicketService {
     @Autowired
     private UsuariosRepository usuariosRepository; 
     
-    public TicketUploadResponse uploadTicketsFromExcel(MultipartFile file, Long idAdministrador) {
+   public TicketUploadResponse uploadTicketsFromExcel(MultipartFile file, Long idAdministrador) {
         TicketUploadResponse response = new TicketUploadResponse();
 
         // 1. Validar Admin
@@ -47,9 +49,6 @@ public class TicketService {
             return response;
         }
 
-        //Se añade linea de comentario
-        
-        
         try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
@@ -141,15 +140,18 @@ public class TicketService {
                     // CREAR Y GUARDAR TICKET
                     Tickets nuevoTicket = new Tickets();
                     nuevoTicket.setAdministrador(administrador);
-
+                    
+                    Adicional nuevoAdicional = new Adicional();
                     Servicio nuevoServicio = new Servicio();
                     nuevoServicio.setIncidencia(incidencia);
                     nuevoServicio.setIdMerchant(idMerchant);
                     nuevoServicio.setMotivoDeServicio(motivoServicio);
                     nuevoServicio.setObservaciones(observaciones);
-
+                    nuevoServicio.setSituacionActual("Abierta");
+                    nuevoServicio.setFechaDeAsignacion(LocalDate.now());
+                    nuevoAdicional.setCiudad("—");
                     nuevoTicket.setServicios(nuevoServicio);
-
+                    nuevoTicket.setAdicionales(nuevoAdicional);
                     saveTickets(nuevoTicket);
                     response.incrementarExito();
 
