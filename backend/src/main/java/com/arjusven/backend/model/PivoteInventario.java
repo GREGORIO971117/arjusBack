@@ -22,7 +22,6 @@ public class PivoteInventario implements Serializable {
     @EmbeddedId
     private PivoteInventarioId id;
 
-    // 2. Mapeo a la entidad Tickets
     @ManyToOne
     @MapsId("idTickets") // Mapea este ManyToOne al campo 'idTickets' del @EmbeddedId
     @JoinColumn(name = "tickets_id_tickets", referencedColumnName = "idTickets")
@@ -34,13 +33,10 @@ public class PivoteInventario implements Serializable {
     @JoinColumn(name = "inventario_id_inventario", referencedColumnName = "idInventario")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "pivoteInventario"})
     private Inventario inventario;
-    
-    // 4. Atributos propios de la relación (del pivote)
-    
+        
     @Column(name = "cantidad")
-    private Integer cantidad; // Usamos Integer, Long o el tipo que definiste en SQL
+    private Integer cantidad; 
     
-    // El nombre de columna coincide con el snake_case en SQL
     @Column(name = "fecha_asignacion")
     private LocalDate fechaAsignacion; 
 

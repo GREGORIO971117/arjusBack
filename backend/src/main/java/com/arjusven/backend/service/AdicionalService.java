@@ -1,5 +1,6 @@
 package com.arjusven.backend.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -7,17 +8,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.arjusven.backend.model.Adicional;
+import com.arjusven.backend.model.Inventario;
+import com.arjusven.backend.model.PivoteInventario;
+import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.repository.AdicionalRepository;
+import com.arjusven.backend.repository.InventarioRepository;
+import com.arjusven.backend.repository.PivoteInventarioRepository;
 
 @Service
 public class AdicionalService {
 
 	
 	private AdicionalRepository adicionalRepository;
+	private InventarioRepository inventarioRepository;
+	private PivoteInventarioRepository pivoteInventarioRepository;
 	
 	@Autowired
-	public AdicionalService(AdicionalRepository adicionalRepository) {
+	public AdicionalService(
+			AdicionalRepository adicionalRepository,
+			InventarioRepository inventarioRepository,
+			PivoteInventarioRepository pivoteInventarioRepository
+			) {
 		this.adicionalRepository = adicionalRepository;
+		this.inventarioRepository = inventarioRepository;
+		this.pivoteInventarioRepository = pivoteInventarioRepository;
 	}
 	
 	public List<Adicional> getAllAdicional(){
@@ -164,10 +178,62 @@ public class AdicionalService {
 	    if (adicionalesDetails.getSimQueQuedaDeStock() != null) {
 	        adicionalesExistentes.setSimQueQuedaDeStock(adicionalesDetails.getSimQueQuedaDeStock());
 	    }
+	    
+	    procesarVinculacionInventario(adicionalesExistentes);
+	    
 	    return adicionalRepository.save(adicionalesExistentes);
 	}
 	
+	private void procesarVinculacionInventario(Adicional adicional) {
+        String serieSale = (adicional.getSerieLogicaSale() != null) ? adicional.getSerieLogicaSale().trim() : "";
+        String serieEntra = (adicional.getSerieLogicaEntra() != null) ? adicional.getSerieLogicaEntra().trim() : "";
+
+        boolean haySalida = !serieSale.isEmpty();
+        boolean hayEntrada = !serieEntra.isEmpty();
+
+        // Validación de igualdad
+        if (haySalida && hayEntrada && serieSale.equalsIgnoreCase(serieEntra)) {
+            throw new IllegalArgumentException("Los números de serie de Salida y Entrada no pueden ser iguales.");
+        }
+
+        // Necesitamos el ticket padre para el historial
+        Tickets ticketPadre = adicional.getTicket(); 
+
+        if (haySalida) {
+            System.out.println("Validando Salida: " + serieSale); // Log para debug
+            actualizarEstadoInventario(serieSale, "Stock", ticketPadre);
+        }
+
+        if (hayEntrada) {
+             System.out.println("Validando Entrada: " + serieEntra); // Log para debug
+            actualizarEstadoInventario(serieEntra, "Instalado", ticketPadre);
+        }
+    }
 	
-	
-	
+	private void actualizarEstadoInventario(String numeroSerie, String nuevoEstado, Tickets ticket) {
+        // Usamos IgnoreCase para ser más flexibles
+        Inventario inventario = inventarioRepository.findByNumeroDeSerieIgnoreCase(numeroSerie)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "El número de serie '" + numeroSerie + "' no existe en el inventario."
+                ));
+
+        // Actualizar Inventario
+        inventario.setEstado(nuevoEstado);
+        inventario.setUltimaActualizacion(LocalDate.now());
+        
+
+        if (ticket != null && ticket.getServicios() != null) {
+            inventario.setNumeroDeIncidencia(ticket.getServicios().getIncidencia());
+        }
+        inventarioRepository.save(inventario);
+
+        // Crear Historial si tenemos el ticket padre
+        if (ticket != null) {
+            PivoteInventario pivote = new PivoteInventario();
+            pivote.setFechaAsignacion(LocalDate.now());
+            pivote.setTicket(ticket);
+            pivote.setInventario(inventario);
+            pivoteInventarioRepository.save(pivote);
+        }
+    }
 }

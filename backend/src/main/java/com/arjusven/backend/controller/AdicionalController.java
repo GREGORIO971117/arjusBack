@@ -4,7 +4,9 @@ package com.arjusven.backend.controller;
 import com.arjusven.backend.model.Adicional;
 import com.arjusven.backend.service.AdicionalService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,9 +49,23 @@ public class AdicionalController {
     }
     
     @PatchMapping(path="{idAdicionales}")
-    public Adicional patchServicios(
-        @PathVariable("idAdicionales") Long id,
-        @RequestBody Adicional adicionalesDetails) {	
-        return adicionalService.patchAdicionales(id, adicionalesDetails);
+    public ResponseEntity<?> patchAdicionales(@PathVariable("idAdicionales") Long id, @RequestBody Adicional adicionalDetails) {
+        try {
+            // Llamamos al servicio que TIENE la validación
+            Adicional actualizado = adicionalService.patchAdicionales(id, adicionalDetails);
+            return ResponseEntity.ok(actualizado);
+
+        } catch (IllegalArgumentException e) {
+            // IMPORTANTE: Devolver el error 400 con el mensaje exacto para que el Front lo pinte en rojo
+            return ResponseEntity
+                    .badRequest()
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Error interno: " + e.getMessage()));
+        }
     }
 }

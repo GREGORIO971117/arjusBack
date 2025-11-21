@@ -9,4 +9,6 @@ import com.arjusven.backend.model.Inventario;
 
 @Repository
 public interface InventarioRepository extends JpaRepository<Inventario, Long> {
+	
+	Optional<Inventario> findByNumeroDeSerieIgnoreCase(String numeroDeSerie);	
 }

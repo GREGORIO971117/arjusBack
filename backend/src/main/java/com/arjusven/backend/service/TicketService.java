@@ -8,10 +8,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.arjusven.backend.dto.TicketUploadResponse;
 import com.arjusven.backend.model.Adicional;
+import com.arjusven.backend.model.Inventario;
+import com.arjusven.backend.model.PivoteInventario;
 import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.model.Usuarios;
 import com.arjusven.backend.repository.EstacionesRepository;
+import com.arjusven.backend.repository.InventarioRepository;
+import com.arjusven.backend.repository.PivoteInventarioRepository;
 import com.arjusven.backend.repository.TicketRepository;
 import com.arjusven.backend.repository.UsuariosRepository;
 
@@ -27,17 +31,22 @@ public class TicketService {
     private TicketRepository ticketsRepository;
     private ServicioService servicioService;
     private EstacionesRepository estacionesRepository;
+    private InventarioRepository inventarioRepository;
+    private UsuariosRepository usuariosRepository;
     
     @Autowired
-    public TicketService(TicketRepository ticketsRepository, ServicioService servicioService,EstacionesRepository estacionesRepository) {
+    public TicketService(TicketRepository ticketsRepository,
+    		ServicioService servicioService,
+    		EstacionesRepository estacionesRepository,
+    		InventarioRepository inventarioRepository,
+    		UsuariosRepository usuariosRepository) {
+    	
 		this.ticketsRepository = ticketsRepository;
 		this.servicioService = servicioService;
 		this.estacionesRepository = estacionesRepository;
+		this.inventarioRepository = inventarioRepository;
+		this.usuariosRepository = usuariosRepository;
 	}
-    
-    
-    @Autowired
-    private UsuariosRepository usuariosRepository; 
     
    public TicketUploadResponse uploadTicketsFromExcel(MultipartFile file, Long idAdministrador) {
         TicketUploadResponse response = new TicketUploadResponse();
@@ -80,15 +89,12 @@ public class TicketService {
                         else if (cellValue.contains(COL_OBSERVACIONES)) headerMap.put(COL_OBSERVACIONES, cell.getColumnIndex());
                     }
 
-                    // Si encontramos AL MENOS Incidencia y ID Merchant en esta fila, bingo!
+                    // Si encontramos AL MENOS Incidencia y ID Merchant en esta fila
                     if (headerMap.containsKey(COL_INCIDENCIA) && headerMap.containsKey(COL_ID_MERCHANT)) {
                         headersFound = true;
-                        // Ya tenemos el mapa, pasamos a la siguiente iteración que ya será DATA
                         continue; 
                     }
                     
-                    // Si no encontramos las columnas clave, asumimos que es una fila de logo/título y la ignoramos.
-                    // Limpiamos el mapa parcial para no mezclar basura de filas anteriores
                     headerMap.clear();
                     continue;
                 }
@@ -195,11 +201,71 @@ public class TicketService {
 
     @Transactional
     public Tickets saveTickets(Tickets tickets) {
-    	if(tickets.getServicios() != null) {
-    		servicioService.assignEstacionesDetails(tickets.getServicios());
-    	}
-    	
+        // 1. Lógica existente de servicios
+        if(tickets.getServicios() != null) {
+            servicioService.assignEstacionesDetails(tickets.getServicios());
+        }
+        
+        // 2. NUEVA LÓGICA: Vinculación con Inventario
+        if (tickets.getAdicionales() != null) {
+            procesarVinculacionInventario(tickets);
+        }
+        
         return ticketsRepository.save(tickets);
+    }
+    
+    private void procesarVinculacionInventario(Tickets ticket) {
+    	
+        Adicional adicional = ticket.getAdicionales();
+        
+        String serieSale = (adicional.getSerieLogicaSale() != null) ? adicional.getSerieLogicaSale().trim() : "";
+        String serieEntra = (adicional.getSerieLogicaEntra() != null) ? adicional.getSerieLogicaEntra().trim() : "";
+
+        boolean haySalida = !serieSale.isEmpty();
+        boolean hayEntrada = !serieEntra.isEmpty();
+
+        // 1. VALIDACIÓN: No pueden ser iguales si ambos existen
+        if (haySalida && hayEntrada && serieSale.equalsIgnoreCase(serieEntra)) {
+            throw new IllegalArgumentException("Error de lógica: El número de serie que sale y el que entra no pueden ser el mismo.");
+        }
+
+        // 2. PROCESAR SALIDA (Pasa a Stock)
+        if (haySalida) {
+            actualizarEstadoInventario(serieSale, "Stock", ticket);
+        }
+
+        // 3. PROCESAR ENTRADA (Pasa a Instalado)
+        if (hayEntrada) {
+            actualizarEstadoInventario(serieEntra, "Instalado", ticket);
+        }
+    }
+
+    /**
+     * Método auxiliar para buscar, actualizar y crear historial
+     */
+    private void actualizarEstadoInventario(String numeroSerie, String nuevoEstado, Tickets ticket) {
+        // A. Buscar en Inventario
+        Inventario inventario = inventarioRepository.findByNumeroDeSerieIgnoreCase(numeroSerie)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "El número de serie '" + numeroSerie + "' no existe en el inventario."
+                ));
+
+        // B. Actualizar datos
+        inventario.setEstado(nuevoEstado);
+        inventario.setUltimaActualizacion(LocalDate.now());
+        
+        if (ticket.getServicios() != null) {
+            inventario.setNumeroDeIncidencia(ticket.getServicios().getIncidencia());
+        }
+        
+        inventarioRepository.save(inventario);
+
+        // C. Crear Historial (Pivote)
+        PivoteInventario pivote = new PivoteInventario();
+        pivote.setTicket(ticket);
+        pivote.setInventario(inventario);
+        
+        ticket.getPivoteInventario().add(pivote);
     }
 
     // Method to find a user by ID

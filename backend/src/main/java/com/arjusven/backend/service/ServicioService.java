@@ -55,10 +55,6 @@ public class ServicioService {
                     servicio.setMotivoDeServicio(estacion.getPrioridad()); 
                 }
                 
-                // 5. Plaza de Atención (Estaciones) -> Tipo de Servicio (Servicio)
-                if (servicio.getTipoDeServicio() == null || servicio.getTipoDeServicio().trim().isEmpty()) {
-                    servicio.setTipoDeServicio(estacion.getPlazaDeAtencion()); 
-                }
                 if(servicio.getDireccion()==null || servicio.getDireccion().trim().isEmpty()) {
                 	servicio.setDireccion(estacion.getDireccion());
                 }

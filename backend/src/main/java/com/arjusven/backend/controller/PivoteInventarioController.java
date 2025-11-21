@@ -1,6 +1,7 @@
 package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.PivoteInventario;
+import com.arjusven.backend.service.InventarioService;
 import com.arjusven.backend.service.PivoteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,24 +15,55 @@ import java.util.List;
 @RequestMapping("/api/pivote")
 public class PivoteInventarioController {
 
-    private final PivoteService pivoteInventarioService;
+    private PivoteService pivoteInventarioService;
+    private InventarioService inventarioService;
 
     @Autowired
-    public PivoteInventarioController(PivoteService pivoteInventarioService) {
+    public PivoteInventarioController(
+    		PivoteService pivoteInventarioService,
+    		InventarioService inventarioService 
+    		) {
     	this.pivoteInventarioService = pivoteInventarioService;
+    	this.inventarioService = inventarioService;
     }
 
     @PostMapping
     public ResponseEntity<PivoteInventario> createPivote(@RequestBody PivoteInventario pivote) {
-
-    	PivoteInventario savedPivote = pivoteInventarioService.save(pivote);
-        return new ResponseEntity<>(savedPivote, HttpStatus.CREATED);
+    	try {
+    		PivoteInventario savedPivote = pivoteInventarioService.save(pivote);
+            return new ResponseEntity<>(savedPivote, HttpStatus.CREATED);
+    		
+    	}catch (IllegalArgumentException e) {
+            // Error de lógica, como rol incorrecto o ID nulo
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Código 400
+        } catch (RuntimeException e) {
+            // Error de DB, como usuario no encontrado
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Código 404
+        } catch (Exception e) {
+            // Error inesperado
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Código 500
+        }
+    	
+    	
     }
     
-    @GetMapping("/{idInventario}")
-    public ResponseEntity<List<PivoteInventario>> getHistorialInventario(@PathVariable("idInventario") Long idInventario) {
-        List<PivoteInventario> historial = pivoteInventarioService.getHistorialByInventarioId(idInventario);
-        return ResponseEntity.ok(historial);
+    @GetMapping("/historial/{id}")
+    public ResponseEntity<List<PivoteInventario>> getHistorialInventario(@PathVariable("id") Long id) {
+        try {
+        	
+        	
+            List<PivoteInventario> historial = inventarioService.obtenerHistorialPorInventario(id);
+            
+            if (historial.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            
+            return ResponseEntity.ok(historial);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping
