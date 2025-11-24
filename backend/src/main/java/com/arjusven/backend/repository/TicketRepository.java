@@ -10,5 +10,4 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<Tickets, Long> {
     
 	List<Tickets> findByServicios_Incidencia(String incidencia);
-
 }
