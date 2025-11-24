@@ -26,6 +26,24 @@ public class TicketController {
         this.documentGenerationService =documentGenerationService;
     }
     
+    @GetMapping("/search")
+    public ResponseEntity<List<Tickets>> searchTickets(@RequestParam("query") String query) {
+        // Si el query está vacío, devolvemos todo o error, según tu preferencia.
+        // Aquí optamos por devolver todo si está vacío para resetear la lista.
+        if (query == null || query.trim().isEmpty()) {
+             return getAllTickets();
+        }
+
+        List<Tickets> resultados = ticketService.searchTicketsSmart(query);
+
+        if (resultados.isEmpty()) {
+            // Opción A: Devolver 204 No Content (la lista en front se vacía)
+            // Opción B: Devolver 200 con lista vacía (más fácil para React)
+            return new ResponseEntity<>(resultados, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(resultados, HttpStatus.OK);
+    }
+    
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<TicketUploadResponse> uploadTickets(
             @RequestParam("file") MultipartFile file,

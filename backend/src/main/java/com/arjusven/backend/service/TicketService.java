@@ -15,7 +15,6 @@ import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.model.Usuarios;
 import com.arjusven.backend.repository.EstacionesRepository;
 import com.arjusven.backend.repository.InventarioRepository;
-import com.arjusven.backend.repository.PivoteInventarioRepository;
 import com.arjusven.backend.repository.TicketRepository;
 import com.arjusven.backend.repository.UsuariosRepository;
 
@@ -47,6 +46,34 @@ public class TicketService {
 		this.inventarioRepository = inventarioRepository;
 		this.usuariosRepository = usuariosRepository;
 	}
+    
+    public List<Tickets> searchTicketsSmart(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return ticketsRepository.findAll();
+        }
+
+        String textoBusqueda = query.trim();
+        Long idMerchantBusqueda = null;
+
+        // 1. Verificar si el input es un número (potencial ID Merchant)
+        try {
+            idMerchantBusqueda = Long.parseLong(textoBusqueda);
+        } catch (NumberFormatException e) {
+            idMerchantBusqueda = null;
+        }
+
+        // 2. INTENTO 1: Búsqueda Exacta
+        List<Tickets> resultados = ticketsRepository.buscarExacto(textoBusqueda, idMerchantBusqueda);
+
+        // 3. INTENTO 2: Si la exacta no trajo nada, intentamos Búsqueda Parcial (LIKE)
+        // Solo si no estamos buscando explícitamente un ID numérico puro que falló, 
+        // aunque a veces un número puede ser parte de una incidencia (ej: "INC-123").
+        if (resultados.isEmpty()) {
+            resultados = ticketsRepository.buscarParcial(textoBusqueda);
+        }
+
+        return resultados;
+    }
     
    public TicketUploadResponse uploadTicketsFromExcel(MultipartFile file, Long idAdministrador) {
         TicketUploadResponse response = new TicketUploadResponse();
