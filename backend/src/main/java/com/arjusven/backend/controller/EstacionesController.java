@@ -1,6 +1,7 @@
 package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.Estaciones;
+import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.service.EstacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,21 @@ public class EstacionesController {
     public ResponseEntity<List<Estaciones>> getAllEstaciones() {
         List<Estaciones> estaciones = estacionesService.getAllEstaciones();
         return ResponseEntity.ok(estaciones);
+    }
+    
+    @GetMapping("/search")
+    public ResponseEntity<List<Estaciones>> searchEstaciones(@RequestParam("query") String query) {
+        if (query == null || query.trim().isEmpty()) {
+             return getAllEstaciones();
+        }
+        List<Estaciones> resultados = estacionesService.searchEstacionesSmart(query);
+
+        if (resultados.isEmpty()) {
+            // Opción A: Devolver 204 No Content (la lista en front se vacía)
+            // Opción B: Devolver 200 con lista vacía (más fácil para React)
+            return new ResponseEntity<>(resultados, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(resultados, HttpStatus.OK);
     }
 
     

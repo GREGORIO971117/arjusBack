@@ -19,6 +19,31 @@ public class EstacionesService {
 		this.estacionesRepository = estacionesRepository;
 	}
 	
+	public List<Estaciones> searchEstacionesSmart(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return estacionesRepository.findAll();
+        }
+
+        String textoBusqueda = query.trim();
+        Long idMerchantBusqueda = null;
+
+        try {
+            idMerchantBusqueda = Long.parseLong(textoBusqueda);
+        } catch (NumberFormatException e) {
+            idMerchantBusqueda = null;
+        }
+
+        // 2. INTENTO 1: Búsqueda Exacta
+        List<Estaciones> resultados = estacionesRepository.buscarExacto(textoBusqueda, idMerchantBusqueda);
+
+        if (resultados.isEmpty()) {
+            resultados = estacionesRepository.buscarParcial(textoBusqueda);
+        }
+
+        return resultados;
+    }
+	
+	
 	public List<Estaciones> getAllEstaciones(){
 		return estacionesRepository.findAll();
 	}

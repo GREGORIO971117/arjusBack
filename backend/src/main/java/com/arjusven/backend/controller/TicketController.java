@@ -28,8 +28,6 @@ public class TicketController {
     
     @GetMapping("/search")
     public ResponseEntity<List<Tickets>> searchTickets(@RequestParam("query") String query) {
-        // Si el query está vacío, devolvemos todo o error, según tu preferencia.
-        // Aquí optamos por devolver todo si está vacío para resetear la lista.
         if (query == null || query.trim().isEmpty()) {
              return getAllTickets();
         }

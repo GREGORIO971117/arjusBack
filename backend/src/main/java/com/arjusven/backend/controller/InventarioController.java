@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.arjusven.backend.model.Inventario;
@@ -24,6 +25,22 @@ public class InventarioController {
 	
 	@Autowired
 	private InventarioService inventarioService;
+	
+	
+	
+	@GetMapping("/search")
+	public ResponseEntity<List<Inventario>> searchInventario(@RequestParam("query") String query){
+		if(query == null || query.trim().isEmpty()) {
+			return getAllInventario();
+		}
+		
+		List<Inventario> resultados = inventarioService.searchInventario(query);
+		
+		if (resultados.isEmpty()) {
+			return new ResponseEntity<>(resultados,HttpStatus.OK);	
+			}
+		return new ResponseEntity<>(resultados,HttpStatus.OK);
+	}	
 	
 	@PostMapping
 	public ResponseEntity<Inventario> createInventario(@RequestBody Inventario inventario){

@@ -10,29 +10,42 @@ import org.springframework.transaction.annotation.Transactional;
 import com.arjusven.backend.model.Inventario;
 import com.arjusven.backend.model.PivoteInventario;
 import com.arjusven.backend.repository.InventarioRepository;
-import com.arjusven.backend.repository.PivoteInventarioRepository; // Importante
-import com.arjusven.backend.repository.TicketRepository;
-
+import com.arjusven.backend.repository.PivoteInventarioRepository;
 @Service
 public class InventarioService {
     
     private final InventarioRepository inventarioRepository;
-    private final TicketRepository ticketRepository;
-    private final PivoteInventarioRepository pivoteInventarioRepository; // Nuevo repositorio
-    
-    // Nota: He quitado TicketService de aquí para evitar "Dependencia Circular" 
-    // (TicketService llama a Inventario y Inventario llama a TicketService = Error al iniciar).
+    private final PivoteInventarioRepository pivoteInventarioRepository; 
     
     @Autowired
     public InventarioService(InventarioRepository inventarioRepository, 
-                             TicketRepository ticketRepository,
                              PivoteInventarioRepository pivoteInventarioRepository) {
+    	
+    	
         this.inventarioRepository = inventarioRepository;
-        this.ticketRepository = ticketRepository;
         this.pivoteInventarioRepository = pivoteInventarioRepository;
     }
 
     // --- NUEVA FUNCIONALIDAD: HISTORIAL ---
+    
+    
+    public List<Inventario>searchInventario(String query){
+    	 if (query == null || query.trim().isEmpty()) {
+             return inventarioRepository.findAll();
+         }
+    	 
+    	 String textoBusqueda = query.trim();
+    	 
+    	 List<Inventario> resultados = inventarioRepository.buscarExacto(textoBusqueda);
+         // 3. INTENTO 2: Si la exacta no trajo nada, intentamos Búsqueda Parcial (LIKE)
+         // Solo si no estamos buscando explícitamente un ID numérico puro que falló, 
+         // aunque a veces un número puede ser parte de una incidencia (ej: "INC-123").
+         if (resultados.isEmpty()) {
+             resultados = inventarioRepository.buscarParcial(textoBusqueda);
+         }
+         return resultados;
+
+    }
     
     public List<PivoteInventario> obtenerHistorialPorInventario(Long idInventario) {
         // Verificamos que exista el inventario (opcional pero recomendado)
