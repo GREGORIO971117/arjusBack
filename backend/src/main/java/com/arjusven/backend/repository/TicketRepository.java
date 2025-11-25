@@ -31,5 +31,14 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 	           "OR LOWER(s.situacionActual) LIKE LOWER(CONCAT('%', :texto, '%'))")
 	    List<Tickets> buscarParcial(@Param("texto") String texto);
 	
+	 
+	 @Query("SELECT t FROM Tickets t " +
+	           "JOIN t.servicios s " +
+	           "WHERE " +
+	           // 1. Filtro por Situación Actual (situacionActual en Servicios)
+	           "(:situacion IS NULL OR s.situacionActual = :situacion)")
+	    List<Tickets> buscarPorFiltros(
+	            @Param("situacion") String situacion
+	    );
 							
 }
