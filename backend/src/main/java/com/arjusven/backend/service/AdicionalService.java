@@ -230,6 +230,7 @@ public class AdicionalService {
         // Crear Historial si tenemos el ticket padre
         if (ticket != null) {
             PivoteInventario pivote = new PivoteInventario();
+            pivote.setEstadoAsignado(nuevoEstado);
             pivote.setFechaAsignacion(LocalDate.now());
             pivote.setTicket(ticket);
             pivote.setInventario(inventario);

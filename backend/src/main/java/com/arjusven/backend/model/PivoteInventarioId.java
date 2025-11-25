@@ -1,6 +1,5 @@
 package com.arjusven.backend.model;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -8,7 +7,7 @@ import jakarta.persistence.Embeddable;
 
 
 @Embeddable
-public class PivoteInventarioId implements Serializable {
+public class PivoteInventarioId{
 
     // FK de Tickets
     @Column(name = "tickets_id_tickets")

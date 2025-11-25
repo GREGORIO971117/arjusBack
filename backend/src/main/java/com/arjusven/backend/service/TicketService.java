@@ -17,6 +17,7 @@ import com.arjusven.backend.repository.EstacionesRepository;
 import com.arjusven.backend.repository.InventarioRepository;
 import com.arjusven.backend.repository.TicketRepository;
 import com.arjusven.backend.repository.UsuariosRepository;
+import com.arjusven.backend.repository.PivoteInventarioRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -32,19 +33,22 @@ public class TicketService {
     private EstacionesRepository estacionesRepository;
     private InventarioRepository inventarioRepository;
     private UsuariosRepository usuariosRepository;
+    private PivoteInventarioRepository pivoteInventarioRepository;
     
     @Autowired
     public TicketService(TicketRepository ticketsRepository,
     		ServicioService servicioService,
     		EstacionesRepository estacionesRepository,
     		InventarioRepository inventarioRepository,
-    		UsuariosRepository usuariosRepository) {
+    		UsuariosRepository usuariosRepository,
+    		PivoteInventarioRepository pivoteInventarioRepository) {
     	
 		this.ticketsRepository = ticketsRepository;
 		this.servicioService = servicioService;
 		this.estacionesRepository = estacionesRepository;
 		this.inventarioRepository = inventarioRepository;
 		this.usuariosRepository = usuariosRepository;
+		this.pivoteInventarioRepository = pivoteInventarioRepository;
 	}
     
     public List<Tickets> searchTicketsSmart(String query) {
@@ -66,8 +70,6 @@ public class TicketService {
         List<Tickets> resultados = ticketsRepository.buscarExacto(textoBusqueda, idMerchantBusqueda);
 
         // 3. INTENTO 2: Si la exacta no trajo nada, intentamos Búsqueda Parcial (LIKE)
-        // Solo si no estamos buscando explícitamente un ID numérico puro que falló, 
-        // aunque a veces un número puede ser parte de una incidencia (ej: "INC-123").
         if (resultados.isEmpty()) {
             resultados = ticketsRepository.buscarParcial(textoBusqueda);
         }
@@ -233,72 +235,14 @@ public class TicketService {
             servicioService.assignEstacionesDetails(tickets.getServicios());
         }
         
-        // 2. NUEVA LÓGICA: Vinculación con Inventario
-        if (tickets.getAdicionales() != null) {
-            procesarVinculacionInventario(tickets);
-        }
-        
         return ticketsRepository.save(tickets);
     }
     
-    private void procesarVinculacionInventario(Tickets ticket) {
-    	
-        Adicional adicional = ticket.getAdicionales();
-        
-        String serieSale = (adicional.getSerieLogicaSale() != null) ? adicional.getSerieLogicaSale().trim() : "";
-        String serieEntra = (adicional.getSerieLogicaEntra() != null) ? adicional.getSerieLogicaEntra().trim() : "";
+   
 
-        boolean haySalida = !serieSale.isEmpty();
-        boolean hayEntrada = !serieEntra.isEmpty();
-
-        // 1. VALIDACIÓN: No pueden ser iguales si ambos existen
-        if (haySalida && hayEntrada && serieSale.equalsIgnoreCase(serieEntra)) {
-            throw new IllegalArgumentException("Error de lógica: El número de serie que sale y el que entra no pueden ser el mismo.");
-        }
-
-        // 2. PROCESAR SALIDA (Pasa a Stock)
-        if (haySalida) {
-            actualizarEstadoInventario(serieSale, "Stock", ticket);
-        }
-
-        // 3. PROCESAR ENTRADA (Pasa a Instalado)
-        if (hayEntrada) {
-            actualizarEstadoInventario(serieEntra, "Instalado", ticket);
-        }
-    }
-
-    /**
-     * Método auxiliar para buscar, actualizar y crear historial
-     */
-    private void actualizarEstadoInventario(String numeroSerie, String nuevoEstado, Tickets ticket) {
-        // A. Buscar en Inventario
-        Inventario inventario = inventarioRepository.findByNumeroDeSerieIgnoreCase(numeroSerie)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "El número de serie '" + numeroSerie + "' no existe en el inventario."
-                ));
-
-        // B. Actualizar datos
-        inventario.setEstado(nuevoEstado);
-        inventario.setUltimaActualizacion(LocalDate.now());
-        
-        if (ticket.getServicios() != null) {
-            inventario.setNumeroDeIncidencia(ticket.getServicios().getIncidencia());
-        }
-        
-        inventarioRepository.save(inventario);
-
-        // C. Crear Historial (Pivote)
-        PivoteInventario pivote = new PivoteInventario();
-        pivote.setTicket(ticket);
-        pivote.setInventario(inventario);
-        
-        ticket.getPivoteInventario().add(pivote);
-    }
-
-    // Method to find a user by ID
-    public Tickets getTicketsById(Long id) { // <-- Change return type to Optional<Tickets>
+    public Tickets getTicketsById(Long id) { 
         return ticketsRepository.findById(id).orElseThrow(
-        		()->new IllegalArgumentException("El ticket con el id" + id+ "no existe")
+        		()->new IllegalArgumentException("El ticket con el id" + id + "no existe")
         		); 
     }
 

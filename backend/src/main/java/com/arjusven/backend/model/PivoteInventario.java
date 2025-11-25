@@ -1,11 +1,7 @@
 package com.arjusven.backend.model;
 
-
-import java.io.Serializable;
 import java.time.LocalDate;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -16,7 +12,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Tickets_has_Inventario")
-public class PivoteInventario implements Serializable {
+public class PivoteInventario{
 
     // 1. Clave compuesta
     @EmbeddedId
@@ -34,21 +30,20 @@ public class PivoteInventario implements Serializable {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "pivoteInventario"})
     private Inventario inventario;
         
-    @Column(name = "cantidad")
-    private Integer cantidad; 
+    @Column(name = "estado_asignado")
+    private String  estadoAsignado; 
     
     @Column(name = "fecha_asignacion")
     private LocalDate fechaAsignacion; 
-
 
     public PivoteInventario() {
         this.id = new PivoteInventarioId();
     }
     
-    public PivoteInventario(Tickets ticket, Inventario inventario, Integer cantidad, LocalDate fechaAsignacion) {
+    public PivoteInventario(Tickets ticket, Inventario inventario, String estadoAsignado, LocalDate fechaAsignacion) {
         this.ticket = ticket;
         this.inventario = inventario;
-        this.cantidad = cantidad;
+        this.estadoAsignado = estadoAsignado;
         this.fechaAsignacion = fechaAsignacion;
         this.id = new PivoteInventarioId(ticket.getIdTickets(), inventario.getIdInventario());
     }
@@ -80,12 +75,12 @@ public class PivoteInventario implements Serializable {
         this.id.setIdInventario(inventario.getIdInventario());
     }
 
-    public Integer getCantidad() {
-        return cantidad;
+    public String getEstadoAsignado() {
+        return estadoAsignado;
     }
 
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
+    public void setEstadoAsignado(String estadoAsignado) {
+        this.estadoAsignado = estadoAsignado;
     }
 
     public LocalDate getFechaAsignacion() {
