@@ -59,7 +59,6 @@ public class TicketService {
         String textoBusqueda = query.trim();
         Long idMerchantBusqueda = null;
 
-        // 1. Verificar si el input es un número (potencial ID Merchant)
         try {
             idMerchantBusqueda = Long.parseLong(textoBusqueda);
         } catch (NumberFormatException e) {
@@ -75,6 +74,11 @@ public class TicketService {
         }
 
         return resultados;
+    }
+    
+    public List<Tickets> filterTickets(String situacion) {
+        
+        return ticketsRepository.buscarPorFiltros(situacion);
     }
     
    public TicketUploadResponse uploadTicketsFromExcel(MultipartFile file, Long idAdministrador) {

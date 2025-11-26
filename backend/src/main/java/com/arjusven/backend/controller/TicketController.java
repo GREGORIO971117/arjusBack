@@ -26,6 +26,36 @@ public class TicketController {
         this.documentGenerationService =documentGenerationService;
     }
     
+    @GetMapping("/filter")
+    public ResponseEntity<List<Tickets>> filterTickets(@RequestParam("situacion") String situacion) {
+        String situacionFilter = null;
+
+        if ("todos".equalsIgnoreCase(situacion)) {
+            
+        	return getAllTickets();
+            
+        }
+        
+        
+        
+        
+        // 2. Lógica de normalización para los filtros específicos
+        if (situacion != null) {
+            if ("abierto".equalsIgnoreCase(situacion)) {
+                situacionFilter = "Abierta";
+            } else if ("cerrado".equalsIgnoreCase(situacion)) {
+                situacionFilter = "Cerrado"; 
+            } else {
+                situacionFilter = situacion;
+            }
+        }
+        
+        // 3. Si llegamos aquí, aplicamos el filtro específico
+        List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter);
+        return ResponseEntity.ok(filteredTickets);
+    }
+    
+    
     @GetMapping("/search")
     public ResponseEntity<List<Tickets>> searchTickets(@RequestParam("query") String query) {
         if (query == null || query.trim().isEmpty()) {
