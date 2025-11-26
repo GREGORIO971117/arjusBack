@@ -27,31 +27,53 @@ public class TicketController {
     }
     
     @GetMapping("/filter")
-    public ResponseEntity<List<Tickets>> filterTickets(@RequestParam("situacion") String situacion) {
-        String situacionFilter = null;
+    public ResponseEntity<List<Tickets>> filterTickets(
+    		@RequestParam("situacion") String situacion,
+    		@RequestParam("sla") String sla) {
+    	
+    	
+    	String situacionFilter = null;
+        String slaFilter = null; 
 
-        if ("todos".equalsIgnoreCase(situacion)) {
-            
-        	return getAllTickets();
-            
-        }
-        
-        
-        
-        
-        // 2. Lógica de normalización para los filtros específicos
-        if (situacion != null) {
+        // 1. Normalización de la Situación
+        if ("todos".equalsIgnoreCase(situacion) || situacion == null) {
+            // Si es 'todos' o no se envía, se pasa null al repositorio para ignorar el filtro.
+            situacionFilter = null;
+        } else {
+            // Normalización para la base de datos (Ej: abierto -> Abierta)
             if ("abierto".equalsIgnoreCase(situacion)) {
-                situacionFilter = "Abierta";
+                situacionFilter = "Abierto";
             } else if ("cerrado".equalsIgnoreCase(situacion)) {
                 situacionFilter = "Cerrado"; 
             } else {
                 situacionFilter = situacion;
             }
         }
+
+        // 2. Normalización del SLA
+        if (sla != null && !"todos".equalsIgnoreCase(sla)) {
+            String normalizedSla = sla.trim();
+
+            if ("local".equalsIgnoreCase(normalizedSla)) {
+                slaFilter = "Local";
+            } else if ("foraneo".equalsIgnoreCase(normalizedSla) || "foráneo".equalsIgnoreCase(normalizedSla)) {
+                // Asegurar que maneje Foraneo/Foráneo
+                slaFilter = "Foráneo"; 
+            } else {
+                slaFilter = sla; 
+            }
+        } else {
+            // Si es "todos" o no se proporciona, se pasa null al repositorio.
+            slaFilter = null; 
+        }
+
+        // 3. Aplicar los filtros: Ahora ambos filtros se aplican independientemente.
+        List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter);
         
-        // 3. Si llegamos aquí, aplicamos el filtro específico
-        List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter);
+        if (filteredTickets == null || filteredTickets.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        
         return ResponseEntity.ok(filteredTickets);
     }
     

@@ -76,9 +76,9 @@ public class TicketService {
         return resultados;
     }
     
-    public List<Tickets> filterTickets(String situacion) {
+    public List<Tickets> filterTickets(String situacion, String sla) {
         
-        return ticketsRepository.buscarPorFiltros(situacion);
+        return ticketsRepository.buscarPorFiltros(situacion, sla);
     }
     
    public TicketUploadResponse uploadTicketsFromExcel(MultipartFile file, Long idAdministrador) {

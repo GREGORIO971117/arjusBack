@@ -35,10 +35,11 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 	 @Query("SELECT t FROM Tickets t " +
 	           "JOIN t.servicios s " +
 	           "WHERE " +
-	           // 1. Filtro por Situación Actual (situacionActual en Servicios)
-	           "(:situacion IS NULL OR s.situacionActual = :situacion)")
+	           "(:situacion IS NULL OR s.situacionActual = :situacion) " +
+	           "AND (:sla IS NULL OR s.sla = :sla)") // <-- CRITERIO SLA AÑADIDO
 	    List<Tickets> buscarPorFiltros(
-	            @Param("situacion") String situacion
+	            @Param("situacion") String situacion,
+	            @Param("sla") String sla 
 	    );
 							
 }
