@@ -1,5 +1,6 @@
 package com.arjusven.backend.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,42 @@ import com.arjusven.backend.service.InventarioService;
 @RequestMapping("/api/inventario")
 public class InventarioController {
 
-	
 	@Autowired
 	private InventarioService inventarioService;
+	
+	@GetMapping("/filter")
+	public ResponseEntity<List<Inventario>> filterInventario(
+	        @RequestParam(value = "estado", required = false) String estado,
+	        @RequestParam(value = "plaza", required = false) String plaza,
+	        @RequestParam(value = "fechaInicio", required = false) LocalDate fechaInicio, 
+            @RequestParam(value = "fechaFin", required = false) LocalDate fechaFin	        
+	        ){
+		
+		
+	    String estadoFilter = null;
+	    if(estado != null && !"todos".equalsIgnoreCase(estado)) {
+	        
+	        String normalizedTipo = estado.trim();
+	        estadoFilter = normalizedTipo; 
+	    }else {
+	        estadoFilter = null; 
+	    }
+	    
+	    if(plaza != null && !"todos".equalsIgnoreCase(plaza)) {
+	    	
+	    	String normalizedTipo = plaza.trim();
+	    	plaza = normalizedTipo;
+	    }else {
+	    	plaza = null;
+	    }
+	    
+	    // 4. Aplicar los filtros
+	    List<Inventario> filteredInventario = inventarioService.filterInventario(estadoFilter,plaza,fechaInicio, fechaFin );
+	    if (filteredInventario == null || filteredInventario.isEmpty()) {
+	        return ResponseEntity.noContent().build();
+	    }
+	    return ResponseEntity.ok(filteredInventario);
+	}
 	
 	
 	

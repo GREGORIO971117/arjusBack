@@ -1,5 +1,6 @@
 package com.arjusven.backend.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -26,8 +27,12 @@ public class InventarioService {
         this.pivoteInventarioRepository = pivoteInventarioRepository;
     }
 
-    // --- NUEVA FUNCIONALIDAD: HISTORIAL ---
+    //Filtro del inventario
     
+    public List<Inventario> filterInventario(String estado,String plaza,LocalDate fechaInicio, LocalDate fechaFin){
+    	
+    	return inventarioRepository.buscarPorFiltro(estado, plaza, fechaInicio, fechaFin);
+    }    
     
     public List<Inventario>searchInventario(String query){
     	 if (query == null || query.trim().isEmpty()) {
@@ -38,8 +43,6 @@ public class InventarioService {
     	 
     	 List<Inventario> resultados = inventarioRepository.buscarExacto(textoBusqueda);
          // 3. INTENTO 2: Si la exacta no trajo nada, intentamos Búsqueda Parcial (LIKE)
-         // Solo si no estamos buscando explícitamente un ID numérico puro que falló, 
-         // aunque a veces un número puede ser parte de una incidencia (ej: "INC-123").
          if (resultados.isEmpty()) {
              resultados = inventarioRepository.buscarParcial(textoBusqueda);
          }
