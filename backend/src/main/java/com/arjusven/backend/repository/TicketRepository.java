@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -38,11 +39,15 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 		       "(:situacion IS NULL OR s.situacionActual = :situacion) " +
 		       "AND (:sla IS NULL OR s.sla = :sla) " +
 		       "AND (:tipoDeServicio IS NULL OR s.tipoDeServicio = :tipoDeServicio) " + 
-		       "AND (:supervisor IS NULL OR s.supervisor = :supervisor)") 
+		       "AND (:supervisor IS NULL OR s.supervisor = :supervisor) " +
+		       "AND (:fechaInicio IS NULL OR s.fechaDeAsignacion >= :fechaInicio) " +
+	           "AND (:fechaFin IS NULL OR s.fechaDeAsignacion <= :fechaFin)")
 		List<Tickets> buscarPorFiltros(
 		        @Param("situacion") String situacion,
 		        @Param("sla") String sla,
 		        @Param("tipoDeServicio") String tipoDeServicio,
-		        @Param("supervisor") String supervisor
+		        @Param("supervisor") String supervisor,
+		        @Param("fechaInicio") LocalDate fechaInicio,
+	            @Param("fechaFin") LocalDate fechaFin
 		);
 }

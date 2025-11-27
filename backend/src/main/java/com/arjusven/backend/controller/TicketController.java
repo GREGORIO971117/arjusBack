@@ -31,8 +31,11 @@ public class TicketController {
             @RequestParam(value = "situacion", required = false) String situacion, 
             @RequestParam(value = "sla", required = false) String sla,            
             @RequestParam(value = "tipoDeServicio", required = false) String tipoDeServicio,
-            @RequestParam(value = "supervisor", required = false) String supervisor 
+            @RequestParam(value = "supervisor", required = false) String supervisor,
+            @RequestParam(value = "fechaInicio", required = false) LocalDate fechaInicio, 
+            @RequestParam(value = "fechaFin", required = false) LocalDate fechaFin
     ) {
+    	
 	    String situacionFilter = null;
 	    String slaFilter = null; 
 	    String tipoDeServicioFilter = null;
@@ -89,7 +92,7 @@ public class TicketController {
 	    
 	    
 	    // 4. Aplicar los filtros
-	    List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter, tipoDeServicioFilter,supervisorFilter);
+	    List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter, tipoDeServicioFilter,supervisorFilter, fechaInicio, fechaFin);
 	    
 	    if (filteredTickets == null || filteredTickets.isEmpty()) {
 	        return ResponseEntity.noContent().build();
