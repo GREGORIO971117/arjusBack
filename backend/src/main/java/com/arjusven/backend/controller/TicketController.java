@@ -30,11 +30,13 @@ public class TicketController {
     public ResponseEntity<List<Tickets>> filterTickets(
             @RequestParam(value = "situacion", required = false) String situacion, 
             @RequestParam(value = "sla", required = false) String sla,            
-            @RequestParam(value = "tipoDeServicio", required = false) String tipoDeServicio
+            @RequestParam(value = "tipoDeServicio", required = false) String tipoDeServicio,
+            @RequestParam(value = "supervisor", required = false) String supervisor 
     ) {
 	    String situacionFilter = null;
 	    String slaFilter = null; 
 	    String tipoDeServicioFilter = null;
+	    String supervisorFilter = null;
 	
 	    // =======================================================
 	    // 1. Normalización de la Situación
@@ -68,28 +70,26 @@ public class TicketController {
 	        slaFilter = null; 
 	    }
 	    
-	    // =======================================================
-	    // 3. Normalización del Tipo de Servicio
-	    // =======================================================
-	    // Lista de valores: "Sin categoria", "Mantenimiento Correctivo", "Mantenimiento Preventivo", etc.
-	    
 	    if (tipoDeServicio != null && !"todos".equalsIgnoreCase(tipoDeServicio)) {
 	         // Eliminamos espacios en blanco accidentales
 	         String normalizedTipo = tipoDeServicio.trim();
-	         
-	         // Aquí simplemente asignamos el valor que viene del front.
-	         // Como es un select/dropdown en el front, el texto debería coincidir con la BD.
 	         tipoDeServicioFilter = normalizedTipo;
 	         
 	    } else {
-	        // Si es null o "todos", pasamos null para que el Repository ignore este filtro
 	        tipoDeServicioFilter = null;
 	    }
-	
-	    // =======================================================
+	    
+	    if(supervisor != null && !"todos".equalsIgnoreCase(supervisor)) {
+	    	
+	    	String normalizedTipo = supervisor.trim();
+	    	supervisorFilter = normalizedTipo;
+	    }else {
+	    	supervisorFilter = null;
+	    }
+	    
+	    
 	    // 4. Aplicar los filtros
-	    // =======================================================
-	    List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter, tipoDeServicioFilter);
+	    List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter, tipoDeServicioFilter,supervisorFilter);
 	    
 	    if (filteredTickets == null || filteredTickets.isEmpty()) {
 	        return ResponseEntity.noContent().build();

@@ -37,10 +37,12 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 		       "WHERE " +
 		       "(:situacion IS NULL OR s.situacionActual = :situacion) " +
 		       "AND (:sla IS NULL OR s.sla = :sla) " +
-		       "AND (:tipoDeServicio IS NULL OR s.tipoDeServicio = :tipoDeServicio)") 
+		       "AND (:tipoDeServicio IS NULL OR s.tipoDeServicio = :tipoDeServicio) " + 
+		       "AND (:supervisor IS NULL OR s.supervisor = :supervisor)") 
 		List<Tickets> buscarPorFiltros(
 		        @Param("situacion") String situacion,
 		        @Param("sla") String sla,
-		        @Param("tipoDeServicio") String tipoDeServicio
+		        @Param("tipoDeServicio") String tipoDeServicio,
+		        @Param("supervisor") String supervisor
 		);
 }
