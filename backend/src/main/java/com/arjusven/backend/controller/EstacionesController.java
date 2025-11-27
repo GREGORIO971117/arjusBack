@@ -1,7 +1,6 @@
 package com.arjusven.backend.controller;
 
 import com.arjusven.backend.model.Estaciones;
-import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.service.EstacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +20,31 @@ public class EstacionesController {
     public EstacionesController(EstacionesService estacionesService) {
         this.estacionesService = estacionesService;
     }
+    
+    @GetMapping("/filter")
+    public ResponseEntity<List<Estaciones>> filterEstaciones(
+    		
+        // ✅ CORRECCIÓN: Añadir required = false
+    	@RequestParam(value = "supervisorArjus", required = false) String supervisorArjus){ 
+    	
+    		String supervisorArjusFilter = null;
+    		
+    		if(supervisorArjus != null && !"todos".equalsIgnoreCase(supervisorArjus)) {
+    	    	
+    	    	String normalizedTipo = supervisorArjus.trim();
+    	    	supervisorArjusFilter = normalizedTipo;
+    	    }else {
+    	    	supervisorArjusFilter = null;
+    	    }
+    		
+    		List<Estaciones> filteredEstaciones = estacionesService.filterEstaciones(supervisorArjusFilter);
+    	    
+    	    if (filteredEstaciones == null || filteredEstaciones.isEmpty()) {
+    	        return ResponseEntity.noContent().build();
+    	    }
+    	    
+    	    return ResponseEntity.ok(filteredEstaciones);
+    	}
 
     @GetMapping
     public ResponseEntity<List<Estaciones>> getAllEstaciones() {

@@ -19,6 +19,12 @@ public class EstacionesService {
 		this.estacionesRepository = estacionesRepository;
 	}
 	
+	public List<Estaciones> filterEstaciones(String supervisorArjus) {
+        return estacionesRepository.buscarPorFiltros(supervisorArjus);
+    }
+    
+	
+	
 	public List<Estaciones> searchEstacionesSmart(String query) {
         if (query == null || query.trim().isEmpty()) {
             return estacionesRepository.findAll();

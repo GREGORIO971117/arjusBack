@@ -25,5 +25,11 @@ public interface EstacionesRepository extends JpaRepository<Estaciones, Long>{
 			"OR LOWER(t.direccion) LIKE LOWER(CONCAT('%', :texto, '%')) " +
 			"OR LOWER(t.plazaDeAtencion) LIKE LOWER(CONCAT('%', :texto, '%'))")
 	List<Estaciones> buscarParcial(@Param("texto") String texto);
-			
+	
+	@Query("SELECT t FROM Estaciones t " +
+			"WHERE " +
+			"(:supervisorArjus IS NULL OR t.supervisorArjus = :supervisorArjus)")
+	List<Estaciones> buscarPorFiltros(
+			@Param("supervisorArjus") String supervisorArjus
+			);
 }
