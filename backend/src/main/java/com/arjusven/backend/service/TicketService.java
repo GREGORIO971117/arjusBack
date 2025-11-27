@@ -8,8 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.arjusven.backend.dto.TicketUploadResponse;
 import com.arjusven.backend.model.Adicional;
-import com.arjusven.backend.model.Inventario;
-import com.arjusven.backend.model.PivoteInventario;
 import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.model.Usuarios;
@@ -31,9 +29,7 @@ public class TicketService {
     private TicketRepository ticketsRepository;
     private ServicioService servicioService;
     private EstacionesRepository estacionesRepository;
-    private InventarioRepository inventarioRepository;
     private UsuariosRepository usuariosRepository;
-    private PivoteInventarioRepository pivoteInventarioRepository;
     
     @Autowired
     public TicketService(TicketRepository ticketsRepository,
@@ -46,9 +42,7 @@ public class TicketService {
 		this.ticketsRepository = ticketsRepository;
 		this.servicioService = servicioService;
 		this.estacionesRepository = estacionesRepository;
-		this.inventarioRepository = inventarioRepository;
 		this.usuariosRepository = usuariosRepository;
-		this.pivoteInventarioRepository = pivoteInventarioRepository;
 	}
     
     public List<Tickets> searchTicketsSmart(String query) {
@@ -76,9 +70,9 @@ public class TicketService {
         return resultados;
     }
     
-    public List<Tickets> filterTickets(String situacion, String sla) {
+    public List<Tickets> filterTickets(String situacion, String sla, String tipoDeServicio) {
         
-        return ticketsRepository.buscarPorFiltros(situacion, sla);
+        return ticketsRepository.buscarPorFiltros(situacion, sla, tipoDeServicio);
     }
     
    public TicketUploadResponse uploadTicketsFromExcel(MultipartFile file, Long idAdministrador) {

@@ -28,54 +28,75 @@ public class TicketController {
     
     @GetMapping("/filter")
     public ResponseEntity<List<Tickets>> filterTickets(
-    		@RequestParam("situacion") String situacion,
-    		@RequestParam("sla") String sla) {
-    	
-    	
-    	String situacionFilter = null;
-        String slaFilter = null; 
-
-        // 1. Normalización de la Situación
-        if ("todos".equalsIgnoreCase(situacion) || situacion == null) {
-            // Si es 'todos' o no se envía, se pasa null al repositorio para ignorar el filtro.
-            situacionFilter = null;
-        } else {
-            // Normalización para la base de datos (Ej: abierto -> Abierta)
-            if ("abierto".equalsIgnoreCase(situacion)) {
-                situacionFilter = "Abierto";
-            } else if ("cerrado".equalsIgnoreCase(situacion)) {
-                situacionFilter = "Cerrado"; 
-            } else {
-                situacionFilter = situacion;
-            }
-        }
-
-        // 2. Normalización del SLA
-        if (sla != null && !"todos".equalsIgnoreCase(sla)) {
-            String normalizedSla = sla.trim();
-
-            if ("local".equalsIgnoreCase(normalizedSla)) {
-                slaFilter = "Local";
-            } else if ("foraneo".equalsIgnoreCase(normalizedSla) || "foráneo".equalsIgnoreCase(normalizedSla)) {
-                // Asegurar que maneje Foraneo/Foráneo
-                slaFilter = "Foráneo"; 
-            } else {
-                slaFilter = sla; 
-            }
-        } else {
-            // Si es "todos" o no se proporciona, se pasa null al repositorio.
-            slaFilter = null; 
-        }
-
-        // 3. Aplicar los filtros: Ahora ambos filtros se aplican independientemente.
-        List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter);
-        
-        if (filteredTickets == null || filteredTickets.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        
-        return ResponseEntity.ok(filteredTickets);
-    }
+            @RequestParam(value = "situacion", required = false) String situacion, 
+            @RequestParam(value = "sla", required = false) String sla,            
+            @RequestParam(value = "tipoDeServicio", required = false) String tipoDeServicio
+    ) {
+	    String situacionFilter = null;
+	    String slaFilter = null; 
+	    String tipoDeServicioFilter = null;
+	
+	    // =======================================================
+	    // 1. Normalización de la Situación
+	    // =======================================================
+	    if ("todos".equalsIgnoreCase(situacion) || situacion == null) {
+	        situacionFilter = null;
+	    } else {
+	        if ("abierto".equalsIgnoreCase(situacion)) {
+	            situacionFilter = "Abierto"; // Asegúrate que en BD sea "Abierta"
+	        } else if ("cerrado".equalsIgnoreCase(situacion)) {
+	            situacionFilter = "Cerrado"; 
+	        } else {
+	            situacionFilter = situacion;
+	        }
+	    }
+	
+	    // =======================================================
+	    // 2. Normalización del SLA
+	    // =======================================================
+	    if (sla != null && !"todos".equalsIgnoreCase(sla)) {
+	        String normalizedSla = sla.trim();
+	
+	        if ("local".equalsIgnoreCase(normalizedSla)) {
+	            slaFilter = "Local";
+	        } else if ("foraneo".equalsIgnoreCase(normalizedSla) || "foráneo".equalsIgnoreCase(normalizedSla)) {
+	            slaFilter = "Foráneo"; 
+	        } else {
+	            slaFilter = sla; 
+	        }
+	    } else {
+	        slaFilter = null; 
+	    }
+	    
+	    // =======================================================
+	    // 3. Normalización del Tipo de Servicio
+	    // =======================================================
+	    // Lista de valores: "Sin categoria", "Mantenimiento Correctivo", "Mantenimiento Preventivo", etc.
+	    
+	    if (tipoDeServicio != null && !"todos".equalsIgnoreCase(tipoDeServicio)) {
+	         // Eliminamos espacios en blanco accidentales
+	         String normalizedTipo = tipoDeServicio.trim();
+	         
+	         // Aquí simplemente asignamos el valor que viene del front.
+	         // Como es un select/dropdown en el front, el texto debería coincidir con la BD.
+	         tipoDeServicioFilter = normalizedTipo;
+	         
+	    } else {
+	        // Si es null o "todos", pasamos null para que el Repository ignore este filtro
+	        tipoDeServicioFilter = null;
+	    }
+	
+	    // =======================================================
+	    // 4. Aplicar los filtros
+	    // =======================================================
+	    List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter, tipoDeServicioFilter);
+	    
+	    if (filteredTickets == null || filteredTickets.isEmpty()) {
+	        return ResponseEntity.noContent().build();
+	    }
+	    
+	    return ResponseEntity.ok(filteredTickets);
+	}
     
     
     @GetMapping("/search")

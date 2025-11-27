@@ -33,13 +33,14 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 	
 	 
 	 @Query("SELECT t FROM Tickets t " +
-	           "JOIN t.servicios s " +
-	           "WHERE " +
-	           "(:situacion IS NULL OR s.situacionActual = :situacion) " +
-	           "AND (:sla IS NULL OR s.sla = :sla)") // <-- CRITERIO SLA AÑADIDO
-	    List<Tickets> buscarPorFiltros(
-	            @Param("situacion") String situacion,
-	            @Param("sla") String sla 
-	    );
-							
+		       "JOIN t.servicios s " +
+		       "WHERE " +
+		       "(:situacion IS NULL OR s.situacionActual = :situacion) " +
+		       "AND (:sla IS NULL OR s.sla = :sla) " +
+		       "AND (:tipoDeServicio IS NULL OR s.tipoDeServicio = :tipoDeServicio)") 
+		List<Tickets> buscarPorFiltros(
+		        @Param("situacion") String situacion,
+		        @Param("sla") String sla,
+		        @Param("tipoDeServicio") String tipoDeServicio
+		);
 }
