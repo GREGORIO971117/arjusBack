@@ -24,7 +24,6 @@ public class EstacionesController {
     @GetMapping("/filter")
     public ResponseEntity<List<Estaciones>> filterEstaciones(
     		
-        // ✅ CORRECCIÓN: Añadir required = false
     	@RequestParam(value = "supervisorArjus", required = false) String supervisorArjus, 
     	@RequestParam(value = "estado", required = false) String estado,
     	@RequestParam(value = "cobertura", required = false) String cobertura,
@@ -77,6 +76,7 @@ public class EstacionesController {
     	    
     	    return ResponseEntity.ok(filteredEstaciones);
     	}
+    
 
     @GetMapping
     public ResponseEntity<List<Estaciones>> getAllEstaciones() {
