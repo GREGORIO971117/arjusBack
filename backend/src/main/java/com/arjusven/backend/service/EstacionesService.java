@@ -19,8 +19,8 @@ public class EstacionesService {
 		this.estacionesRepository = estacionesRepository;
 	}
 	
-	public List<Estaciones> filterEstaciones(String supervisorArjus) {
-        return estacionesRepository.buscarPorFiltros(supervisorArjus);
+	public List<Estaciones> filterEstaciones(String supervisorArjus, String estado, String cobertura, String plazaDeAtencion) {
+        return estacionesRepository.buscarPorFiltros(supervisorArjus, estado, cobertura, plazaDeAtencion);
     }
     
 	

@@ -25,9 +25,16 @@ public class EstacionesController {
     public ResponseEntity<List<Estaciones>> filterEstaciones(
     		
         // ✅ CORRECCIÓN: Añadir required = false
-    	@RequestParam(value = "supervisorArjus", required = false) String supervisorArjus){ 
+    	@RequestParam(value = "supervisorArjus", required = false) String supervisorArjus, 
+    	@RequestParam(value = "estado", required = false) String estado,
+    	@RequestParam(value = "cobertura", required = false) String cobertura,
+    	@RequestParam(value = "plazaDeAtencion", required = false) String plazaDeAtencion){ 
+
     	
     		String supervisorArjusFilter = null;
+    		String estadoFilter = null;
+    		String coberturaFilter = null;
+    		String plazaDeAtencionFilter = null;
     		
     		if(supervisorArjus != null && !"todos".equalsIgnoreCase(supervisorArjus)) {
     	    	
@@ -37,7 +44,32 @@ public class EstacionesController {
     	    	supervisorArjusFilter = null;
     	    }
     		
-    		List<Estaciones> filteredEstaciones = estacionesService.filterEstaciones(supervisorArjusFilter);
+    		
+    		if(estado != null && !"todos".equalsIgnoreCase(estado)) {
+    	    	
+    	    	String normalizedTipo = estado.trim();
+    	    	estadoFilter = normalizedTipo;
+    	    }else {
+    	    	estadoFilter = null;
+    	    }
+    		
+    		if(cobertura != null && !"todos".equalsIgnoreCase(cobertura)) {
+    	    	
+    	    	String normalizedTipo = cobertura.trim();
+    	    	coberturaFilter = normalizedTipo;
+    	    }else {
+    	    	coberturaFilter = null;
+    	    }
+    		
+    		if(plazaDeAtencion != null && !"todos".equalsIgnoreCase(plazaDeAtencion)) {
+    	    	
+    	    	String normalizedTipo = plazaDeAtencion.trim();
+    	    	plazaDeAtencionFilter = normalizedTipo;
+    	    }else {
+    	    	plazaDeAtencionFilter = null;
+    	    }
+    		
+    		List<Estaciones> filteredEstaciones = estacionesService.filterEstaciones(supervisorArjusFilter, estadoFilter, coberturaFilter, plazaDeAtencionFilter);
     	    
     	    if (filteredEstaciones == null || filteredEstaciones.isEmpty()) {
     	        return ResponseEntity.noContent().build();

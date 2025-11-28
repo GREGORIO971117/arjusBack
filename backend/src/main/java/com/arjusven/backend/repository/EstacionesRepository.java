@@ -28,8 +28,14 @@ public interface EstacionesRepository extends JpaRepository<Estaciones, Long>{
 	
 	@Query("SELECT t FROM Estaciones t " +
 			"WHERE " +
-			"(:supervisorArjus IS NULL OR t.supervisorArjus = :supervisorArjus)")
+			"(:supervisorArjus IS NULL OR t.supervisorArjus = :supervisorArjus) " +
+			"AND (:estado IS NULL OR t.estado  = :estado) " +
+			"AND (:cobertura IS NULL OR t.cobertura = :cobertura) " +
+			"AND (:plazaDeAtencion IS NULL OR t.plazaDeAtencion = :plazaDeAtencion)")
 	List<Estaciones> buscarPorFiltros(
-			@Param("supervisorArjus") String supervisorArjus
+			@Param("supervisorArjus") String supervisorArjus,
+			@Param("estado") String estado,
+			@Param("cobertura") String cobertura,
+			@Param("plazaDeAtencion") String plazaDeAtencion 
 			);
 }
