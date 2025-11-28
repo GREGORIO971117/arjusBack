@@ -3,11 +3,13 @@ package com.arjusven.backend.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.arjusven.backend.model.Adicional;
+import com.arjusven.backend.model.Estaciones;
 import com.arjusven.backend.model.Inventario;
 import com.arjusven.backend.model.PivoteInventario;
 import com.arjusven.backend.model.Tickets;
@@ -22,16 +24,19 @@ public class AdicionalService {
 	private AdicionalRepository adicionalRepository;
 	private InventarioRepository inventarioRepository;
 	private PivoteInventarioRepository pivoteInventarioRepository;
+	private EstacionesService estacionesService;
 	
 	@Autowired
 	public AdicionalService(
 			AdicionalRepository adicionalRepository,
 			InventarioRepository inventarioRepository,
-			PivoteInventarioRepository pivoteInventarioRepository
+			PivoteInventarioRepository pivoteInventarioRepository,
+			EstacionesService estacionesService
 			) {
 		this.adicionalRepository = adicionalRepository;
 		this.inventarioRepository = inventarioRepository;
 		this.pivoteInventarioRepository = pivoteInventarioRepository;
+		this.estacionesService = estacionesService;
 	}
 	
 	public List<Adicional> getAllAdicional(){
@@ -42,10 +47,36 @@ public class AdicionalService {
 	public Adicional getAdicionalById(Long id) {
 		return adicionalRepository.findById(id).orElse(null);
 	}
-
-	public Adicional saveAdicional(Adicional adicionales) {
-		return adicionalRepository.save(adicionales);
+	
+	public void assignEstacionDetails(Adicional adicionales, Long merchantId) { // Modificación aquí
+	    
+	    if (merchantId != null) {
+	        // Usamos el EstacionesService (inyectado previamente)
+	        Optional<Estaciones> estacionesOpt = estacionesService.findById(merchantId);
+	        
+	        if (estacionesOpt.isPresent()) {
+	            Estaciones estacion = estacionesOpt.get();
+	            
+	            // 1. Asignar PLAZA (Si está nulo o vacío)
+	            String plazaActual = adicionales.getPlaza();
+	            if (plazaActual == null || plazaActual.trim().isEmpty()) {
+	                adicionales.setPlaza(estacion.getPlazaDeAtencion()); 
+	            }
+	            
+	            // 2. Asignar CIUDAD/ESTADO (Si está nulo, vacío o es el placeholder "—")
+	            String ciudadActual = adicionales.getCiudad();
+	            if (ciudadActual == null || ciudadActual.trim().isEmpty() || ciudadActual.equals("—")) {
+	                adicionales.setCiudad(estacion.getEstado()); 
+	            }
+	        } else {
+	            System.out.println("Advertencia: ID Merchant [" + merchantId + "] no encontrado en Estaciones para Adicionales.");
+	        }
+	    }
 	}
+
+//	public Adicional saveAdicional(Adicional adicionales) {
+	//	return adicionalRepository.save(adicionales);
+	//}
 	
 	
 	public Adicional patchAdicionales(Long id, Adicional adicionalesDetails) {
@@ -220,6 +251,8 @@ public class AdicionalService {
         // Actualizar Inventario
         inventario.setEstado(nuevoEstado);
         inventario.setUltimaActualizacion(LocalDate.now());
+        inventario.setPlaza(ticket.getAdicionales().getPlaza());
+        inventario.setTecnico(ticket.getServicios().getTecnico());
         
 
         if (ticket != null && ticket.getServicios() != null) {

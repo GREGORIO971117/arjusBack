@@ -30,6 +30,7 @@ public class TicketService {
     private ServicioService servicioService;
     private EstacionesRepository estacionesRepository;
     private UsuariosRepository usuariosRepository;
+    private AdicionalService adicionalService;
     
     @Autowired
     public TicketService(TicketRepository ticketsRepository,
@@ -37,12 +38,14 @@ public class TicketService {
     		EstacionesRepository estacionesRepository,
     		InventarioRepository inventarioRepository,
     		UsuariosRepository usuariosRepository,
-    		PivoteInventarioRepository pivoteInventarioRepository) {
+    		PivoteInventarioRepository pivoteInventarioRepository,
+    		AdicionalService adicionalService) {
     	
 		this.ticketsRepository = ticketsRepository;
 		this.servicioService = servicioService;
 		this.estacionesRepository = estacionesRepository;
 		this.usuariosRepository = usuariosRepository;
+		this.adicionalService = adicionalService;
 	}
     
     public List<Tickets> searchTicketsSmart(String query) {
@@ -70,9 +73,9 @@ public class TicketService {
         return resultados;
     }
     
-    public List<Tickets> filterTickets(String situacion, String sla, String tipoDeServicio, String supervisor, LocalDate fechaInicio, LocalDate fechaFin) {
+    public List<Tickets> filterTickets(String situacion, String sla, String tipoDeServicio, String supervisor,String plaza ,LocalDate fechaInicio, LocalDate fechaFin) {
         
-        return ticketsRepository.buscarPorFiltros(situacion, sla, tipoDeServicio, supervisor,fechaInicio, fechaFin);
+        return ticketsRepository.buscarPorFiltros(situacion, sla, tipoDeServicio, supervisor, plaza ,fechaInicio, fechaFin);
     }
     
    public TicketUploadResponse uploadTicketsFromExcel(MultipartFile file, Long idAdministrador) {
@@ -229,10 +232,35 @@ public class TicketService {
     @Transactional
     public Tickets saveTickets(Tickets tickets) {
         // 1. Lógica existente de servicios
-        if(tickets.getServicios() != null) {
-            servicioService.assignEstacionesDetails(tickets.getServicios());
+    	if (tickets.getServicios() != null) {
+            tickets.getServicios().setTicket(tickets);
+        }
+        if (tickets.getAdicionales() != null) {
+            tickets.getAdicionales().setTicket(tickets);
         }
         
+        
+        Long merchantId = null;
+
+        // 1. Lógica para el sub-objeto SERVICIO (usando el servicio existente)
+        if(tickets.getServicios() != null) {
+            Servicio servicio = tickets.getServicios();
+            
+            // Obtener el ID Merchant que necesitamos para AMBOS
+            merchantId = servicio.getIdMerchant();
+            
+            // Llenar datos de Estación en el sub-objeto SERVICIO
+            servicioService.assignEstacionesDetails(servicio);
+        }
+        
+        // 2. Lógica para el sub-objeto ADICIONAL (¡La nueva parte!)
+        if (tickets.getAdicionales() != null && merchantId != null) {
+            // Llenar datos de Estación en el sub-objeto ADICIONAL
+            adicionalService.assignEstacionDetails(tickets.getAdicionales(), merchantId);
+        }
+        
+        // 3. Guardar el objeto padre.
+        // Esto guardará a los hijos gracias a @OneToOne y CascadeType.ALL en la entidad Tickets
         return ticketsRepository.save(tickets);
     }
     

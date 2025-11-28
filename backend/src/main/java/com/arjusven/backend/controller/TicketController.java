@@ -32,6 +32,7 @@ public class TicketController {
             @RequestParam(value = "sla", required = false) String sla,            
             @RequestParam(value = "tipoDeServicio", required = false) String tipoDeServicio,
             @RequestParam(value = "supervisor", required = false) String supervisor,
+            @RequestParam(value = "plaza", required = false) String plaza,
             @RequestParam(value = "fechaInicio", required = false) LocalDate fechaInicio, 
             @RequestParam(value = "fechaFin", required = false) LocalDate fechaFin
     ) {
@@ -40,6 +41,7 @@ public class TicketController {
 	    String slaFilter = null; 
 	    String tipoDeServicioFilter = null;
 	    String supervisorFilter = null;
+	    String plazaFilter = null; 
 	
 	    // =======================================================
 	    // 1. Normalización de la Situación
@@ -90,9 +92,16 @@ public class TicketController {
 	    	supervisorFilter = null;
 	    }
 	    
+	    if(plaza != null && !"todos".equalsIgnoreCase(plaza)) {
+	    	
+	    	String normalizedTipo = plaza.trim();
+	    	plazaFilter = normalizedTipo;
+	    }else {
+	    	plazaFilter = null;
+	    }
 	    
 	    // 4. Aplicar los filtros
-	    List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter, tipoDeServicioFilter,supervisorFilter, fechaInicio, fechaFin);
+	    List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter, tipoDeServicioFilter,supervisorFilter,plazaFilter, fechaInicio, fechaFin);
 	    
 	    if (filteredTickets == null || filteredTickets.isEmpty()) {
 	        return ResponseEntity.noContent().build();

@@ -30,11 +30,6 @@ public class AdicionalController {
         return new ResponseEntity<>(adicional, HttpStatus.OK); // Código 200
     }
 
-    @PostMapping
-    public ResponseEntity<Adicional> createAdicional(@RequestBody Adicional adicional) {
-    	Adicional savedAdicional = adicionalService.saveAdicional(adicional);
-        return new ResponseEntity<>(savedAdicional, HttpStatus.CREATED);
-    }
 
     // ENDPOINT: GET /api/usuarios/{id}
     // Purpose: Retrieve a user by ID (reads data from the database)
