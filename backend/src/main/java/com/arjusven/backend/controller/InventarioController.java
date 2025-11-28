@@ -30,12 +30,16 @@ public class InventarioController {
 	public ResponseEntity<List<Inventario>> filterInventario(
 	        @RequestParam(value = "estado", required = false) String estado,
 	        @RequestParam(value = "plaza", required = false) String plaza,
+	        @RequestParam(value = "equipo", required = false) String equipo,
 	        @RequestParam(value = "fechaInicio", required = false) LocalDate fechaInicio, 
             @RequestParam(value = "fechaFin", required = false) LocalDate fechaFin	        
 	        ){
 		
 		
 	    String estadoFilter = null;
+	    String equipoFilter = null;
+	    
+	    
 	    if(estado != null && !"todos".equalsIgnoreCase(estado)) {
 	        
 	        String normalizedTipo = estado.trim();
@@ -52,8 +56,16 @@ public class InventarioController {
 	    	plaza = null;
 	    }
 	    
+	    if(equipo != null && !"todos".equalsIgnoreCase(equipo)) {
+	    	
+	    	String normalizedTipo = equipo.trim();
+	    	equipoFilter = normalizedTipo;
+	    }else {
+	    	equipoFilter = null;
+	    }
+	    
 	    // 4. Aplicar los filtros
-	    List<Inventario> filteredInventario = inventarioService.filterInventario(estadoFilter,plaza,fechaInicio, fechaFin );
+	    List<Inventario> filteredInventario = inventarioService.filterInventario(estadoFilter,plaza,equipoFilter,fechaInicio, fechaFin );
 	    if (filteredInventario == null || filteredInventario.isEmpty()) {
 	        return ResponseEntity.noContent().build();
 	    }

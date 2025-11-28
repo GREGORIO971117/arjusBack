@@ -31,12 +31,16 @@ public interface InventarioRepository extends JpaRepository<Inventario, Long> {
 				"WHERE " +
 				"(:estado IS NULL OR s.estado = :estado) " +
 				"AND (:plaza IS NULL OR s.plaza = :plaza) " +
+				"AND (:equipo IS NULL OR s.equipo = :equipo) " +
 				"AND (:fechaInicio IS NULL OR s.ultimaActualizacion >= :fechaInicio) " +
 		        "AND (:fechaFin IS NULL OR s.ultimaActualizacion <= :fechaFin)")
 		List<Inventario> buscarPorFiltro(
 				@Param("estado") String estado,
 				@Param("plaza") String plaza,
+				@Param("equipo") String equipo,
 				@Param("fechaInicio") LocalDate fechaInicio,
 	            @Param("fechaFin") LocalDate fechaFin
 		);
 }
+
+

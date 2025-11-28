@@ -29,9 +29,9 @@ public class InventarioService {
 
     //Filtro del inventario
     
-    public List<Inventario> filterInventario(String estado,String plaza,LocalDate fechaInicio, LocalDate fechaFin){
+    public List<Inventario> filterInventario(String estado,String plaza,String equipo ,LocalDate fechaInicio, LocalDate fechaFin){
     	
-    	return inventarioRepository.buscarPorFiltro(estado, plaza, fechaInicio, fechaFin);
+    	return inventarioRepository.buscarPorFiltro(estado, plaza, equipo, fechaInicio, fechaFin);
     }    
     
     public List<Inventario>searchInventario(String query){

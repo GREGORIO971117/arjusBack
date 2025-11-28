@@ -73,7 +73,7 @@ public class TicketService {
         return resultados;
     }
     
-    public List<Tickets> filterTickets(String situacion, String sla, String tipoDeServicio, String supervisor,String plaza ,LocalDate fechaInicio, LocalDate fechaFin) {
+    public List<Tickets> filterTickets(String situacion, String sla, String tipoDeServicio, String supervisor,String plaza, LocalDate fechaInicio, LocalDate fechaFin) {
         
         return ticketsRepository.buscarPorFiltros(situacion, sla, tipoDeServicio, supervisor, plaza ,fechaInicio, fechaFin);
     }

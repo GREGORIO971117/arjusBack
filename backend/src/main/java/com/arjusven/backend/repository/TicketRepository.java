@@ -17,9 +17,12 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 	
 	@Query("SELECT t FROM Tickets t " +
 	           "JOIN t.servicios s " +
+	           "JOIN t.adicionales u " +
 	           "WHERE LOWER(s.nombreDeEss) = LOWER(:texto) " +
 	           "OR LOWER(s.incidencia) = LOWER(:texto) " +
 	           "OR LOWER(s.situacionActual) = LOWER(:texto) " +
+	           "OR LOWER(u.serieLogicaEntra) = LOWER(:texto) " +
+	           "OR LOWER(u.serieLogicaSale) = LOWER(:texto) " +
 	           "OR (:idMerchant IS NOT NULL AND s.idMerchant = :idMerchant)")
 	    List<Tickets> buscarExacto(@Param("texto") String texto, 
 	                               @Param("idMerchant") Long idMerchant);
@@ -27,12 +30,14 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 	
 	 @Query("SELECT t FROM Tickets t " +
 	           "JOIN t.servicios s " +
+	           "JOIN t.adicionales u " +
 	           "WHERE LOWER(s.nombreDeEss) LIKE LOWER(CONCAT('%', :texto, '%')) " +
 	           "OR LOWER(s.incidencia) LIKE LOWER(CONCAT('%', :texto, '%')) " +
+	           "OR LOWER(u.serieLogicaEntra) LIKE LOWER(CONCAT('%', :texto, '%')) " +
+	           "OR LOWER(u.serieLogicaSale) LIKE LOWER(CONCAT('%', :texto, '%')) " +
 	           "OR LOWER(s.situacionActual) LIKE LOWER(CONCAT('%', :texto, '%'))")
 	    List<Tickets> buscarParcial(@Param("texto") String texto);
 	
-	 
 	 @Query("SELECT t FROM Tickets t " +
 		       "JOIN t.servicios s " +
 		       "JOIN t.adicionales u " +
