@@ -50,7 +50,7 @@ public class TicketController {
 	        situacionFilter = null;
 	    } else {
 	        if ("abierto".equalsIgnoreCase(situacion)) {
-	            situacionFilter = "Abierto"; // Asegúrate que en BD sea "Abierta"
+	            situacionFilter = "Abierta";
 	        } else if ("cerrado".equalsIgnoreCase(situacion)) {
 	            situacionFilter = "Cerrado"; 
 	        } else {
