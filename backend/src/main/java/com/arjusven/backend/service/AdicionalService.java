@@ -247,13 +247,16 @@ public class AdicionalService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "El número de serie '" + numeroSerie + "' no existe en el inventario."
                 ));
+        
+        
 
         // Actualizar Inventario
         inventario.setEstado(nuevoEstado);
         inventario.setUltimaActualizacion(LocalDate.now());
         inventario.setPlaza(ticket.getAdicionales().getPlaza());
         inventario.setTecnico(ticket.getServicios().getTecnico());
-        inventario.setUltimaActualizacion(LocalDate.now());
+        
+        ticket.getServicios().setFechaDeAsignacion(LocalDate.now());
         
 
         if (ticket != null && ticket.getServicios() != null) {

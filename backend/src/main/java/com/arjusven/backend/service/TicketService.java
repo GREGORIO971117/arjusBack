@@ -184,7 +184,7 @@ public class TicketService {
                     nuevoServicio.setMotivoDeServicio(motivoServicio);
                     nuevoServicio.setObservaciones(observaciones);
                     nuevoServicio.setSituacionActual("Abierta");
-                    nuevoServicio.setFechaDeAsignacion(LocalDate.now());
+                    //nuevoServicio.setFechaDeAsignacion();
                     nuevoAdicional.setCiudad("—");
                     nuevoTicket.setServicios(nuevoServicio);
                     nuevoTicket.setAdicionales(nuevoAdicional);
