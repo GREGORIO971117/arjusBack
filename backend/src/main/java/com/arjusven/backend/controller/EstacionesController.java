@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -131,6 +132,23 @@ public class EstacionesController {
             return ResponseEntity.ok(estacionActualizada);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+    
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<?> deleteAllEstaciones() {
+        estacionesService.deleteAllEstaciones();
+        return ResponseEntity.noContent().build();
+    }
+    
+    @PostMapping("/bulk")
+    public ResponseEntity<?> createManyEstaciones(@RequestBody List<Estaciones> estaciones) {
+        // Puedes agregar validaciones aquí si quieres
+        try {
+            Map<String, Object> nuevas = estacionesService.saveAllWithReport(estaciones);
+            return new ResponseEntity<>(nuevas, HttpStatus.CREATED);
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar: " + e.getMessage());
         }
     }
   

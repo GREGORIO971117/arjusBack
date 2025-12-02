@@ -1,6 +1,8 @@
 package com.arjusven.backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,24 @@ public class EstacionesService {
         return estacionesRepository.buscarPorFiltros(supervisorArjus, estado, cobertura, plazaDeAtencion);
     }
     
+	public Map<String, Object> saveAllWithReport(List<Estaciones> estaciones) {
+	    List<Estaciones> guardadas = new ArrayList<>();
+	    List<Map<String, Object>> errores = new ArrayList<>();
+
+	    for (int i = 0; i < estaciones.size(); i++) {
+	        try {
+	            guardadas.add(estacionesRepository.save(estaciones.get(i)));
+	        } catch (Exception e) {
+	            errores.add(Map.of("index", i, "error", e.getMessage()));
+	        }
+	    }
+
+	    return Map.of("guardadas", guardadas, "errores", errores);
+	}
+	
+	public void deleteAllEstaciones() {
+	    estacionesRepository.deleteAll();
+	}
 	
 	
 	public List<Estaciones> searchEstacionesSmart(String query) {

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.arjusven.backend.model.Inventario;
-import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.service.InventarioService;
 
 @RestController

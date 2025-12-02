@@ -253,6 +253,7 @@ public class AdicionalService {
         inventario.setUltimaActualizacion(LocalDate.now());
         inventario.setPlaza(ticket.getAdicionales().getPlaza());
         inventario.setTecnico(ticket.getServicios().getTecnico());
+        inventario.setUltimaActualizacion(LocalDate.now());
         
 
         if (ticket != null && ticket.getServicios() != null) {
