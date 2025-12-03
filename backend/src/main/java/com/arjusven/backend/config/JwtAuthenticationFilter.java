@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
          String username = jwtTokenProvider.getUsernameFromToken(token);
          
          try {
-   	      UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+        	 
    	      // Si llegas aquí, el usuario existe y tienes éxito.
    	      System.out.println("✅ Usuario " + username + " cargado con éxito."); 
    	      // ... luego se establece la autenticación

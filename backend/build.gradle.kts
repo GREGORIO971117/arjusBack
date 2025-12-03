@@ -2,11 +2,19 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.5.6"
 	id("io.spring.dependency-management") version "1.1.7"
+	id("org.sonarqube") version "7.0.1.6134"
 }
 
 group = "com.arjusven"
 version = "0.0.1-SNAPSHOT"
 description = "Demo project for Spring Boot"
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "Arjusven")
+        property("sonar.projectName", "Arjusven")
+    }
+}
 
 java {
 	toolchain {
