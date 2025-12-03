@@ -216,14 +216,22 @@ public class AdicionalService {
 	}
 	
 	private void procesarVinculacionInventario(Adicional adicional) {
-        String serieSale = (adicional.getSerieLogicaSale() != null) ? adicional.getSerieLogicaSale().trim() : "";
-        String serieEntra = (adicional.getSerieLogicaEntra() != null) ? adicional.getSerieLogicaEntra().trim() : "";
+        String serieSale = (adicional.getSerieFisicaSale() != null) ? adicional.getSerieFisicaSale().trim() : "";
+        String serieEntra = (adicional.getSerieFisicaEntra() != null) ? adicional.getSerieFisicaEntra().trim() : "";
+        String serieSimEntra = (adicional.getSim() != null) ? adicional.getSim().trim() : "";
+        String serieSimSale = (adicional.getSimSale() != null) ? adicional.getSimSale().trim() : "";
 
         boolean haySalida = !serieSale.isEmpty();
         boolean hayEntrada = !serieEntra.isEmpty();
+        boolean haySimEntra = !serieSimEntra.isEmpty();
+        boolean haySimSale = !serieSimSale.isEmpty();
 
         // Validación de igualdad
         if (haySalida && hayEntrada && serieSale.equalsIgnoreCase(serieEntra)) {
+            throw new IllegalArgumentException("Los números de serie de Salida y Entrada no pueden ser iguales.");
+        }
+        
+        if (haySimEntra && haySimSale && serieSimSale.equalsIgnoreCase(serieSimEntra)) {
             throw new IllegalArgumentException("Los números de serie de Salida y Entrada no pueden ser iguales.");
         }
 
@@ -239,6 +247,17 @@ public class AdicionalService {
              System.out.println("Validando Entrada: " + serieEntra); // Log para debug
             actualizarEstadoInventario(serieEntra, "Instalado", ticketPadre);
         }
+        
+        if(haySimEntra) {
+        	System.out.println("Validando Entrada: " + serieSimEntra); // Log para debug
+            actualizarEstadoInventario(serieSimEntra, "Instalado", ticketPadre);
+        }
+        
+        if(haySimSale) {
+        	System.out.println("Validando Entrada: " + serieSimSale); // Log para debug
+            actualizarEstadoInventario(serieSimSale, "Stock", ticketPadre);
+        }
+        
     }
 	
 	private void actualizarEstadoInventario(String numeroSerie, String nuevoEstado, Tickets ticket) {
@@ -247,8 +266,6 @@ public class AdicionalService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "El número de serie '" + numeroSerie + "' no existe en el inventario."
                 ));
-        
-        
 
         // Actualizar Inventario
         inventario.setEstado(nuevoEstado);

@@ -43,7 +43,7 @@ public class Servicio {
     @Column(name = "Motivo_real")
     private String motivoReal;
     
-    @Column(name = "Observaciones", length = 500)
+    @Column(name = "Observaciones", length = 1000)
     private String observaciones;
     
     @Column(name = "Guia_de_encomienda")
