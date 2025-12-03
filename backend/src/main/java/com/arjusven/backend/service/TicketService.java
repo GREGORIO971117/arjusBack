@@ -212,13 +212,13 @@ public class TicketService {
     }
 
     // Métodos auxiliares para leer celdas de Excel de forma segura
-    private String getCellValueAsString(Cell cell) {
+    public String getCellValueAsString(Cell cell) {
         if (cell == null) return "";
         DataFormatter formatter = new DataFormatter();
         return formatter.formatCellValue(cell).trim();
     }
 
-    private boolean isRowEmpty(Row row) {
+    public boolean isRowEmpty(Row row) {
         if (row == null) return true;
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
             Cell cell = row.getCell(c);
