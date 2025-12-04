@@ -109,6 +109,15 @@ public class InventarioController {
 		return new ResponseEntity<>(resultados,HttpStatus.OK);
 	}	
 	
+	
+	
+	@DeleteMapping("/deleteAll")
+    public ResponseEntity<?> deleteAllEstaciones() {
+		inventarioService.deleteAllEstaciones();
+        return ResponseEntity.noContent().build();
+    }
+	
+	
 	@PostMapping
 	public ResponseEntity<Inventario> createInventario(@RequestBody Inventario inventario){
 		

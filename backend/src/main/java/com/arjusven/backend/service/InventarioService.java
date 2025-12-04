@@ -56,6 +56,12 @@ public class InventarioService {
     	return inventarioRepository.buscarPorFiltro(estado, plaza, equipo, fechaInicio, fechaFin);
     }
     
+    
+
+	public void deleteAllEstaciones() {
+	    inventarioRepository.deleteAll();
+	}
+    
    
     public List<Inventario>searchInventario(String query){
     	 if (query == null || query.trim().isEmpty()) {
@@ -133,9 +139,8 @@ public class InventarioService {
     
     
     public TicketUploadResponse uploadInventarioFromExcel(MultipartFile file, Long idAdministrador) {
-        TicketUploadResponse response = new TicketUploadResponse(); // Reutilizando tu DTO de respuesta
+        TicketUploadResponse response = new TicketUploadResponse();
 
-        // 1. Validar Admin
         Usuarios administrador = usuariosRepository.findById(idAdministrador).orElse(null);
         if (administrador == null) {
             response.agregarError("No se encontró el usuario administrador con ID: " + idAdministrador);
@@ -149,7 +154,6 @@ public class InventarioService {
             Map<String, Integer> headerMap = new HashMap<>();
             boolean headersFound = false;
             
-            // Nombres de columnas esperados (basado en tu imagen y requerimiento)
             String COL_MATERIAL = "material entregado";
             String COL_SERIE = "serie";
             String COL_GUIA = "guia";
@@ -160,59 +164,46 @@ public class InventarioService {
                 Row row = rowIterator.next();
                 rowIndex++;
 
-                // --- FASE 1: BUSCANDO ENCABEZADOS ---
                 if (!headersFound) {
                     for (Cell cell : row) {
                         String cellValue = ticketService.getCellValueAsString(cell).toLowerCase().trim();
-                        
-                        // Mapeo dinámico de columnas
                         if (cellValue.contains(COL_MATERIAL)) headerMap.put(COL_MATERIAL, cell.getColumnIndex());
-                        else if (cellValue.equals(COL_SERIE)) headerMap.put(COL_SERIE, cell.getColumnIndex()); // equals para ser más exacto con "serie"
+                        else if (cellValue.equals(COL_SERIE)) headerMap.put(COL_SERIE, cell.getColumnIndex());
                         else if (cellValue.contains(COL_GUIA)) headerMap.put(COL_GUIA, cell.getColumnIndex());
                     }
-
-                    // Verificamos si encontramos al menos Material y Serie (Guía podría ser opcional, depende de tu regla)
                     if (headerMap.containsKey(COL_MATERIAL) && headerMap.containsKey(COL_SERIE)) {
                         headersFound = true;
                         continue; 
                     }
-                    
                     headerMap.clear();
                     continue;
                 }
-
-                // --- FASE 2: PROCESANDO DATOS ---
                 
                 if (ticketService.isRowEmpty(row)) continue;
 
                 try {
-                    // Extraer datos usando el mapa
                     String material = headerMap.containsKey(COL_MATERIAL) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_MATERIAL))) : "";
                     String serie = headerMap.containsKey(COL_SERIE) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_SERIE))) : "";
                     String guia = headerMap.containsKey(COL_GUIA) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_GUIA))) : "";
 
-                    // Validación básica
-                    if (material.isEmpty() && serie.isEmpty()) {
-                        continue; 
-                    }
-
-                    // Limpieza de Serie (La imagen muestra notación científica '8.95E+19', dataFormatter ayuda pero a veces hay que limpiar)
-                    // Si serie viene vacía, decidimos si saltar o guardar. Asumiré que Serie es requerida.
+                    if (material.isEmpty() && serie.isEmpty()) continue; 
                     if (serie.isEmpty()) {
                          response.agregarError("Fila " + rowIndex + ": El número de serie está vacío.");
                          continue;
                     }
 
-                    // CREAR Y GUARDAR INVENTARIO
+                    // --- CLASIFICACIÓN DEL EQUIPO ---
+                    // Aquí llamamos a la función que determina el tipo basándose en la columna 'material'
+                    String tipoEquipo = determinarTipoEquipo(material);
+
                     Inventario nuevoInventario = new Inventario();
+                    nuevoInventario.setDescripcion(material);      
+                    nuevoInventario.setNumeroDeSerie(serie);       
+                    nuevoInventario.setGuias(guia);
                     
-                    // Mapeo de datos solicitados
-                    nuevoInventario.setDescripcion(material);      // material entregado -> Inventario.descripcion
-                    nuevoInventario.setNumeroDeSerie(serie);       // serie -> Inventario.numeroDeSerie
-                    nuevoInventario.setGuias(guia);                // guia -> Inventario.guias (o ticket.guia según lógica de negocio)
-                    
-                    // Datos de auditoría o por defecto
-                    // nuevoInventario.setResponsable(administrador.getNombre()); // Opcional: asignar al admin como responsable inicial
+                    // Asignamos el equipo clasificado automáticamente
+                    nuevoInventario.setEquipo(tipoEquipo); 
+
                     nuevoInventario.setUltimaActualizacion(LocalDate.now());
 
                     saveInventario(nuevoInventario);
@@ -225,7 +216,7 @@ public class InventarioService {
             }
             
             if (!headersFound) {
-                response.agregarError("No se encontró la fila de encabezados. Se requieren: 'Material Entregado' y 'Serie'.");
+                response.agregarError("No se encontró la fila de encabezados requerida.");
             } else {
                 response.setTotalProcesados(rowIndex);
             }
@@ -235,6 +226,46 @@ public class InventarioService {
         }
 
         return response;
+    }
+
+    // --- NUEVO MÉTODO DE CLASIFICACIÓN ---
+    private String determinarTipoEquipo(String descripcionMaterial) {
+        if (descripcionMaterial == null || descripcionMaterial.isEmpty()) {
+            return "OTROS";
+        }
+        
+        // Convertimos a mayúsculas para comparar fácilmente
+        String desc = descripcionMaterial.toUpperCase().trim();
+
+        // 1. ACCESORIOS (Prioridad Alta: para evitar que "Eliminador N910" se clasifique como "N910")
+        if (desc.contains("ELIMINADOR")) return "ELIMINADOR";
+        if (desc.contains("BATERIA") || desc.contains("BATERÍA")) return "BATERIA";
+        if (desc.contains("BASE DE CARGA")) return "BASE DE CARGA";
+
+        // 2. SIMs
+        // Telcel
+        if (desc.contains("SIM TELCEL")) return "SIM TELCEL";
+        // AT&T (cubre "SIM AT&T", "SIM ATT", "SIMAT&T" si vienen pegados)
+        if (desc.contains("SIM AT&T") || desc.contains("SIM ATT") || desc.contains("SIMAT&T")) return "SIM ATT";
+
+        // 3. TERMINALES Y PINPADS
+        // Verifone VX520 (Validar primero CTLS por ser más específico)
+        if (desc.contains("VX520 TRÍO CTLS") || desc.contains("VX520 TRIO CTLS") || desc.contains("CTLS")) return "VX520 CTLS";
+        if (desc.contains("VX520 C") || desc.contains("VX520 TRIO C")) return "VX520 C";
+        
+        // Otras Verifone
+        if (desc.contains("VX690")) return "VX690";
+        if (desc.contains("V240M")) return "V240M";
+
+        // Newland
+        if (desc.contains("N910")) return "N910";
+
+        // Ingenico
+        if (desc.contains("LANE 3000")) return "Ingenico Lane 3000";
+        if (desc.contains("LINK 2500")) return "Ingenico Link 2500";
+
+        // Si no coincide con nada, devolvemos un valor por defecto o la misma descripción
+        return "OTROS"; 
     }
     
     
