@@ -13,7 +13,7 @@ import com.arjusven.backend.model.Inventario;
 
 @Repository
 public interface InventarioRepository extends JpaRepository<Inventario, Long> {
-	
+	Optional<Inventario> findByNumeroDeSerie(String numeroDeSerie);
 	Optional<Inventario> findByNumeroDeSerieIgnoreCase(String numeroDeSerie);	
 		@Query("SELECT s FROM Inventario s " + 
 				"WHERE LOWER(s.titulo) = LOWER(:texto) " +

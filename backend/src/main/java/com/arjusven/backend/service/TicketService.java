@@ -161,7 +161,6 @@ public class TicketService {
                         response.agregarError("Fila " + rowIndex + ": ID Merchant inválido ('" + idMerchantStr + "').");
                         continue;
                     }
-
                     // VALIDACIÓN EXISTENCIA ESTACIÓN (Foreign Key check)
                     if (!estacionesRepository.existsById(idMerchant)) {
                         response.agregarError("Fila " + rowIndex + ": La Estación con ID " + idMerchant + " no existe. Ticket omitido.");

@@ -7,10 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -20,12 +17,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.arjusven.backend.model.Adicional;
 import com.arjusven.backend.model.Inventario;
 import com.arjusven.backend.model.PivoteInventario;
-import com.arjusven.backend.model.Usuarios; // Asegúrate de tener este import
+import com.arjusven.backend.model.Servicio;
+import com.arjusven.backend.model.Usuarios;
+import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.repository.InventarioRepository;
 import com.arjusven.backend.repository.PivoteInventarioRepository;
+import com.arjusven.backend.repository.TicketRepository;
 import com.arjusven.backend.repository.UsuariosRepository;
+import com.arjusven.backend.repository.ServicioRepository;
+
+
+
 // Asumo que reutilizas la clase de respuesta, si tienes una específica para inventario cámbiala aquí
 import com.arjusven.backend.dto.TicketUploadResponse;
 
@@ -36,16 +41,21 @@ public class InventarioService {
     private InventarioRepository inventarioRepository;
     private PivoteInventarioRepository pivoteInventarioRepository;
     private UsuariosRepository usuariosRepository;
+    private TicketRepository ticketRepository;
     private TicketService ticketService;// Necesario para validar admin
     
     @Autowired
     public InventarioService(InventarioRepository inventarioRepository, 
                              PivoteInventarioRepository pivoteInventarioRepository,
                              UsuariosRepository usuariosRepository,
-                             TicketService ticketService){
+                             TicketRepository ticketRepository,
+                             ServicioRepository servicioRepository,
+                             TicketService ticketService
+                             ){
         this.inventarioRepository = inventarioRepository;
         this.pivoteInventarioRepository = pivoteInventarioRepository;
         this.usuariosRepository = usuariosRepository;
+        this.ticketRepository = ticketRepository;
         this.ticketService = ticketService;
     }
 
@@ -136,137 +146,194 @@ public class InventarioService {
         return inventarioRepository.save(inventarioExistente);     
     }
     
-    
-    
-    public TicketUploadResponse uploadInventarioFromExcel(MultipartFile file, Long idAdministrador) {
-        TicketUploadResponse response = new TicketUploadResponse();
+  @Transactional
+  public TicketUploadResponse uploadInventarioFromExcel(MultipartFile file, Long idAdministrador) {
+    TicketUploadResponse response = new TicketUploadResponse();
 
-        Usuarios administrador = usuariosRepository.findById(idAdministrador).orElse(null);
-        if (administrador == null) {
-            response.agregarError("No se encontró el usuario administrador con ID: " + idAdministrador);
-            return response;
-        }
-
-        try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
-            Sheet sheet = workbook.getSheetAt(0);
-            Iterator<Row> rowIterator = sheet.iterator();
-
-            Map<String, Integer> headerMap = new HashMap<>();
-            boolean headersFound = false;
-            
-            String COL_MATERIAL = "material entregado";
-            String COL_SERIE = "serie";
-            String COL_GUIA = "guia";
-
-            int rowIndex = 0; 
-
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                rowIndex++;
-
-                if (!headersFound) {
-                    for (Cell cell : row) {
-                        String cellValue = ticketService.getCellValueAsString(cell).toLowerCase().trim();
-                        if (cellValue.contains(COL_MATERIAL)) headerMap.put(COL_MATERIAL, cell.getColumnIndex());
-                        else if (cellValue.equals(COL_SERIE)) headerMap.put(COL_SERIE, cell.getColumnIndex());
-                        else if (cellValue.contains(COL_GUIA)) headerMap.put(COL_GUIA, cell.getColumnIndex());
-                    }
-                    if (headerMap.containsKey(COL_MATERIAL) && headerMap.containsKey(COL_SERIE)) {
-                        headersFound = true;
-                        continue; 
-                    }
-                    headerMap.clear();
-                    continue;
-                }
-                
-                if (ticketService.isRowEmpty(row)) continue;
-
-                try {
-                    String material = headerMap.containsKey(COL_MATERIAL) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_MATERIAL))) : "";
-                    String serie = headerMap.containsKey(COL_SERIE) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_SERIE))) : "";
-                    String guia = headerMap.containsKey(COL_GUIA) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_GUIA))) : "";
-
-                    if (material.isEmpty() && serie.isEmpty()) continue; 
-                    if (serie.isEmpty()) {
-                         response.agregarError("Fila " + rowIndex + ": El número de serie está vacío.");
-                         continue;
-                    }
-
-                    // --- CLASIFICACIÓN DEL EQUIPO ---
-                    // Aquí llamamos a la función que determina el tipo basándose en la columna 'material'
-                    String tipoEquipo = determinarTipoEquipo(material);
-
-                    Inventario nuevoInventario = new Inventario();
-                    nuevoInventario.setDescripcion(material);      
-                    nuevoInventario.setNumeroDeSerie(serie);       
-                    nuevoInventario.setGuias(guia);
-                    
-                    // Asignamos el equipo clasificado automáticamente
-                    nuevoInventario.setEquipo(tipoEquipo); 
-
-                    nuevoInventario.setUltimaActualizacion(LocalDate.now());
-
-                    saveInventario(nuevoInventario);
-                    response.incrementarExito();
-
-                } catch (Exception e) {
-                    response.agregarError("Fila " + rowIndex + ": Error al guardar inventario (" + e.getMessage() + ")");
-                    e.printStackTrace();
-                }
-            }
-            
-            if (!headersFound) {
-                response.agregarError("No se encontró la fila de encabezados requerida.");
-            } else {
-                response.setTotalProcesados(rowIndex);
-            }
-
-        } catch (IOException e) {
-            response.agregarError("Error crítico al leer archivo: " + e.getMessage());
-        }
-
+    Usuarios administrador = usuariosRepository.findById(idAdministrador).orElse(null);
+    if (administrador == null) {
+        response.agregarError("No se encontró el usuario administrador con ID: " + idAdministrador);
         return response;
     }
 
-    // --- NUEVO MÉTODO DE CLASIFICACIÓN ---
+    try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
+        Sheet sheet = workbook.getSheetAt(0);
+        Iterator<Row> rowIterator = sheet.iterator();
+
+        Map<String, Integer> headerMap = new HashMap<>();
+        boolean headersFound = false;
+        
+        // ... (Declaración de COL_MATERIAL, COL_SERIE, COL_GUIA, COL_INCIDENCIA) ...
+        String COL_MATERIAL = "material entregado";
+        String COL_SERIE = "serie";
+        String COL_GUIA = "guia";
+        String COL_INCIDENCIA = "incidencias";
+       
+        int rowIndex = 0; 
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            rowIndex++;
+            
+            // ... (Lógica de búsqueda de encabezados se omite) ...
+            if (!headersFound) {
+                for (Cell cell : row) {
+                    String cellValue = ticketService.getCellValueAsString(cell).toLowerCase().trim();
+                    if (cellValue.contains(COL_MATERIAL)) headerMap.put(COL_MATERIAL, cell.getColumnIndex());
+                    else if (cellValue.equals(COL_SERIE)) headerMap.put(COL_SERIE, cell.getColumnIndex());
+                    else if (cellValue.contains(COL_GUIA)) headerMap.put(COL_GUIA, cell.getColumnIndex());
+                    else if (cellValue.contains(COL_INCIDENCIA)) headerMap.put(COL_INCIDENCIA, cell.getColumnIndex());
+                }
+                if (headerMap.containsKey(COL_MATERIAL) && headerMap.containsKey(COL_SERIE) && headerMap.containsKey(COL_INCIDENCIA)) {
+                    headersFound = true;
+                    continue; 
+                }
+                if (rowIndex > 10 && !headersFound) {
+                    response.agregarError("No se encontraron los encabezados 'serie', 'material entregado' e 'incidencias'.");
+                    break;
+                }
+                continue;
+            }
+
+            if (ticketService.isRowEmpty(row)) continue;
+
+            try {
+                String material = headerMap.containsKey(COL_MATERIAL) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_MATERIAL))) : "";
+                String serie = headerMap.containsKey(COL_SERIE) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_SERIE))) : "";
+                String guia = headerMap.containsKey(COL_GUIA) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_GUIA))) : "";
+                
+                String incidenciaStr = headerMap.containsKey(COL_INCIDENCIA) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_INCIDENCIA))) : "";
+                // Limpieza de la incidencia (asegurando que solo quede el texto/número relevante)
+                String incidenciaLimpia = incidenciaStr.replace(".0", "").replaceAll("[^a-zA-Z0-9-]", "").trim();
+                
+                // --- 2. PROCESAR INVENTARIO (SERIE) ---
+                Inventario inventarioExistente = inventarioRepository.findByNumeroDeSerie(serie).orElse(null);
+                Inventario inventario = null;
+                
+                if (material.isEmpty() && serie.isEmpty() && incidenciaLimpia.isEmpty()) continue; 
+                if (serie.isEmpty()) {
+                     response.agregarError("Fila " + rowIndex + ": El número de serie está vacío.");
+                     continue;
+                }
+                
+              
+
+               
+
+                if (inventarioExistente != null) {
+                    inventario = inventarioExistente;
+                } else {
+                    inventario = new Inventario();
+                    inventario.setNumeroDeSerie(serie);
+                }
+
+                // Actualizar campos de Inventario
+                String tipoEquipo = determinarTipoEquipo(material);
+                
+                inventario.setDescripcion(material);      
+                inventario.setGuias(guia);
+                inventario.setEquipo(tipoEquipo); 
+                inventario.setUltimaActualizacion(LocalDate.now());
+                
+                if (!incidenciaLimpia.isEmpty()) {
+                    inventario.setNumeroDeIncidencia(incidenciaLimpia); 
+                }
+
+                inventarioRepository.save(inventario);
+                response.incrementarExito();
+                
+                
+  
+                
+              
+                
+                // --- 1. PROCESAR TICKET Y SUS ENTIDADES RELACIONADAS ---
+                if (!incidenciaLimpia.isEmpty()) {
+                    
+                    // **MODIFICACIÓN CRUCIAL:** Usar el método que devuelve List<Tickets>
+                    List<Tickets> ticketsEncontrados = ticketRepository.findByServicios_Incidencia(incidenciaLimpia);
+                    
+                    if (!ticketsEncontrados.isEmpty()) {
+                        // Tomamos el primer ticket de la lista (asumiendo unicidad)
+                        Tickets ticket = ticketsEncontrados.get(0);
+                        
+                        // A. Actualizar Servicios
+                        Servicio servicio = ticket.getServicios(); // Asumo que Tickets tiene getServicios()
+                        if (servicio != null) {
+                            servicio.setFechaDeEnvio(LocalDate.now()); 
+                            servicio.setGuiaDeEncomienda(guia);
+                        }
+
+                        // B. Actualizar Adicionales (Puedes agregar tu lógica aquí)
+                         Adicional adicionales = ticket.getAdicionales();
+                         if (adicionales != null) {
+                        	 
+                        	 if(inventario.getEquipo() == "SIM ATT" || inventario.getEquipo() == "SIM TELCEL"){
+                        		 adicionales.setSim(inventario.getNumeroDeSerie());
+                        	 }
+                        	
+                        	 else{
+                        		 adicionales.setSerieFisicaEntra(inventario.getNumeroDeSerie());
+                        	 }
+                         }
+
+                        // Guardar el Ticket para persistir todos los cambios anidados
+                        ticketRepository.save(ticket); 
+                        
+                    } else {
+                        response.agregarAdvertencia("Fila " + rowIndex + ": La Incidencia '" + incidenciaLimpia + "' no fue encontrada. No se actualizó el Ticket ni sus entidades.");
+                    }
+                }
+
+            } catch (Exception e) {
+                response.agregarError("Fila " + rowIndex + ": Error al procesar datos (" + e.getMessage() + ")");
+                e.printStackTrace();
+            }
+        }
+        
+        if (!headersFound) {
+            response.agregarError("No se encontró la fila de encabezados requerida.");
+        } else {
+            response.setTotalProcesados(rowIndex);
+        }
+
+    } catch (IOException e) {
+        response.agregarError("Error crítico al leer archivo: " + e.getMessage());
+    }
+
+    return response;
+}
+
+    // El método determinarTipoEquipo se mantiene igual y funciona correctamente
     private String determinarTipoEquipo(String descripcionMaterial) {
         if (descripcionMaterial == null || descripcionMaterial.isEmpty()) {
             return "OTROS";
         }
         
-        // Convertimos a mayúsculas para comparar fácilmente
         String desc = descripcionMaterial.toUpperCase().trim();
 
-        // 1. ACCESORIOS (Prioridad Alta: para evitar que "Eliminador N910" se clasifique como "N910")
+        // 1. ACCESORIOS (Prioridad Alta)
         if (desc.contains("ELIMINADOR")) return "ELIMINADOR";
         if (desc.contains("BATERIA") || desc.contains("BATERÍA")) return "BATERIA";
         if (desc.contains("BASE DE CARGA")) return "BASE DE CARGA";
 
         // 2. SIMs
-        // Telcel
         if (desc.contains("SIM TELCEL")) return "SIM TELCEL";
-        // AT&T (cubre "SIM AT&T", "SIM ATT", "SIMAT&T" si vienen pegados)
         if (desc.contains("SIM AT&T") || desc.contains("SIM ATT") || desc.contains("SIMAT&T")) return "SIM ATT";
 
         // 3. TERMINALES Y PINPADS
-        // Verifone VX520 (Validar primero CTLS por ser más específico)
         if (desc.contains("VX520 TRÍO CTLS") || desc.contains("VX520 TRIO CTLS") || desc.contains("CTLS")) return "VX520 CTLS";
         if (desc.contains("VX520 C") || desc.contains("VX520 TRIO C")) return "VX520 C";
         
-        // Otras Verifone
         if (desc.contains("VX690")) return "VX690";
         if (desc.contains("V240M")) return "V240M";
 
-        // Newland
         if (desc.contains("N910")) return "N910";
 
-        // Ingenico
         if (desc.contains("LANE 3000")) return "Ingenico Lane 3000";
         if (desc.contains("LINK 2500")) return "Ingenico Link 2500";
 
-        // Si no coincide con nada, devolvemos un valor por defecto o la misma descripción
         return "OTROS"; 
     }
-    
     
 }
