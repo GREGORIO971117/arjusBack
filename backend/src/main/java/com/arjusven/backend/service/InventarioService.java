@@ -215,10 +215,6 @@ public class InventarioService {
                      response.agregarError("Fila " + rowIndex + ": El número de serie está vacío.");
                      continue;
                 }
-                
-              
-
-               
 
                 if (inventarioExistente != null) {
                     inventario = inventarioExistente;
@@ -241,11 +237,7 @@ public class InventarioService {
 
                 inventarioRepository.save(inventario);
                 response.incrementarExito();
-                
-                
-  
-                
-              
+
                 
                 // --- 1. PROCESAR TICKET Y SUS ENTIDADES RELACIONADAS ---
                 if (!incidenciaLimpia.isEmpty()) {

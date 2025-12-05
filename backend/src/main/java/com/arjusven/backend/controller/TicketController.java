@@ -6,8 +6,6 @@ import com.arjusven.backend.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-
-import com.arjusven.backend.dto.PlaneacionDTO;
 import com.arjusven.backend.dto.TicketUploadResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,19 +24,6 @@ public class TicketController {
     public TicketController(TicketService ticketService, DocumentGenerationService documentGenerationService) {
         this.ticketService = ticketService;
         this.documentGenerationService =documentGenerationService;
-    }
-    
-    @GetMapping("/planeacion")
-    public ResponseEntity<List<PlaneacionDTO>> getPlaneacionData() {
-        try {
-            List<PlaneacionDTO> data = ticketService.getPlaneacionOperativa();
-            if (data.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(data, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
     
     

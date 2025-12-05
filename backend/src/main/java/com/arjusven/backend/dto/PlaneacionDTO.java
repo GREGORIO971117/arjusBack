@@ -4,6 +4,9 @@ import java.time.LocalDate;
 
 public class PlaneacionDTO {
 
+    // 🔹 Identificador principal para realizar PATCH
+    private Long idTicket;
+
     // Datos directos de Ticket/Servicio
     private LocalDate fechaAsignacion;
     private String incidencia;
@@ -18,29 +21,36 @@ public class PlaneacionDTO {
     private String nombreTecnico;
     private String observacionImportante; // observaciones
     private String supervisor;
+
     // Datos de Estaciones (Vienen dentro de Servicio o por ID)
     private String colonia;
-    private String ciudad; // Mapeado a estaciones.estado segun tu requerimiento
-    private String estadoMx;  // Para accessorKey: 'estadoMx' (NUEVO)
+    private String ciudad;
+    private String estadoMx;
     private String transporteEstimado;
-    // Datos de Inventario (Vienen de cruzar serieLogica/Fisica)
-    private LocalDate fechaLlegada; // fechaDeFinPrevista
+
+    // Datos de Inventario
+    private LocalDate fechaLlegada;
     private String equipoReportado;
     private String equipoEnviado;
-    private LocalDate fechaAsignacionReporte; // fechaDeFin
-    private LocalDate fechaCierre; // Para accessorKey: 'fechaCierre' (NUEVO)
+    private LocalDate fechaAsignacionReporte;
+    private LocalDate fechaCierre;
+
     // Datos vacíos o calculados
-    private String observacionArjus; // "no existe en otras entidades"
-    
+    private String observacionArjus;
+
     // Constructor vacío
     public PlaneacionDTO() {}
+
+    // 🔹 Getter y Setter de idTicket
+    public Long getIdTicket() { return idTicket; }
+    public void setIdTicket(Long idTicket) { this.idTicket = idTicket; }
 
     public String getEstadoMx() { return estadoMx; }
     public void setEstadoMx(String estadoMx) { this.estadoMx = estadoMx; }
 
     public LocalDate getFechaCierre() { return fechaCierre; }
     public void setFechaCierre(LocalDate fechaCierre) { this.fechaCierre = fechaCierre; }
-    // Getters y Setters
+
     public LocalDate getFechaAsignacion() { return fechaAsignacion; }
     public void setFechaAsignacion(LocalDate fechaAsignacion) { this.fechaAsignacion = fechaAsignacion; }
 

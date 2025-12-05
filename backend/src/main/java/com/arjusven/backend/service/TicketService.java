@@ -6,11 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.arjusven.backend.dto.PlaneacionDTO;
 import com.arjusven.backend.dto.TicketUploadResponse;
 import com.arjusven.backend.model.Adicional;
-import com.arjusven.backend.model.Estaciones;
-import com.arjusven.backend.model.Inventario;
 import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.model.Usuarios;
@@ -25,7 +22,6 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
@@ -35,7 +31,6 @@ public class TicketService {
     private EstacionesRepository estacionesRepository;
     private UsuariosRepository usuariosRepository;
     private AdicionalService adicionalService;
-    private InventarioRepository inventarioRepository;
     
     @Autowired
     public TicketService(TicketRepository ticketsRepository,
@@ -51,7 +46,6 @@ public class TicketService {
 		this.estacionesRepository = estacionesRepository;
 		this.usuariosRepository = usuariosRepository;
 		this.adicionalService = adicionalService;
-		this.inventarioRepository = inventarioRepository;
 	}
     
     public List<Tickets> searchTicketsSmart(String query) {
@@ -78,77 +72,7 @@ public class TicketService {
 
         return resultados;
     }
-    
-    public List<PlaneacionDTO> getPlaneacionOperativa() {
-        // 1. Obtener todos los tickets (o filtrados según necesites)
-        List<Tickets> todosLosTickets = ticketsRepository.findAll();
-
-        // 2. Transformar la lista de Tickets a lista de DTOs
-        return todosLosTickets.stream().map(this::mapTicketToDTO).collect(Collectors.toList());
-    }
-    
-   private PlaneacionDTO mapTicketToDTO(Tickets ticket) {
-    PlaneacionDTO dto = new PlaneacionDTO();
-    
-    // Obtenemos las entidades relacionadas
-    Servicio servicio = ticket.getServicios();
-    Adicional adicional = ticket.getAdicionales();
-    
-    // --- A. Datos de SERVICIO (Fuente principal) ---
-    if (servicio != null) {
-        dto.setFechaAsignacion(servicio.getFechaDeAsignacion());
-        dto.setIncidencia(servicio.getIncidencia());
-        dto.setCliente(servicio.getNombreDeEss());
-        dto.setEstadoGuia(servicio.getSituacionActual());
-        dto.setFechaDeEnvio(servicio.getFechaDeEnvio());
-        dto.setMerchantId(servicio.getIdMerchant());
-        dto.setGuiaDhl(servicio.getGuiaDeEncomienda());
-        dto.setDireccion(servicio.getDireccion());
-        dto.setTipoServicio(servicio.getTipoDeServicio());
-        dto.setDescripcion(servicio.getMotivoDeServicio());
-        dto.setNombreTecnico(servicio.getTecnico());
-        dto.setObservacionImportante(servicio.getObservaciones());
-        dto.setSupervisor(servicio.getSupervisor());
-
-        // --- B. Datos de ESTACIONES (Anidadas en Servicio) ---
-        Estaciones estacion = servicio.getEstaciones(); 
-        
-        if (estacion != null) {
-            dto.setColonia(estacion.getColoniaAsentamiento());
-            // Mapeo corregido: Ciudad (Municipio) y Estado
-            dto.setCiudad(estacion.getMunicipio()); // accessorKey: 'ciudad'
-            dto.setEstadoMx(estacion.getEstado());  // accessorKey: 'estadoMx'
-            if (estacion.getTransporte() != null) {
-                // Convertir Integer/Long a String para el DTO
-                dto.setTransporteEstimado(String.valueOf(estacion.getTransporte()));
-            }
-        }
-    }
-
-    // --- C. Datos de INVENTARIO (Búsqueda por Adicionales) ---
-    // Usamos la serie de Adicionales para buscar el objeto Inventario
-    if (adicional != null && adicional.getSerieFisicaEntra() != null && !adicional.getSerieFisicaEntra().isEmpty()) {
-        
-        // Se asume que InventarioRepository está inyectado y tiene findByNumeroDeSerie
-        String serieBusqueda = adicional.getSerieFisicaEntra(); 
-        Inventario inventario = inventarioRepository.findByNumeroDeSerie(serieBusqueda).orElse(null);
-
-        if (inventario != null) {
-            dto.setFechaLlegada(inventario.getFechaDeFinPrevista());
-            dto.setEquipoReportado(inventario.getEquipo());
-            dto.setEquipoEnviado(inventario.getEquipo());
-            dto.setFechaAsignacionReporte(inventario.getFechaDeFin());
-            dto.setObservacionArjus(inventario.getCodigoEmail());
-            dto.setFechaCierre(inventario.getFechaDeInicioPrevista()); 
-        }
-    }
-    
-    // --- D. Campos adicionales ---
-    // Este campo se deja vacío según el requerimiento.
-    //dto.setObservacionArjus(""); 
-
-    return dto;
-}
+    	
     
     public List<Tickets> filterTickets(String situacion, String sla, String tipoDeServicio, String supervisor,String plaza, LocalDate fechaInicio, LocalDate fechaFin) {
         

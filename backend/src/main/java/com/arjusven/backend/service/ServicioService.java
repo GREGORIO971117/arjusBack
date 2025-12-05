@@ -166,6 +166,17 @@ public class ServicioService {
             servicioExistente.setSla(servicioDetails.getSla());
         }
         
+        if (servicioDetails.getFechaLlegada() != null) {
+        	servicioExistente.setFechaLlegada(servicioDetails.getFechaLlegada());
+        }
+        
+        if (servicioDetails.getFechaCierre() != null) {
+        	servicioExistente.setFechaCierre(servicioDetails.getFechaCierre());
+        }
+        
+        if (servicioDetails.getObservacionesEspeciales() != null) {
+        	servicioExistente.setObservacionesEspeciales(servicioDetails.getObservacionesEspeciales());
+        }
         // Retorna el servicio ya actualizado
         return servicioRepository.save(servicioExistente);
     }

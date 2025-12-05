@@ -62,7 +62,21 @@ public class Servicio {
     private String sla;
     
     
-    @OneToOne
+    //Datos de entidad que solo se ven en la pantalla de planeación
+    @Column(name = "Fecha_llegada")
+    private LocalDate fechaLlegada;
+    
+    @Column(name = "Fecha_cierre")
+    private LocalDate fechaCierre;
+    
+    @Column(name = "Fecha_asignacion_reporte")
+    private LocalDate fechaReporte;
+    
+    @Column(name = "Observaciones_especiales")
+    private String observacionesEspeciales;
+
+
+	@OneToOne
     @JoinColumn(name = "Tickets_idTickets", referencedColumnName = "idTickets")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","servicio"}) 
     private Tickets ticket;
@@ -74,6 +88,9 @@ public class Servicio {
     
     public Servicio() {
 	} 
+    
+    
+    
 
 	public Long getIdServicios() {
 		return idServicios;
@@ -263,4 +280,36 @@ public class Servicio {
     public void setEstaciones(Estaciones estaciones) {
         this.estaciones = estaciones;
     }
+    
+    public LocalDate getFechaLlegada() {
+		return fechaLlegada;
+	}
+
+	public void setFechaLlegada(LocalDate fechaLlegada) {
+		this.fechaLlegada = fechaLlegada;
+	}
+
+	public LocalDate getFechaCierre() {
+		return fechaCierre;
+	}
+
+	public void setFechaCierre(LocalDate fechaCierre) {
+		this.fechaCierre = fechaCierre;
+	}
+
+	public LocalDate getFechaReporte() {
+		return fechaReporte;
+	}
+
+	public void setFechaReporte(LocalDate fechaReporte) {
+		this.fechaReporte = fechaReporte;
+	}
+
+	public String getObservacionesEspeciales() {
+		return observacionesEspeciales;
+	}
+
+	public void setObservacionesEspeciales(String observacionesEspeciales) {
+		this.observacionesEspeciales = observacionesEspeciales;
+	}
 }
