@@ -18,13 +18,11 @@ public class PlaneacionDTO {
     private String nombreTecnico;
     private String observacionImportante; // observaciones
     private String supervisor;
-
     // Datos de Estaciones (Vienen dentro de Servicio o por ID)
     private String colonia;
     private String ciudad; // Mapeado a estaciones.estado segun tu requerimiento
     private String estadoMx;  // Para accessorKey: 'estadoMx' (NUEVO)
     private String transporteEstimado;
-
     // Datos de Inventario (Vienen de cruzar serieLogica/Fisica)
     private LocalDate fechaLlegada; // fechaDeFinPrevista
     private String equipoReportado;
@@ -33,7 +31,7 @@ public class PlaneacionDTO {
     private LocalDate fechaCierre; // Para accessorKey: 'fechaCierre' (NUEVO)
     // Datos vacíos o calculados
     private String observacionArjus; // "no existe en otras entidades"
-
+    
     // Constructor vacío
     public PlaneacionDTO() {}
 

@@ -112,13 +112,12 @@ public class TicketService {
 
         // --- B. Datos de ESTACIONES (Anidadas en Servicio) ---
         Estaciones estacion = servicio.getEstaciones(); 
+        
         if (estacion != null) {
             dto.setColonia(estacion.getColoniaAsentamiento());
-            
             // Mapeo corregido: Ciudad (Municipio) y Estado
             dto.setCiudad(estacion.getMunicipio()); // accessorKey: 'ciudad'
             dto.setEstadoMx(estacion.getEstado());  // accessorKey: 'estadoMx'
-            
             if (estacion.getTransporte() != null) {
                 // Convertir Integer/Long a String para el DTO
                 dto.setTransporteEstimado(String.valueOf(estacion.getTransporte()));
@@ -139,15 +138,14 @@ public class TicketService {
             dto.setEquipoReportado(inventario.getEquipo());
             dto.setEquipoEnviado(inventario.getEquipo());
             dto.setFechaAsignacionReporte(inventario.getFechaDeFin());
-            
-            // Mapeo de Fecha Cierre (Usamos la fecha de finalización del Inventario)
-            dto.setFechaCierre(inventario.getFechaDeFin()); 
+            dto.setObservacionArjus(inventario.getCodigoEmail());
+            dto.setFechaCierre(inventario.getFechaDeInicioPrevista()); 
         }
     }
     
     // --- D. Campos adicionales ---
     // Este campo se deja vacío según el requerimiento.
-    dto.setObservacionArjus(""); 
+    //dto.setObservacionArjus(""); 
 
     return dto;
 }
