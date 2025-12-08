@@ -52,23 +52,23 @@ public class PlaneacionService {
         // ==========================================
         
         // Campos existentes
-        if (dto.getDescripcion() != null) servicio.setMotivoDeServicio(dto.getDescripcion());
+        if (dto.getFechaAsignacion() != null) servicio.setFechaDeAsignacion(dto.getFechaAsignacion());
+       // if (dto.getCliente() != null) servicio.setNombreDeEss(dto.getCliente());
         if (dto.getEstadoGuia() != null) servicio.setSituacionActual(dto.getEstadoGuia());
         if (dto.getFechaDeEnvio() != null) servicio.setFechaDeEnvio(dto.getFechaDeEnvio());
-        if (dto.getFechaAsignacion() != null) servicio.setFechaDeAsignacion(dto.getFechaAsignacion());
         if (dto.getFechaLlegada() != null) servicio.setFechaLlegada(dto.getFechaLlegada());
-        if (dto.getFechaCierre() != null) servicio.setFechaCierre(dto.getFechaCierre());
-        if (dto.getFechaAsignacionReporte() != null) servicio.setFechaReporte(dto.getFechaAsignacionReporte());
-        if (dto.getNombreTecnico() != null) servicio.setTecnico(dto.getNombreTecnico());
-        if (dto.getSupervisor() != null) servicio.setSupervisor(dto.getSupervisor());
+        if (dto.getGuiaDhl() != null) servicio.setGuiaDeEncomienda(dto.getGuiaDhl());
+        //if (dto.getDireccion() != null) servicio.setDireccion(dto.getDireccion());
+        //if (dto.getTipoServicio() != null) servicio.setTipoDeServicio(dto.getTipoServicio());
+       // if (dto.getDescripcion() != null) servicio.setMotivoDeServicio(dto.getDescripcion());
         if (dto.getObservacionArjus() != null) servicio.setObservacionesEspeciales(dto.getObservacionArjus());
+        //if (dto.getNombreTecnico() != null) servicio.setTecnico(dto.getNombreTecnico());
+        //if (dto.getFechaAsignacionReporte() != null) servicio.setFechaReporte(dto.getFechaAsignacionReporte());
+        if (dto.getFechaCierre() != null) servicio.setFechaCierre(dto.getFechaCierre());
+        if (dto.getObservacionImportante() != null) servicio.setObservaciones(dto.getObservacionImportante());
+        if (dto.getSupervisor() != null) servicio.setSupervisor(dto.getSupervisor());
 
         // NUEVOS CAMPOS AGREGADOS EN TU DTO
-        if (dto.getCliente() != null) servicio.setNombreDeEss(dto.getCliente());
-        if (dto.getGuiaDhl() != null) servicio.setGuiaDeEncomienda(dto.getGuiaDhl());
-        if (dto.getDireccion() != null) servicio.setDireccion(dto.getDireccion());
-        if (dto.getTipoServicio() != null) servicio.setTipoDeServicio(dto.getTipoServicio());
-        if (dto.getObservacionImportante() != null) servicio.setObservaciones(dto.getObservacionImportante());
 
         // ==========================================
         // 2. ACTUALIZACIÓN DE DATOS ADICIONALES (EQUIPOS)
@@ -118,7 +118,6 @@ public class PlaneacionService {
             dto.setNombreTecnico(servicio.getTecnico());
             dto.setObservacionImportante(servicio.getObservaciones());
             dto.setSupervisor(servicio.getSupervisor());
-
             dto.setFechaLlegada(servicio.getFechaLlegada());
             dto.setFechaCierre(servicio.getFechaCierre());
             dto.setFechaAsignacionReporte(servicio.getFechaReporte());
