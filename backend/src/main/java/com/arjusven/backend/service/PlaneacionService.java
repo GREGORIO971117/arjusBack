@@ -7,7 +7,6 @@ import com.arjusven.backend.model.Estaciones;
 import com.arjusven.backend.model.Servicio;
 import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.repository.TicketRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,89 +21,83 @@ public class PlaneacionService {
     private final TicketService ticketService;
 
     @Autowired
-    public PlaneacionService(TicketRepository ticketsRepository,
-                             TicketService ticketService) {
+    public PlaneacionService(TicketRepository ticketsRepository, TicketService ticketService) {
         this.ticketsRepository = ticketsRepository;
         this.ticketService = ticketService;
     }
 
-    // =======================================================
-    //   GET: LISTA COMPLETA
-    // =======================================================
+    // ... (Mantén tus métodos GET existentes aquí) ...
     public List<PlaneacionDTO> getPlaneacionOperativa() {
-        return ticketsRepository.findAll()
-                .stream()
-                .map(this::mapTicketToDTO)
-                .collect(Collectors.toList());
+        return ticketsRepository.findAll().stream().map(this::mapTicketToDTO).collect(Collectors.toList());
     }
 
-    public List<Tickets> obtenerTicketsPorIncidencia(String incidencia) {
-        return ticketService.findTicketsByIncidencia(incidencia);
-    }
-
-    // =======================================================
-    //   PATCH PARCIAL (BUSCA POR INCIDENCIA)
-    // =======================================================
     @Transactional
     public PlaneacionDTO patchPlaneacion(String incidencia, PatchPlaneacionDTO dto) {
 
-        // Buscar ticket por incidencia
         List<Tickets> tickets = ticketService.findTicketsByIncidencia(incidencia);
 
         if (tickets.isEmpty()) {
             throw new IllegalArgumentException("No existe ticket con incidencia: " + incidencia);
         }
 
-        Tickets ticket = tickets.get(0); // Tomar el primero encontrado
+        Tickets ticket = tickets.get(0);
         Servicio servicio = ticket.getServicios();
 
         if (servicio == null) {
             throw new IllegalArgumentException("El ticket no tiene servicio asociado");
         }
 
-        // ---------------------
-        //   PATCH SIN VALIDAR
-        // ---------------------
+        // ==========================================
+        // 1. ACTUALIZACIÓN DE DATOS DEL SERVICIO
+        // ==========================================
+        
+        // Campos existentes
+        if (dto.getDescripcion() != null) servicio.setMotivoDeServicio(dto.getDescripcion());
+        if (dto.getEstadoGuia() != null) servicio.setSituacionActual(dto.getEstadoGuia());
+        if (dto.getFechaDeEnvio() != null) servicio.setFechaDeEnvio(dto.getFechaDeEnvio());
+        if (dto.getFechaAsignacion() != null) servicio.setFechaDeAsignacion(dto.getFechaAsignacion());
+        if (dto.getFechaLlegada() != null) servicio.setFechaLlegada(dto.getFechaLlegada());
+        if (dto.getFechaCierre() != null) servicio.setFechaCierre(dto.getFechaCierre());
+        if (dto.getFechaAsignacionReporte() != null) servicio.setFechaReporte(dto.getFechaAsignacionReporte());
+        if (dto.getNombreTecnico() != null) servicio.setTecnico(dto.getNombreTecnico());
+        if (dto.getSupervisor() != null) servicio.setSupervisor(dto.getSupervisor());
+        if (dto.getObservacionArjus() != null) servicio.setObservacionesEspeciales(dto.getObservacionArjus());
 
-        if (dto.getDescripcion() != null)
-            servicio.setMotivoDeServicio(dto.getDescripcion());
+        // NUEVOS CAMPOS AGREGADOS EN TU DTO
+        if (dto.getCliente() != null) servicio.setNombreDeEss(dto.getCliente());
+        if (dto.getGuiaDhl() != null) servicio.setGuiaDeEncomienda(dto.getGuiaDhl());
+        if (dto.getDireccion() != null) servicio.setDireccion(dto.getDireccion());
+        if (dto.getTipoServicio() != null) servicio.setTipoDeServicio(dto.getTipoServicio());
+        if (dto.getObservacionImportante() != null) servicio.setObservaciones(dto.getObservacionImportante());
 
-        if (dto.getEstadoGuia() != null)
-            servicio.setSituacionActual(dto.getEstadoGuia());
+        // ==========================================
+        // 2. ACTUALIZACIÓN DE DATOS ADICIONALES (EQUIPOS)
+        // ==========================================
+        
+        // Verificamos si hay datos de equipos para actualizar
+        if (dto.getEquipoReportado() != null || dto.getEquipoEnviado() != null) {
+            Adicional adicional = ticket.getAdicionales();
 
-        if (dto.getFechaDeEnvio() != null)
-            servicio.setFechaDeEnvio(dto.getFechaDeEnvio());
+            // CRÍTICO: Si no existe la entidad Adicional, la creamos
+            if (adicional == null) {
+                adicional = new Adicional();
+                // Aquí deberías setear cualquier relación inversa si es necesaria, o guardar 'adicional' primero si no hay cascade.
+                // Asumiendo que Tickets tiene CascadeType.ALL sobre Adicionales:
+                ticket.setAdicionales(adicional); 
+            }
 
-        if (dto.getFechaAsignacion() != null)
-            servicio.setFechaDeAsignacion(dto.getFechaAsignacion());
+            if (dto.getEquipoReportado() != null) adicional.setSerieFisicaSale(dto.getEquipoReportado());
+            if (dto.getEquipoEnviado() != null) adicional.setSerieFisicaEntra(dto.getEquipoEnviado());
+        }
 
-        if (dto.getFechaLlegada() != null)
-            servicio.setFechaLlegada(dto.getFechaLlegada());
-
-        if (dto.getFechaCierre() != null)
-            servicio.setFechaCierre(dto.getFechaCierre());
-
-        if (dto.getFechaAsignacionReporte() != null)
-            servicio.setFechaReporte(dto.getFechaAsignacionReporte());
-
-        if (dto.getNombreTecnico() != null)
-            servicio.setTecnico(dto.getNombreTecnico());
-
-        if (dto.getSupervisor() != null)
-            servicio.setSupervisor(dto.getSupervisor());
-
-        if (dto.getObservacionArjus() != null)
-            servicio.setObservacionesEspeciales(dto.getObservacionArjus());
-
+        // Guardamos el ticket (y por cascada el servicio y adicionales)
         ticketsRepository.save(ticket);
 
         return mapTicketToDTO(ticket);
     }
 
-    // =======================================================
-    //   MAPPER COMPLETO DEL TICKET -> DTO
-    // =======================================================
-    private PlaneacionDTO mapTicketToDTO(Tickets ticket) {
+    // ... (Tu método mapTicketToDTO sigue igual) ...
+      private PlaneacionDTO mapTicketToDTO(Tickets ticket) {
 
         PlaneacionDTO dto = new PlaneacionDTO();
         Servicio servicio = ticket.getServicios();

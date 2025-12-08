@@ -37,7 +37,7 @@ public class PlaneacionController {
 
     @PatchMapping("/{idTicket}")
     public ResponseEntity<?> actualizarPlaneacion(
-            @PathVariable Long idTicket,
+            @PathVariable("idTicket") String idTicket,
             @RequestBody PatchPlaneacionDTO dto) {
 
         try {

@@ -21,8 +21,6 @@ public class PlaneacionDTO {
     private String nombreTecnico;
     private String observacionImportante; // observaciones
     private String supervisor;
-
-    // Datos de Estaciones (Vienen dentro de Servicio o por ID)
     private String colonia;
     private String ciudad;
     private String estadoMx;
