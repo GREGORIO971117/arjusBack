@@ -168,6 +168,7 @@ public class InventarioService {
         String COL_SERIE = "serie";
         String COL_GUIA = "guia";
         String COL_INCIDENCIA = "incidencias";
+        String COL_FECHA_ENVIO = "fecha de envio";
        
         int rowIndex = 0; 
 
@@ -183,6 +184,8 @@ public class InventarioService {
                     else if (cellValue.equals(COL_SERIE)) headerMap.put(COL_SERIE, cell.getColumnIndex());
                     else if (cellValue.contains(COL_GUIA)) headerMap.put(COL_GUIA, cell.getColumnIndex());
                     else if (cellValue.contains(COL_INCIDENCIA)) headerMap.put(COL_INCIDENCIA, cell.getColumnIndex());
+                    else if (cellValue.contains(COL_FECHA_ENVIO)) headerMap.put(COL_FECHA_ENVIO, cell.getColumnIndex());
+
                 }
                 if (headerMap.containsKey(COL_MATERIAL) && headerMap.containsKey(COL_SERIE) && headerMap.containsKey(COL_INCIDENCIA)) {
                     headersFound = true;
@@ -201,6 +204,7 @@ public class InventarioService {
                 String material = headerMap.containsKey(COL_MATERIAL) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_MATERIAL))) : "";
                 String serie = headerMap.containsKey(COL_SERIE) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_SERIE))) : "";
                 String guia = headerMap.containsKey(COL_GUIA) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_GUIA))) : "";
+                LocalDate fechaEnvio = headerMap.containsKey(COL_FECHA_ENVIO) ? ticketService.getCellValueAsLocalDate(row.getCell(headerMap.get(COL_FECHA_ENVIO))) : null;
                 
                 String incidenciaStr = headerMap.containsKey(COL_INCIDENCIA) ? ticketService.getCellValueAsString(row.getCell(headerMap.get(COL_INCIDENCIA))) : "";
                 // Limpieza de la incidencia (asegurando que solo quede el texto/número relevante)
@@ -225,7 +229,7 @@ public class InventarioService {
 
                 // Actualizar campos de Inventario
                 String tipoEquipo = determinarTipoEquipo(material);
-                
+               
                 inventario.setDescripcion(material);      
                 inventario.setGuias(guia);
                 inventario.setEquipo(tipoEquipo); 
@@ -242,7 +246,6 @@ public class InventarioService {
                 // --- 1. PROCESAR TICKET Y SUS ENTIDADES RELACIONADAS ---
                 if (!incidenciaLimpia.isEmpty()) {
                     
-                    // **MODIFICACIÓN CRUCIAL:** Usar el método que devuelve List<Tickets>
                     List<Tickets> ticketsEncontrados = ticketRepository.findByServicios_Incidencia(incidenciaLimpia);
                     
                     if (!ticketsEncontrados.isEmpty()) {
@@ -252,7 +255,7 @@ public class InventarioService {
                         // A. Actualizar Servicios
                         Servicio servicio = ticket.getServicios(); // Asumo que Tickets tiene getServicios()
                         if (servicio != null) {
-                            servicio.setFechaDeEnvio(LocalDate.now()); 
+                            servicio.setFechaDeEnvio(fechaEnvio); 
                             servicio.setGuiaDeEncomienda(guia);
                         }
 

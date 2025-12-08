@@ -26,7 +26,6 @@ public class PlaneacionService {
         this.ticketService = ticketService;
     }
 
-    // ... (Mantén tus métodos GET existentes aquí) ...
     public List<PlaneacionDTO> getPlaneacionOperativa() {
         return ticketsRepository.findAll().stream().map(this::mapTicketToDTO).collect(Collectors.toList());
     }
@@ -124,10 +123,21 @@ public class PlaneacionService {
             dto.setObservacionArjus(servicio.getObservacionesEspeciales());
 
             if (adicional != null) {
-                dto.setEquipoEnviado(adicional.getSerieFisicaEntra());
-                dto.setEquipoReportado(adicional.getSerieFisicaSale());
-            }
+                // Para Equipo Enviado: Si SerieFisicaEntra no es nulo Y no está vacío, úsalo. 
+                // Si no, usa el valor de Sim.
+                String equipoEnviado = (adicional.getSerieFisicaEntra() != null && !adicional.getSerieFisicaEntra().isEmpty())
+                    ? adicional.getSerieFisicaEntra()
+                    : adicional.getSim(); 
+                    
+                // Para Equipo Reportado: Si SerieFisicaSale no es nulo Y no está vacío, úsalo. 
+                // Si no, usa el valor de SimSale.
+                String equipoReportado = (adicional.getSerieFisicaSale() != null && !adicional.getSerieFisicaSale().isEmpty())
+                    ? adicional.getSerieFisicaSale()
+                    : adicional.getSimSale();
 
+                dto.setEquipoEnviado(equipoEnviado);
+                dto.setEquipoReportado(equipoReportado);
+            }
             Estaciones estacion = servicio.getEstaciones();
             if (estacion != null) {
                 dto.setColonia(estacion.getColoniaAsentamiento());

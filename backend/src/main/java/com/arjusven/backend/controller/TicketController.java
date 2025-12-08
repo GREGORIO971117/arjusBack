@@ -285,4 +285,15 @@ public class TicketController {
 	public Tickets deleteUsuario(@PathVariable ("idTickets") Long id) {
 		return ticketService.deleteTickets(id);
 	}
+    
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<?> deleteAllTickets() {
+        ticketService.deleteAllTickets();
+        return ResponseEntity.noContent().build();
+    }
+
+    
+    
+    
+    
 }

@@ -21,6 +21,9 @@ import jakarta.transaction.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service
@@ -179,6 +182,7 @@ public class TicketService {
                     
                     Adicional nuevoAdicional = new Adicional();
                     Servicio nuevoServicio = new Servicio();
+                    nuevoServicio.setFechaReporte(LocalDate.now());
                     nuevoServicio.setIncidencia(incidencia);
                     nuevoServicio.setIdMerchant(idMerchant);
                     nuevoServicio.setMotivoDeServicio(motivoServicio);
@@ -292,6 +296,49 @@ public class TicketService {
     	}
     	return ticket;
     }
+
+	public void deleteAllTickets() {
+		estacionesRepository.deleteAll();
+	}
+
+	public LocalDate getCellValueAsLocalDate(Cell cell) {
+		if (cell == null) {
+	        return null;
+	    }
+
+	    // 1. Intentar leerla como Fecha de Apache POI (la forma más fiable)
+	    if (DateUtil.isCellDateFormatted(cell)) {
+	        try {
+	            return cell.getDateCellValue().toInstant()
+	                .atZone(ZoneId.systemDefault())
+	                .toLocalDate();
+	        } catch (IllegalStateException | NullPointerException e) {
+	            // Ignorar y pasar a leer como String si falla la conversión de POI
+	        }
+	    }
+
+	    // 2. Si no es formato de fecha POI, intentar leer como String y parsear
+	    String dateString = getCellValueAsString(cell).trim();
+
+	    if (dateString.isEmpty()) {
+	        return null;
+	    }
+
+	    // Formato que se ve en la imagen: dd/MM/yy (ej. 05/12/25)
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+
+	    try {
+	        return LocalDate.parse(dateString, formatter);
+	    } catch (DateTimeParseException e) {
+	        // Opcional: Intentar con el formato dd/MM/yyyy por si acaso (ej. 05/12/2025)
+	        try {
+	            return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+	        } catch (DateTimeParseException innerE) {
+	            System.err.println("Advertencia: No se pudo parsear la fecha '" + dateString + "' con formatos estándar.");
+	            return null;
+	        }
+	    }
+	}
     
     
 }

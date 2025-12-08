@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/usuarios/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/estaciones/bulk").permitAll()
                 .requestMatchers(HttpMethod.DELETE,"/api/inventario/deleteAll").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/tickets/deleteAll").permitAll()
                 //.requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()                
                 // 3. RUTAS PROTEGIDAS: Cualquier otra petición requiere autenticación (token)
                 .anyRequest().authenticated() 
