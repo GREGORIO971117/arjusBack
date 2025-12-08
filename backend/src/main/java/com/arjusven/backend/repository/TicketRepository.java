@@ -35,7 +35,6 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 	    List<Tickets> buscarExacto(@Param("texto") String texto, 
 	                               @Param("idMerchant") Long idMerchant);
 	
-	
 	 @Query("SELECT t FROM Tickets t " +
 	           "JOIN t.servicios s " +
 	           "JOIN t.adicionales u " +
