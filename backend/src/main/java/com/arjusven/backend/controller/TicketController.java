@@ -4,6 +4,7 @@ import com.arjusven.backend.model.Tickets;
 import com.arjusven.backend.service.DocumentGenerationService;
 import com.arjusven.backend.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import com.arjusven.backend.dto.TicketUploadResponse;
@@ -23,110 +24,131 @@ public class TicketController {
     @Autowired
     public TicketController(TicketService ticketService, DocumentGenerationService documentGenerationService) {
         this.ticketService = ticketService;
-        this.documentGenerationService =documentGenerationService;
+        this.documentGenerationService = documentGenerationService;
     }
-    
-    
-    @GetMapping("/filter")
-    public ResponseEntity<List<Tickets>> filterTickets(
+
+// --------------------------------------------------------------------------------
+// 🚀 ENDPOINT DE CONSULTA Y FILTRADO (CONSOLIDADO) 🚀
+// --------------------------------------------------------------------------------
+
+    /**
+     * Único método para GET /api/tickets. Maneja el caso sin filtros y con todos los filtros.
+     * Esto resuelve el error de mapeo ambiguo.
+     */
+    @GetMapping
+    public ResponseEntity<List<Tickets>> getAllTickets(
             @RequestParam(value = "situacion", required = false) String situacion, 
-            @RequestParam(value = "sla", required = false) String sla,            
+            @RequestParam(value = "sla", required = false) String sla,          
             @RequestParam(value = "tipoDeServicio", required = false) String tipoDeServicio,
             @RequestParam(value = "supervisor", required = false) String supervisor,
             @RequestParam(value = "plaza", required = false) String plaza,
-            @RequestParam(value = "fechaInicio", required = false) LocalDate fechaInicio, 
-            @RequestParam(value = "fechaFin", required = false) LocalDate fechaFin
+            
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, 
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
-    	
-	    String situacionFilter = null;
-	    String slaFilter = null; 
-	    String tipoDeServicioFilter = null;
-	    String supervisorFilter = null;
-	    String plazaFilter = null; 
-	
-	    // =======================================================
-	    // 1. Normalización de la Situación
-	    // =======================================================
-	    if ("todos".equalsIgnoreCase(situacion) || situacion == null) {
-	        situacionFilter = null;
-	    } else {
-	        if ("abierto".equalsIgnoreCase(situacion)) {
-	            situacionFilter = "Abierta";
-	        } else if ("cerrado".equalsIgnoreCase(situacion)) {
-	            situacionFilter = "Cerrado"; 
-	        } else {
-	            situacionFilter = situacion;
-	        }
-	    }
-	
-	    // =======================================================
-	    // 2. Normalización del SLA
-	    // =======================================================
-	    if (sla != null && !"todos".equalsIgnoreCase(sla)) {
-	        String normalizedSla = sla.trim();
-	
-	        if ("local".equalsIgnoreCase(normalizedSla)) {
-	            slaFilter = "Local";
-	        } else if ("foraneo".equalsIgnoreCase(normalizedSla) || "foráneo".equalsIgnoreCase(normalizedSla)) {
-	            slaFilter = "Foráneo"; 
-	        } else {
-	            slaFilter = sla; 
-	        }
-	    } else {
-	        slaFilter = null; 
-	    }
-	    
-	    if (tipoDeServicio != null && !"todos".equalsIgnoreCase(tipoDeServicio)) {
-	         // Eliminamos espacios en blanco accidentales
-	         String normalizedTipo = tipoDeServicio.trim();
-	         tipoDeServicioFilter = normalizedTipo;
-	         
-	    } else {
-	        tipoDeServicioFilter = null;
-	    }
-	    
-	    if(supervisor != null && !"todos".equalsIgnoreCase(supervisor)) {
-	    	
-	    	String normalizedTipo = supervisor.trim();
-	    	supervisorFilter = normalizedTipo;
-	    }else {
-	    	supervisorFilter = null;
-	    }
-	    
-	    if(plaza != null && !"todos".equalsIgnoreCase(plaza)) {
-	    	
-	    	String normalizedTipo = plaza.trim();
-	    	plazaFilter = normalizedTipo;
-	    }else {
-	    	plazaFilter = null;
-	    }
-	    
-	    // 4. Aplicar los filtros
-	    List<Tickets> filteredTickets = ticketService.filterTickets(situacionFilter, slaFilter, tipoDeServicioFilter,supervisorFilter,plazaFilter, fechaInicio, fechaFin);
-	    
-	    if (filteredTickets == null || filteredTickets.isEmpty()) {
-	        return ResponseEntity.noContent().build();
-	    }
-	    
-	    return ResponseEntity.ok(filteredTickets);
-	}
-    
-    
+        
+        // La lógica de normalización de filtros de string se mantiene.
+        String situacionFilter = null;
+        String slaFilter = null; 
+        String tipoDeServicioFilter = null;
+        String supervisorFilter = null;
+        String plazaFilter = null; 
+
+        // 1. Normalización de la Situación
+        if ("todos".equalsIgnoreCase(situacion) || situacion == null) {
+            situacionFilter = null;
+        } else {
+            if ("abierto".equalsIgnoreCase(situacion)) {
+                situacionFilter = "Abierta";
+            } else if ("cerrado".equalsIgnoreCase(situacion)) {
+                situacionFilter = "Cerrado"; 
+            } else {
+                situacionFilter = situacion;
+            }
+        }
+
+        // 2. Normalización del SLA
+        if (sla != null && !"todos".equalsIgnoreCase(sla)) {
+            String normalizedSla = sla.trim();
+
+            if ("local".equalsIgnoreCase(normalizedSla)) {
+                slaFilter = "Local";
+            } else if ("foraneo".equalsIgnoreCase(normalizedSla) || "foráneo".equalsIgnoreCase(normalizedSla)) {
+                slaFilter = "Foráneo"; 
+            } else {
+                slaFilter = sla; 
+            }
+        } else {
+            slaFilter = null; 
+        }
+        
+        // Normalización de Tipo de Servicio
+        if (tipoDeServicio != null && !"todos".equalsIgnoreCase(tipoDeServicio)) {
+            String normalizedTipo = tipoDeServicio.trim();
+            tipoDeServicioFilter = normalizedTipo;
+        } else {
+            tipoDeServicioFilter = null;
+        }
+        
+        // Normalización de Supervisor
+        if(supervisor != null && !"todos".equalsIgnoreCase(supervisor)) {
+            String normalizedTipo = supervisor.trim();
+            supervisorFilter = normalizedTipo;
+        }else {
+            supervisorFilter = null;
+        }
+        
+        // Normalización de Plaza
+        if(plaza != null && !"todos".equalsIgnoreCase(plaza)) {
+            String normalizedTipo = plaza.trim();
+            plazaFilter = normalizedTipo;
+        }else {
+            plazaFilter = null;
+        }
+        
+        // 4. Aplicar los filtros
+        // Asumiendo que filterTickets en el servicio ya maneja los filtros de fecha (startDate, endDate)
+        List<Tickets> filteredTickets = ticketService.filterTickets(
+            situacionFilter, 
+            slaFilter, 
+            tipoDeServicioFilter,
+            supervisorFilter, 
+            plazaFilter, 
+            startDate, 
+            endDate    
+        );
+        
+        if (filteredTickets == null || filteredTickets.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        
+        return ResponseEntity.ok(filteredTickets);
+    }
+
+// --------------------------------------------------------------------------------
+// 🔍 ENDPOINT DE BÚSQUEDA 🔍
+// --------------------------------------------------------------------------------
+
     @GetMapping("/search")
     public ResponseEntity<List<Tickets>> searchTickets(@RequestParam("query") String query) {
         if (query == null || query.trim().isEmpty()) {
-             return getAllTickets();
+             // Si la query está vacía, devuelve todos los tickets sin filtro
+             // ⚠️ Se reemplaza la llamada al método ambiguo por una llamada directa al servicio
+             List<Tickets> allTickets = ticketService.getAllTickets(); 
+             return new ResponseEntity<>(allTickets, HttpStatus.OK);
         }
 
         List<Tickets> resultados = ticketService.searchTicketsSmart(query);
 
         if (resultados.isEmpty()) {
-            // Opción A: Devolver 204 No Content (la lista en front se vacía)
-            // Opción B: Devolver 200 con lista vacía (más fácil para React)
             return new ResponseEntity<>(resultados, HttpStatus.OK);
         }
         return new ResponseEntity<>(resultados, HttpStatus.OK);
     }
+
+// --------------------------------------------------------------------------------
+// 📤 ENDPOINT DE SUBIDA DE ARCHIVOS 📤
+// --------------------------------------------------------------------------------
     
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<TicketUploadResponse> uploadTickets(
@@ -141,9 +163,9 @@ public class TicketController {
         }
 
         if (idAdministrador == null) {
-             TicketUploadResponse resp = new TicketUploadResponse();
-             resp.agregarError("El ID del administrador es obligatorio.");
-             return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
+              TicketUploadResponse resp = new TicketUploadResponse();
+              resp.agregarError("El ID del administrador es obligatorio.");
+              return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
         }
 
         // Llamar al servicio
@@ -154,21 +176,23 @@ public class TicketController {
             // Si todo falló
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else if (!response.getErrores().isEmpty()) {
-            // Si hubo éxito parcial (mezcla de éxitos y errores) -> 207 Multi-Status o 200 OK con detalles
-            // Usaremos 200 OK para que el front lea el JSON y decida qué mostrar
+            // Éxito parcial
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
         // Éxito total
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+// --------------------------------------------------------------------------------
+// ⬇️ ENDPOINT DE DESCARGA ⬇️
+// --------------------------------------------------------------------------------
     
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadTicketDocx(
             @PathVariable("id") Long id,
-            @RequestParam(name = "type", defaultValue = "intercambio") String type) { // Acepta el parámetro 'type'
+            @RequestParam(name = "type", defaultValue = "intercambio") String type) { 
         
-        // 1. Obtener el Ticket principal
         Tickets ticket = ticketService.getTicketsById(id);
         
         if (ticket == null || ticket.getServicios() == null) {
@@ -202,16 +226,11 @@ public class TicketController {
             String incidencia = ticket.getServicios().getIncidencia();
             String nombreEss = ticket.getServicios().getNombreDeEss();
             
-            // 3.1. Limpieza y Creación del nombre de archivo
-            // Incluimos el tipo de plantilla en el nombre
             String baseName = incidencia + "_" + nombreEss + "_" + templateName; 
-            
-            // Eliminación y reemplazo de caracteres
             String nombreLimpio = baseName.replaceAll("[^a-zA-Z0-9\\s_-]", "").replaceAll("\\s+", "_");
             
             final String filename = nombreLimpio + ".docx"; 
 
-            // 3.2. Codificación para el Content-Disposition
             String encodedFilename = java.net.URLEncoder.encode(filename, "UTF-8").replaceAll("\\+", "%20");
 
 
@@ -223,7 +242,6 @@ public class TicketController {
             
             headers.setContentLength(documentBytes.length);
 
-            // 4. Devolver los bytes al navegador
             return new ResponseEntity<>(documentBytes, headers, HttpStatus.OK);
 
         } catch (IOException e) {
@@ -231,55 +249,50 @@ public class TicketController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); 
         }
     }
-    
 
-    @GetMapping
-    public ResponseEntity<List<Tickets>> getAllTickets() {
-        List<Tickets> tickets = ticketService.getAllTickets();
-        if (tickets.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Código 204
-        }
-        return new ResponseEntity<>(tickets, HttpStatus.OK); // Código 200
-    }
+// --------------------------------------------------------------------------------
+// ℹ️ ENDPOINT DE DETALLE POR ID ℹ️
+// --------------------------------------------------------------------------------
 
     @GetMapping("/{id}")
     public ResponseEntity<Tickets> getTicketById(@PathVariable("id") Long id) {
         Tickets ticket = ticketService.getTicketsById(id);
         
         if (ticket!=null) {
-            return new ResponseEntity<>(ticket, HttpStatus.OK); // Código 200
+            return new ResponseEntity<>(ticket, HttpStatus.OK); 
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Código 404
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
         }
     }
     
-    // ====================================================================
-    // MÉTODO POST
-    // ====================================================================
+// --------------------------------------------------------------------------------
+// ➕ ENDPOINT DE CREACIÓN (POST) ➕
+// --------------------------------------------------------------------------------
 
     @PostMapping
     public ResponseEntity<Tickets> createTicket(@RequestBody Tickets nuevoTicket) {
         try {
-        	
-        	nuevoTicket.getServicios().setFechaDeAsignacion(LocalDate.now());
+            
+            nuevoTicket.getServicios().setFechaDeAsignacion(LocalDate.now());
             nuevoTicket.getServicios().setSituacionActual("Abierta");
-            // Llama al servicio, que maneja la validación de los 4 IDs de Usuario.
+            
             Tickets ticketGuardado = ticketService.saveTickets(nuevoTicket);
-            // Retorna el ticket creado con el ID generado por la DB.
-            return new ResponseEntity<>(ticketGuardado, HttpStatus.CREATED); // Código 201
+            
+            return new ResponseEntity<>(ticketGuardado, HttpStatus.CREATED); 
 
         } catch (IllegalArgumentException e) {
-            // Error de lógica, como rol incorrecto o ID nulo
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Código 400
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
         } catch (RuntimeException e) {
             // Error de DB, como usuario no encontrado
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Código 404
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
         } catch (Exception e) {
-            // Error inesperado
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Código 500
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
         }
     }
     
+// --------------------------------------------------------------------------------
+// ❌ ENDPOINTS DE ELIMINACIÓN ❌
+// --------------------------------------------------------------------------------
     
     @DeleteMapping(path="{idTickets}")
 	public Tickets deleteUsuario(@PathVariable ("idTickets") Long id) {
@@ -291,9 +304,4 @@ public class TicketController {
         ticketService.deleteAllTickets();
         return ResponseEntity.noContent().build();
     }
-
-    
-    
-    
-    
 }

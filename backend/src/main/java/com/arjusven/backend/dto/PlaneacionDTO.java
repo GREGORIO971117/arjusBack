@@ -25,7 +25,6 @@ public class PlaneacionDTO {
     private String ciudad;
     private String estadoMx;
     private String transporteEstimado;
-
     // Datos de Inventario
     private LocalDate fechaLlegada;
     private String equipoReportado;
