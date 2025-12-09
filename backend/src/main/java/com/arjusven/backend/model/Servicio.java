@@ -74,6 +74,12 @@ public class Servicio {
     
     @Column(name = "Observaciones_especiales")
     private String observacionesEspeciales;
+    
+    @Column(name = "Equipo_enviado")
+    private String equipoEnviado;
+    
+    @Column(name = "Modelo_reportado")
+    private String modeloReportado;
 
 
 	@OneToOne
@@ -88,9 +94,22 @@ public class Servicio {
     
     public Servicio() {
 	} 
-    
-    
-    
+
+	public String getModeloReportado() {
+		return modeloReportado;
+	}
+
+	public void setModeloReportado(String modeloReportado) {
+		this.modeloReportado = modeloReportado;
+	}
+
+	public String getEquipoEnviado() {
+		return equipoEnviado;
+	}
+
+	public void setEquipoEnviado(String equipoEnviado) {
+		this.equipoEnviado = equipoEnviado;
+	}
 
 	public Long getIdServicios() {
 		return idServicios;

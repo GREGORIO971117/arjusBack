@@ -101,7 +101,6 @@ public class PlaneacionService {
 
         PlaneacionDTO dto = new PlaneacionDTO();
         Servicio servicio = ticket.getServicios();
-        Adicional adicional = ticket.getAdicionales();
 
         if (servicio != null) {
 
@@ -113,7 +112,7 @@ public class PlaneacionService {
             dto.setMerchantId(servicio.getIdMerchant());
             dto.setGuiaDhl(servicio.getGuiaDeEncomienda());
             dto.setDireccion(servicio.getDireccion());
-            dto.setTipoServicio(servicio.getTipoDeServicio());
+            dto.setTipoServicio(servicio.getSla());
             dto.setDescripcion(servicio.getMotivoDeServicio());
             dto.setNombreTecnico(servicio.getTecnico());
             dto.setObservacionImportante(servicio.getObservaciones());
@@ -122,23 +121,9 @@ public class PlaneacionService {
             dto.setFechaCierre(servicio.getFechaCierre());
             dto.setFechaAsignacionReporte(servicio.getFechaReporte());
             dto.setObservacionArjus(servicio.getObservacionesEspeciales());
+            dto.setEquipoEnviado(servicio.getEquipoEnviado());
+            dto.setEquipoReportado(servicio.getModeloReportado());
 
-            if (adicional != null) {
-                // Para Equipo Enviado: Si SerieFisicaEntra no es nulo Y no está vacío, úsalo. 
-                // Si no, usa el valor de Sim.
-                String equipoEnviado = (adicional.getSerieFisicaEntra() != null && !adicional.getSerieFisicaEntra().isEmpty())
-                    ? adicional.getSerieFisicaEntra()
-                    : adicional.getSim(); 
-                    
-                // Para Equipo Reportado: Si SerieFisicaSale no es nulo Y no está vacío, úsalo. 
-                // Si no, usa el valor de SimSale.
-                String equipoReportado = (adicional.getSerieFisicaSale() != null && !adicional.getSerieFisicaSale().isEmpty())
-                    ? adicional.getSerieFisicaSale()
-                    : adicional.getSimSale();
-
-                dto.setEquipoEnviado(equipoEnviado);
-                dto.setEquipoReportado(equipoReportado);
-            }
             Estaciones estacion = servicio.getEstaciones();
             if (estacion != null) {
                 dto.setColonia(estacion.getColoniaAsentamiento());

@@ -104,6 +104,8 @@ public class TicketService {
             String COL_ID_MERCHANT = "id merchant"; // Busca "id merchant" con espacio, ajusta si es "idmerchant"
             String COL_DETALLE = "detalle";
             String COL_OBSERVACIONES = "observaciones";
+            String COL_SIN_STOCK = "insumo a enviar";
+            String COL_MODELO_REPORTADO = "modelo reportado";
 
             int rowIndex = 0; // Contador real de filas del Excel
 
@@ -121,6 +123,10 @@ public class TicketService {
                         else if (cellValue.contains(COL_ID_MERCHANT)) headerMap.put(COL_ID_MERCHANT, cell.getColumnIndex());
                         else if (cellValue.contains(COL_DETALLE)) headerMap.put(COL_DETALLE, cell.getColumnIndex());
                         else if (cellValue.contains(COL_OBSERVACIONES)) headerMap.put(COL_OBSERVACIONES, cell.getColumnIndex());
+                        else if (cellValue.contains(COL_SIN_STOCK)) headerMap.put(COL_SIN_STOCK, cell.getColumnIndex());
+                        else if (cellValue.contains(COL_MODELO_REPORTADO)) headerMap.put(COL_MODELO_REPORTADO, cell.getColumnIndex());
+
+
                     }
 
                     // Si encontramos AL MENOS Incidencia y ID Merchant en esta fila
@@ -147,6 +153,8 @@ public class TicketService {
                     
                     String motivoServicio = headerMap.containsKey(COL_DETALLE) ? getCellValueAsString(row.getCell(headerMap.get(COL_DETALLE))) : "";
                     String observaciones = headerMap.containsKey(COL_OBSERVACIONES) ? getCellValueAsString(row.getCell(headerMap.get(COL_OBSERVACIONES))) : "";
+                    String sinStock = headerMap.containsKey(COL_SIN_STOCK) ? getCellValueAsString(row.getCell(headerMap.get(COL_SIN_STOCK))) : "";
+                    String modeloReportado = headerMap.containsKey(COL_MODELO_REPORTADO) ? getCellValueAsString(row.getCell(headerMap.get(COL_MODELO_REPORTADO))) : "";
 
                     // Validación básica de campos vacíos
                     if (incidencia.isEmpty() || idMerchantStr.isEmpty()) {
@@ -188,6 +196,8 @@ public class TicketService {
                     nuevoServicio.setMotivoDeServicio(motivoServicio);
                     nuevoServicio.setObservaciones(observaciones);
                     nuevoServicio.setSituacionActual("Abierta");
+                    nuevoServicio.setEquipoEnviado(sinStock);
+                    nuevoServicio.setModeloReportado(modeloReportado);
                     //nuevoServicio.setFechaDeAsignacion();
                     nuevoAdicional.setCiudad("—");
                     nuevoTicket.setServicios(nuevoServicio);

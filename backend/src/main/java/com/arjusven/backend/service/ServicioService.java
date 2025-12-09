@@ -177,6 +177,13 @@ public class ServicioService {
         if (servicioDetails.getObservacionesEspeciales() != null) {
         	servicioExistente.setObservacionesEspeciales(servicioDetails.getObservacionesEspeciales());
         }
+        if (servicioDetails.getEquipoEnviado() != null) {
+        	servicioExistente.setEquipoEnviado(servicioDetails.getEquipoEnviado());
+        }
+        if (servicioDetails.getModeloReportado() != null) {
+        	servicioExistente.setModeloReportado(servicioDetails.getModeloReportado());
+        }
+        
         // Retorna el servicio ya actualizado
         return servicioRepository.save(servicioExistente);
     }

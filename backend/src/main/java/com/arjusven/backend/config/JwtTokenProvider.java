@@ -13,7 +13,6 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     // 💡 La clave secreta debe ser leída desde application.properties (o .yml)
-    // Asumiendo que has añadido: jwt.secret=Gregorioeslameraverdura
     @Value("${jwt.secret}")
     private String jwtSecret;
 
