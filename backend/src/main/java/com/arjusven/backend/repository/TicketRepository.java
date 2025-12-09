@@ -15,14 +15,6 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
     
 	List<Tickets> findByServicios_Incidencia(String incidencia);
 	
-	@Query("SELECT t FROM Tickets t WHERE " +
-	           "(:startDate IS NULL OR t.servicios.fechaDeAsignacion >= :startDate) AND " +
-	           "(:endDate IS NULL OR t.servicios.fechaDeAsignacion <= :endDate)")
-	    List<Tickets> findByFechaAsignacionBetween(
-	            @Param("startDate") LocalDate startDate, 
-	            @Param("endDate") LocalDate endDate);
-	
-	
 	@Query("SELECT t FROM Tickets t " +
 	           "JOIN t.servicios s " +
 	           "JOIN t.adicionales u " +
@@ -54,8 +46,8 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 		       "AND (:tipoDeServicio IS NULL OR s.tipoDeServicio = :tipoDeServicio) " + 
 		       "AND (:supervisor IS NULL OR s.supervisor = :supervisor) " +
 		       "AND (:plaza IS NULL OR u.plaza = :plaza) " +
-		       "AND (:fechaInicio IS NULL OR s.fechaReporte >= :fechaInicio) " +
-	           "AND (:fechaFin IS NULL OR s.fechaReporte <= :fechaFin)")
+		       "AND (:fechaInicio IS NULL OR s.fechaDeAsignacion >= :fechaInicio) " +
+	           "AND (:fechaFin IS NULL OR s.fechaDeAsignacion <= :fechaFin)")
 		List<Tickets> buscarPorFiltros(
 		        @Param("situacion") String situacion,
 		        @Param("sla") String sla,

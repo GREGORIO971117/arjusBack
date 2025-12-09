@@ -27,13 +27,8 @@ public class TicketController {
         this.documentGenerationService = documentGenerationService;
     }
 
-// --------------------------------------------------------------------------------
-// 🚀 ENDPOINT DE CONSULTA Y FILTRADO (CONSOLIDADO) 🚀
-// --------------------------------------------------------------------------------
-
     /**
      * Único método para GET /api/tickets. Maneja el caso sin filtros y con todos los filtros.
-     * Esto resuelve el error de mapeo ambiguo.
      */
     @GetMapping
     public ResponseEntity<List<Tickets>> getAllTickets(
@@ -42,7 +37,7 @@ public class TicketController {
             @RequestParam(value = "tipoDeServicio", required = false) String tipoDeServicio,
             @RequestParam(value = "supervisor", required = false) String supervisor,
             @RequestParam(value = "plaza", required = false) String plaza,
-            
+     
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, 
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -107,7 +102,6 @@ public class TicketController {
         }
         
         // 4. Aplicar los filtros
-        // Asumiendo que filterTickets en el servicio ya maneja los filtros de fecha (startDate, endDate)
         List<Tickets> filteredTickets = ticketService.filterTickets(
             situacionFilter, 
             slaFilter, 

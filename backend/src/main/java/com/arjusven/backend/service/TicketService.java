@@ -339,11 +339,5 @@ public class TicketService {
 	        }
 	    }
 	}
-
-	public List<Tickets> findAllTicketsByDateRange(LocalDate startDate, LocalDate endDate) {
-        // La lógica de la fecha se maneja en el Repository
-        return ticketsRepository.findByFechaAsignacionBetween(startDate, endDate);
-    }
-    
     
 }
