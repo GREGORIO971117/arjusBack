@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +27,21 @@ public class PlaneacionService {
         this.ticketService = ticketService;
     }
 
+    //public List<PlaneacionDTO> getPlaneacionOperativa() {
+     //   return ticketsRepository.findAll().stream().map(this::mapTicketToDTO).collect(Collectors.toList());
+   // }
+    
     public List<PlaneacionDTO> getPlaneacionOperativa() {
-        return ticketsRepository.findAll().stream().map(this::mapTicketToDTO).collect(Collectors.toList());
+        LocalDate today = LocalDate.now();
+        
+        // 💡 1. Llama al nuevo método del repositorio para obtener Tickets filtrados
+        // Se asume que el repositorio manejará la lógica de acceder a la fecha del Servicio.
+        List<Tickets> filteredTickets = ticketsRepository.findTicketsForCurrentPlanning(today);
+        
+        // 💡 2. Mapea solo los tickets filtrados a DTOs
+        return filteredTickets.stream()
+                .map(this::mapTicketToDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional

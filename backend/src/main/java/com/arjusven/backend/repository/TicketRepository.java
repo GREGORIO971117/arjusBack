@@ -57,4 +57,9 @@ public interface TicketRepository extends JpaRepository<Tickets, Long> {
 		        @Param("fechaInicio") LocalDate fechaInicio,
 	            @Param("fechaFin") LocalDate fechaFin
 		);
+
+	 @Query("SELECT t FROM Tickets t " + 
+	           "JOIN t.servicios s " + // Une Tickets (t) con Servicio (s)
+	           "WHERE NOT (s.situacionActual = 'CERRADO' AND s.fechaDeAsignacion < :today)")
+	    List<Tickets> findTicketsForCurrentPlanning(@Param("today") LocalDate today);
 }
