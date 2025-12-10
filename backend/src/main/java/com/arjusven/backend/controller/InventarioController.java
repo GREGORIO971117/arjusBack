@@ -110,14 +110,6 @@ public class InventarioController {
 	}	
 	
 	
-	
-	@DeleteMapping("/deleteAll")
-    public ResponseEntity<?> deleteAllEstaciones() {
-		inventarioService.deleteAllEstaciones();
-        return ResponseEntity.noContent().build();
-    }
-	
-	
 	@PostMapping
 	public ResponseEntity<Inventario> createInventario(@RequestBody Inventario inventario){
 		

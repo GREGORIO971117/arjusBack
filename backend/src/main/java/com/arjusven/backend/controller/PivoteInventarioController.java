@@ -48,14 +48,15 @@ public class PivoteInventarioController {
     }
     
     @GetMapping("/historial/{id}")
-    public ResponseEntity<List<PivoteInventario>> getHistorialInventario(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getHistorialInventario(@PathVariable("id") Long id) {
         try {
         	
         	
             List<PivoteInventario> historial = inventarioService.obtenerHistorialPorInventario(id);
             
             if (historial.isEmpty()) {
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                		.body("No hay historial para este inventario.");
             }
             
             return ResponseEntity.ok(historial);

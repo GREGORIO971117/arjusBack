@@ -234,6 +234,7 @@ public class InventarioService {
                 inventario.setGuias(guia);
                 inventario.setEquipo(tipoEquipo); 
                 inventario.setUltimaActualizacion(LocalDate.now());
+                inventario.setEstado("Para instalar");
                 
                 if (!incidenciaLimpia.isEmpty()) {
                     inventario.setNumeroDeIncidencia(incidenciaLimpia); 
