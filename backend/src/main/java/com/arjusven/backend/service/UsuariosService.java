@@ -18,8 +18,11 @@ public class UsuariosService {
     private UsuariosRepository usuariosRepository;
 
     @Autowired
-    public UsuariosService(UsuariosRepository usuariosRepository) {
+    public UsuariosService(
+    		UsuariosRepository usuariosRepository,
+    		PasswordEncoder encoder) {
 		this.usuariosRepository = usuariosRepository;
+		this.encoder = encoder;
 	}
     
  // Method to get all users (optional but good for testing)
@@ -86,11 +89,18 @@ public class UsuariosService {
         
         // NOTA: Para la contraseña, normalmente se usa un endpoint de cambio de contraseña dedicado, 
         // pero si se permite la actualización parcial aquí:
-        if (usuarioDetails.getContraseña() != null) {
-            // En un caso real, aquí deberías HASHEAR la contraseña antes de guardarla.
-            usuarioExistente.setContraseña(usuarioDetails.getContraseña());
+        if (usuarioDetails.getContraseña() != null && !usuarioDetails.getContraseña().isEmpty()) {
+            // Verificar si la nueva contraseña es diferente o cumple con mínimos de longitud/complejidad aquí (opcional)
+            
+            // 🚨 1. HASHEAR la nueva contraseña
+            String nuevaContrasenaHasheada = encoder.encode(usuarioDetails.getContraseña());
+            
+            // 2. Establecer la contraseña hasheada en la entidad
+            usuarioExistente.setContraseña(nuevaContrasenaHasheada);
+            
+            // NOTA: Es importante que el campo 'contraseña' en tu entidad 'Usuarios' no sea devuelto
+            // en la respuesta de la API para evitar fugas de información.
         }
-        
 
         // 3. Guardar y devolver la entidad actualizada.
         return usuariosRepository.save(usuarioExistente);

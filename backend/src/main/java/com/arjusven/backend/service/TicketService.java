@@ -99,7 +99,6 @@ public class TicketService {
             Map<String, Integer> headerMap = new HashMap<>();
             boolean headersFound = false;
             
-            // Nombres de columnas esperados (en minúsculas para facilitar comparación)
             String COL_INCIDENCIA = "incidencia";
             String COL_ID_MERCHANT = "id merchant"; // Busca "id merchant" con espacio, ajusta si es "idmerchant"
             String COL_DETALLE = "detalle";
