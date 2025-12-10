@@ -68,7 +68,7 @@ public class TicketService {
         // 2. INTENTO 1: Búsqueda Exacta
         List<Tickets> resultados = ticketsRepository.buscarExacto(textoBusqueda, idMerchantBusqueda);
 
-        // 3. INTENTO 2: Si la exacta no trajo nada, intentamos Búsqueda Parcial (LIKE)
+        // 3. INTENTO 2: Si la exacta no trajo nada, intentamos Búsqueda Parcial
         if (resultados.isEmpty()) {
             resultados = ticketsRepository.buscarParcial(textoBusqueda);
         }

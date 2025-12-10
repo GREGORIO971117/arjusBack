@@ -78,12 +78,12 @@ public class DocumentGenerationService {
 
             // Cierre
             map.put("${atencionEnPunto}", adicionales.getAtencionEnPunto());
-            map.put("${tecnico}", adicionales.getTecnico());
             map.put("${firmaEnEstacion}", adicionales.getFirmaEnEstacion());
         }
         
         if (servicios != null) {
             map.put("${resolucion}", servicios.getResolucion());
+            map.put("${tecnico}", servicios.getTecnico());
             map.put("${incidencia}", servicios.getIncidencia());
             map.put("${nombreDeEss}", servicios.getNombreDeEss());
             map.put("${motivoDeServicio}", servicios.getMotivoDeServicio());
