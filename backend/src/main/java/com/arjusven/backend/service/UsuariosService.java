@@ -51,6 +51,7 @@ public class UsuariosService {
     
     public Usuarios deleteUsuario(Long id) {
 		
+    	
 		Usuarios user = null;
 		if(usuariosRepository.existsById(id)) {
 			user = usuariosRepository.findById(id).get();
