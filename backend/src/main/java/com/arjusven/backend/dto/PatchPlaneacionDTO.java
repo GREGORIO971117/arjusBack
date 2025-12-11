@@ -6,6 +6,7 @@ public class PatchPlaneacionDTO {
 
     private String descripcion;
     private String estadoGuia;
+    private String statusPaqueteria;
     private LocalDate fechaDeEnvio;
     private LocalDate fechaAsignacion;
     private LocalDate fechaLlegada;
@@ -24,7 +25,10 @@ public class PatchPlaneacionDTO {
 
     public PatchPlaneacionDTO() {}
     
-    public String getCliente() {return cliente;}
+    public String getStatusPaqueteria() {return statusPaqueteria;}
+	public void setStatusPaqueteria(String statusPaqueteria) {this.statusPaqueteria = statusPaqueteria;}
+
+	public String getCliente() {return cliente;}
 	public void setCliente(String cliente) {this.cliente = cliente;}
 
 	public String getGuiaDhl() {return guiaDhl;}

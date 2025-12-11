@@ -80,7 +80,12 @@ public class Servicio {
     
     @Column(name = "Modelo_reportado")
     private String modeloReportado;
-
+    
+    @Column(name = "Estado_guia")
+    private String estadoGuia;
+    
+    @Column(name = "Status_paqueteria")
+    private String statusPaqueteria;
 
 	@OneToOne
     @JoinColumn(name = "Tickets_idTickets", referencedColumnName = "idTickets")
@@ -94,6 +99,22 @@ public class Servicio {
     
     public Servicio() {
 	} 
+    
+	public String getStatusPaqueteria() {
+		return statusPaqueteria;
+	}
+
+	public void setStatusPaqueteria(String statusPaqueteria) {
+		this.statusPaqueteria = statusPaqueteria;
+	}
+
+	public String getEstadoGuia() {
+		return estadoGuia;
+	}
+
+	public void setEstadoGuia(String estadoGuia) {
+		this.estadoGuia = estadoGuia;
+	}
 
 	public String getModeloReportado() {
 		return modeloReportado;

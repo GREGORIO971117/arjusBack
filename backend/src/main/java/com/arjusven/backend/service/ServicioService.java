@@ -69,7 +69,6 @@ public class ServicioService {
         }
     }
 
-    // Método para guardar un nuevo servicio (Creación)
     @Transactional
     public Servicio saveServicio(Servicio servicio) {
         // La asignación se realiza ANTES de guardar
@@ -84,7 +83,6 @@ public class ServicioService {
             .orElseThrow(() -> new NoSuchElementException("Servicio con ID " + id + " no encontrado."));
     }
 
-    // Método para obtener todos los servicios
     public List<Servicio> getAllServicio() {
         return servicioRepository.findAll();
     }
@@ -182,6 +180,13 @@ public class ServicioService {
         }
         if (servicioDetails.getModeloReportado() != null) {
         	servicioExistente.setModeloReportado(servicioDetails.getModeloReportado());
+        }
+        if (servicioDetails.getEstadoGuia() != null) {
+        	servicioExistente.setEstadoGuia(servicioDetails.getEstadoGuia());
+        }
+        
+        if (servicioDetails.getStatusPaqueteria() != null) {
+        	servicioExistente.setStatusPaqueteria(servicioDetails.getStatusPaqueteria());
         }
         
         // Retorna el servicio ya actualizado

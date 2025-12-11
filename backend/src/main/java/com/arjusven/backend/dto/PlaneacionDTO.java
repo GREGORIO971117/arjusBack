@@ -10,6 +10,7 @@ public class PlaneacionDTO {
     // Datos directos de Ticket/Servicio
     private LocalDate fechaAsignacion;
     private String incidencia;
+    private String statusPaqueteria;
     private String cliente; // nombreDeEss
     private String estadoGuia; // situacionActual
     private LocalDate fechaDeEnvio;
@@ -37,9 +38,11 @@ public class PlaneacionDTO {
 
     // Constructor vacío
     public PlaneacionDTO() {}
+    
+    public String getStatusPaqueteria() {return statusPaqueteria;}
+	public void setStatusPaqueteria(String statusPaqueteria) {this.statusPaqueteria = statusPaqueteria;}
 
-    // 🔹 Getter y Setter de idTicket
-    public Long getIdTicket() { return idTicket; }
+	public Long getIdTicket() { return idTicket; }
     public void setIdTicket(Long idTicket) { this.idTicket = idTicket; }
 
     public String getEstadoMx() { return estadoMx; }

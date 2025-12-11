@@ -195,8 +195,10 @@ public class TicketService {
                     nuevoServicio.setMotivoDeServicio(motivoServicio);
                     nuevoServicio.setObservaciones(observaciones);
                     nuevoServicio.setSituacionActual("Abierta");
+                    nuevoServicio.setEstadoGuia("Abierta");
                     nuevoServicio.setEquipoEnviado(sinStock);
                     nuevoServicio.setModeloReportado(modeloReportado);
+                    nuevoServicio.setStatusPaqueteria("Sin status");
                     //nuevoServicio.setFechaDeAsignacion();
                     nuevoAdicional.setCiudad("—");
                     nuevoTicket.setServicios(nuevoServicio);

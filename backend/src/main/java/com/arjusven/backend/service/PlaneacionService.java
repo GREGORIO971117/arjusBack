@@ -67,7 +67,7 @@ public class PlaneacionService {
         // Campos existentes
         if (dto.getFechaAsignacion() != null) servicio.setFechaDeAsignacion(dto.getFechaAsignacion());
         // if (dto.getCliente() != null) servicio.setNombreDeEss(dto.getCliente());
-        if (dto.getEstadoGuia() != null) servicio.setSituacionActual(dto.getEstadoGuia());
+        if (dto.getEstadoGuia() != null) servicio.setEstadoGuia(dto.getEstadoGuia());
         if (dto.getFechaDeEnvio() != null) servicio.setFechaDeEnvio(dto.getFechaDeEnvio());
         if (dto.getFechaLlegada() != null) servicio.setFechaLlegada(dto.getFechaLlegada());
         if (dto.getGuiaDhl() != null) servicio.setGuiaDeEncomienda(dto.getGuiaDhl());
@@ -80,7 +80,7 @@ public class PlaneacionService {
         if (dto.getFechaCierre() != null) servicio.setFechaCierre(dto.getFechaCierre());
         if (dto.getObservacionImportante() != null) servicio.setObservaciones(dto.getObservacionImportante());
         if (dto.getSupervisor() != null) servicio.setSupervisor(dto.getSupervisor());
-       
+        if (dto.getStatusPaqueteria() != null) servicio.setStatusPaqueteria(dto.getStatusPaqueteria());
         //if (dto.getFechaAsignacionReporte() != null) servicio.setFechaReporte(dto.getFechaAsignacionReporte());
         // NUEVOS CAMPOS AGREGADOS EN TU DTO
 
@@ -121,7 +121,8 @@ public class PlaneacionService {
             dto.setFechaAsignacion(servicio.getFechaDeAsignacion());
             dto.setIncidencia(servicio.getIncidencia());
             dto.setCliente(servicio.getNombreDeEss());
-            dto.setEstadoGuia(servicio.getSituacionActual());
+            dto.setEstadoGuia(servicio.getEstadoGuia());
+            dto.setStatusPaqueteria(servicio.getStatusPaqueteria());
             dto.setFechaDeEnvio(servicio.getFechaDeEnvio());
             dto.setMerchantId(servicio.getIdMerchant());
             dto.setGuiaDhl(servicio.getGuiaDeEncomienda());
