@@ -8,13 +8,15 @@ public class JwtAuthResponse {
     
     // 🔑 CAMPOS NUEVOS: ID y Nombre del usuario
     private Long userId;        
-    private String userName;    
+    private String userName;  
+    private String rol; 
 
     // 1. Constructor ACTUALIZADO para incluir los nuevos datos
-    public JwtAuthResponse(String accessToken, Long userId, String userName) {
+    public JwtAuthResponse(String accessToken, Long userId, String userName, String rol) {
         this.accessToken = accessToken;
         this.userId = userId;
         this.userName = userName;
+        this.rol = rol;
     }
     
     // 2. GETTERS Y SETTERS ACTUALIZADOS
@@ -52,4 +54,14 @@ public class JwtAuthResponse {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
+	public String getRol() {
+		return rol;
+	}
+
+	public void setRol(String rol) {
+		this.rol = rol;
+	}
+    
+    
 }

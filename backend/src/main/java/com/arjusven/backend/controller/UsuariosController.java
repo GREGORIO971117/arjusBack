@@ -52,7 +52,8 @@ public class UsuariosController {
             JwtAuthResponse response = new JwtAuthResponse(
                 token,
                 authenticatedUser.getIdUsuarios(), // Obtenido del objeto
-                authenticatedUser.getNombre()      // Obtenido del objeto
+                authenticatedUser.getNombre(),
+                authenticatedUser.getRol()// Obtenido del objeto
             );
             
             return new ResponseEntity<>(response, HttpStatus.OK);
