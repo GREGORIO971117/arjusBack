@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+
+import com.arjusven.backend.dto.DashboardResponseDTO;
 import com.arjusven.backend.dto.TicketUploadResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -138,18 +140,19 @@ public class TicketController {
     }
     
     @GetMapping("/dashboard")
-    public ResponseEntity<List<Tickets>> getDashboardTickets(
+    public ResponseEntity<DashboardResponseDTO> getDashboardTickets(
             @RequestParam("supervisor") String supervisor,
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-        List<Tickets> tickets = ticketService.getTicketsDashboard(supervisor, startDate, endDate);
+        DashboardResponseDTO dashboardData = ticketService.getTicketsDashboard(supervisor, startDate, endDate);
 
-        if (tickets.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Devuelve 204 si no hay datos
+        // Validamos si no hay tickets (totalTickets == 0)
+        if (dashboardData.getTotalTickets() == 0) {
+            return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(tickets); // Devuelve 200 con la lista de tickets
+        return ResponseEntity.ok(dashboardData);
     }
     
 

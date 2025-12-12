@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.arjusven.backend.dto.DashboardResponseDTO;
 import com.arjusven.backend.dto.TicketUploadResponse;
 import com.arjusven.backend.model.Adicional;
 import com.arjusven.backend.model.Servicio;
@@ -278,8 +279,35 @@ public class TicketService {
         return ticketsRepository.save(tickets);
     }
     
-    public List<Tickets> getTicketsDashboard(String supervisor, LocalDate fechaInicio, LocalDate fechaFin) {
-    	return ticketsRepository.findBySupervisorAndDateRange(supervisor, fechaInicio, fechaFin);
+    public DashboardResponseDTO getTicketsDashboard(String supervisor, LocalDate fechaInicio, LocalDate fechaFin) {
+        // 1. Obtenemos la lista cruda desde la BD
+        List<Tickets> listaTickets = ticketsRepository.findBySupervisorAndDateRange(supervisor, fechaInicio, fechaFin);
+
+        // 2. Realizamos la clasificación flexible en el Backend
+        long total = listaTickets.size();
+
+        long abiertos = listaTickets.stream()
+                .filter(t -> esEstado(t, "Abierta")) // Usamos un método auxiliar
+                .count();
+
+        long cerrados = listaTickets.stream()
+                .filter(t -> esEstado(t, "Cerrado"))
+                .count();
+
+        long cancelados = listaTickets.stream()
+                .filter(t -> esEstado(t, "Cancelada por PC"))
+                .count();
+
+        // 3. Retornamos el DTO con todo empaquetado
+        return new DashboardResponseDTO(listaTickets, total, abiertos, cerrados, cancelados);
+    }
+
+    private boolean esEstado(Tickets t, String estadoEsperado) {
+        if (t.getServicios() == null || t.getServicios().getSituacionActual() == null) {
+            return false;
+        }
+        String estadoActual = t.getServicios().getSituacionActual().trim(); // Quita espacios
+        return estadoActual.equalsIgnoreCase(estadoEsperado); // Ignora mayúsculas/minúsculas
     }
 
     public Tickets getTicketsById(Long id) { 
