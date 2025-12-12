@@ -22,10 +22,14 @@ public class PatchPlaneacionDTO {
     private String observacionImportante;
     private String equipoReportado;
     private String equipoEnviado;
+    private String ejecutivo;
 
     public PatchPlaneacionDTO() {}
     
-    public String getStatusPaqueteria() {return statusPaqueteria;}
+    public String getEjecutivo() {return ejecutivo;}
+	public void setEjecutivo(String ejecutivo) {this.ejecutivo = ejecutivo;}
+
+	public String getStatusPaqueteria() {return statusPaqueteria;}
 	public void setStatusPaqueteria(String statusPaqueteria) {this.statusPaqueteria = statusPaqueteria;}
 
 	public String getCliente() {return cliente;}

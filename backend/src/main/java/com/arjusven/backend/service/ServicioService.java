@@ -188,6 +188,9 @@ public class ServicioService {
         if (servicioDetails.getStatusPaqueteria() != null) {
         	servicioExistente.setStatusPaqueteria(servicioDetails.getStatusPaqueteria());
         }
+        if (servicioDetails.getEjecutivo() != null) {
+        	servicioExistente.setEjecutivo(servicioDetails.getEjecutivo());
+        }
         
         // Retorna el servicio ya actualizado
         return servicioRepository.save(servicioExistente);

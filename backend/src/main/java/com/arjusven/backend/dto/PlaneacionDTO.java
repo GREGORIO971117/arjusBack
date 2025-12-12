@@ -35,11 +35,15 @@ public class PlaneacionDTO {
 
     // Datos vacíos o calculados
     private String observacionArjus;
+    private String ejecutivo;
 
     // Constructor vacío
     public PlaneacionDTO() {}
     
-    public String getStatusPaqueteria() {return statusPaqueteria;}
+    public String getEjecutivo() {return ejecutivo;}
+	public void setEjecutivo(String ejecutivo) {this.ejecutivo = ejecutivo;}
+
+	public String getStatusPaqueteria() {return statusPaqueteria;}
 	public void setStatusPaqueteria(String statusPaqueteria) {this.statusPaqueteria = statusPaqueteria;}
 
 	public Long getIdTicket() { return idTicket; }

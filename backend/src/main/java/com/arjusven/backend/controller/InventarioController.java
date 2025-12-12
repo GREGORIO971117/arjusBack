@@ -2,12 +2,14 @@ package com.arjusven.backend.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.arjusven.backend.dto.TicketUploadResponse;
+import com.arjusven.backend.model.Estaciones;
 import com.arjusven.backend.model.Inventario;
 import com.arjusven.backend.service.InventarioService;
 
@@ -63,6 +65,17 @@ public class InventarioController {
 	    }
 	    return ResponseEntity.ok(filteredInventario);
 	}
+	
+	@PostMapping("/bulk")
+    public ResponseEntity<?> createManyInventario(@RequestBody List<Inventario> estaciones) {
+        // Puedes agregar validaciones aquí si quieres
+        try {
+            Map<String, Object> nuevas = inventarioService.saveAllWithReport(estaciones);
+            return new ResponseEntity<>(nuevas, HttpStatus.CREATED);
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar: " + e.getMessage());
+        }
+    }
 	
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<TicketUploadResponse> uploadInventario(
@@ -149,6 +162,12 @@ public class InventarioController {
         @RequestBody Inventario inventarioDetails) {	
         return inventarioService.patchInventario(id, inventarioDetails);
     }
+	
+	 @DeleteMapping("/deleteAll")
+	    public ResponseEntity<?> deleteAllEstaciones() {
+	        inventarioService.deleteAllInventario();
+	        return ResponseEntity.noContent().build();
+	    }
 	
 	
 }

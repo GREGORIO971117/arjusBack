@@ -94,7 +94,7 @@ public class EstacionesService {
     	return estaciones;
     }
 	
-public Estaciones updateEstacionesPatch(Long idMerchant, Estaciones updatedEstacion) {
+	public Estaciones updateEstacionesPatch(Long idMerchant, Estaciones updatedEstacion) {
         
         Optional<Estaciones> existingEstacionOptional = estacionesRepository.findById(idMerchant);
 

@@ -86,6 +86,9 @@ public class Servicio {
     
     @Column(name = "Status_paqueteria")
     private String statusPaqueteria;
+    
+    @Column(name = "Ejecutivo")
+    private String ejecutivo;
 
 	@OneToOne
     @JoinColumn(name = "Tickets_idTickets", referencedColumnName = "idTickets")
@@ -100,6 +103,11 @@ public class Servicio {
     public Servicio() {
 	} 
     
+	public String getEjecutivo() {return ejecutivo;}
+	
+	public void setEjecutivo(String ejecutivo) 
+	{this.ejecutivo = ejecutivo;}
+
 	public String getStatusPaqueteria() {
 		return statusPaqueteria;
 	}

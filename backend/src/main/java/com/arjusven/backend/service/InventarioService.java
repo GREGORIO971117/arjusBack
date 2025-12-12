@@ -2,6 +2,7 @@ package com.arjusven.backend.service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.arjusven.backend.model.Adicional;
+import com.arjusven.backend.model.Estaciones;
 import com.arjusven.backend.model.Inventario;
 import com.arjusven.backend.model.PivoteInventario;
 import com.arjusven.backend.model.Servicio;
@@ -68,7 +70,7 @@ public class InventarioService {
     
     
 
-	public void deleteAllEstaciones() {
+	public void deleteAllInventario() {
 	    inventarioRepository.deleteAll();
 	}
     
@@ -331,5 +333,20 @@ public class InventarioService {
 
         return "OTROS"; 
     }
+
+	public Map<String, Object> saveAllWithReport(List<Inventario> estaciones) {
+	    List<Inventario> guardadas = new ArrayList<>();
+	    List<Map<String, Object>> errores = new ArrayList<>();
+
+	    for (int i = 0; i < estaciones.size(); i++) {
+	        try {
+	            guardadas.add(inventarioRepository.save(estaciones.get(i)));
+	        } catch (Exception e) {
+	            errores.add(Map.of("index", i, "error", e.getMessage()));
+	        }
+	    }
+
+	    return Map.of("guardadas", guardadas, "errores", errores);
+	}
     
 }
