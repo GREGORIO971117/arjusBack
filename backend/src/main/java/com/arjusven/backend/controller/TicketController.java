@@ -37,7 +37,6 @@ public class TicketController {
             @RequestParam(value = "tipoDeServicio", required = false) String tipoDeServicio,
             @RequestParam(value = "supervisor", required = false) String supervisor,
             @RequestParam(value = "plaza", required = false) String plaza,
-     
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, 
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
@@ -126,8 +125,6 @@ public class TicketController {
     @GetMapping("/search")
     public ResponseEntity<List<Tickets>> searchTickets(@RequestParam("query") String query) {
         if (query == null || query.trim().isEmpty()) {
-             // Si la query está vacía, devuelve todos los tickets sin filtro
-             // ⚠️ Se reemplaza la llamada al método ambiguo por una llamada directa al servicio
              List<Tickets> allTickets = ticketService.getAllTickets(); 
              return new ResponseEntity<>(allTickets, HttpStatus.OK);
         }
@@ -139,6 +136,22 @@ public class TicketController {
         }
         return new ResponseEntity<>(resultados, HttpStatus.OK);
     }
+    
+    @GetMapping("/dashboard")
+    public ResponseEntity<List<Tickets>> getDashboardTickets(
+            @RequestParam("supervisor") String supervisor,
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        List<Tickets> tickets = ticketService.getTicketsDashboard(supervisor, startDate, endDate);
+
+        if (tickets.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Devuelve 204 si no hay datos
+        }
+
+        return ResponseEntity.ok(tickets); // Devuelve 200 con la lista de tickets
+    }
+    
 
 // --------------------------------------------------------------------------------
 // 📤 ENDPOINT DE SUBIDA DE ARCHIVOS 📤

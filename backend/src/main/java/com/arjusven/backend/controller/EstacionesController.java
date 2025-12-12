@@ -30,7 +30,6 @@ public class EstacionesController {
     	@RequestParam(value = "cobertura", required = false) String cobertura,
     	@RequestParam(value = "plazaDeAtencion", required = false) String plazaDeAtencion){ 
 
-    	
     		String supervisorArjusFilter = null;
     		String estadoFilter = null;
     		String coberturaFilter = null;

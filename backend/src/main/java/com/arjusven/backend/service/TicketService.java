@@ -1,6 +1,5 @@
 package com.arjusven.backend.service;
 
-
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -279,7 +278,9 @@ public class TicketService {
         return ticketsRepository.save(tickets);
     }
     
-   
+    public List<Tickets> getTicketsDashboard(String supervisor, LocalDate fechaInicio, LocalDate fechaFin) {
+    	return ticketsRepository.findBySupervisorAndDateRange(supervisor, fechaInicio, fechaFin);
+    }
 
     public Tickets getTicketsById(Long id) { 
         return ticketsRepository.findById(id).orElseThrow(

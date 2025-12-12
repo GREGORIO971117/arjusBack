@@ -41,7 +41,7 @@ public class SecurityConfig {
                 // 2. RUTAS PÚBLICAS: Permitir el login y el registro
                 .requestMatchers(HttpMethod.POST, "/api/usuarios/login").permitAll()
                 //.requestMatchers(HttpMethod.POST, "/api/estaciones/bulk").permitAll()
-                //.requestMatchers(HttpMethod.DELETE,"/api/inventario/deleteAll").permitAll()
+                .requestMatchers(HttpMethod.DELETE,"/api/inventario/deleteAll").permitAll()
                 //.requestMatchers(HttpMethod.DELETE, "/api/tickets/deleteAll").permitAll()
                 //.requestMatchers(HttpMethod.POST, "/api/inventario/bulk").permitAll()
 

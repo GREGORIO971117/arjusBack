@@ -55,6 +55,7 @@ public class PlaneacionService {
 
         Tickets ticket = tickets.get(0);
         Servicio servicio = ticket.getServicios();
+        Adicional adicional = ticket.getAdicionales();
 
         if (servicio == null) {
             throw new IllegalArgumentException("El ticket no tiene servicio asociado");
@@ -67,7 +68,7 @@ public class PlaneacionService {
         // Campos existentes
         if (dto.getFechaAsignacion() != null) servicio.setFechaDeAsignacion(dto.getFechaAsignacion());
         // if (dto.getCliente() != null) servicio.setNombreDeEss(dto.getCliente());
-        if (dto.getEstadoGuia() != null) servicio.setEstadoGuia(dto.getEstadoGuia());
+        if (dto.getEstadoGuia() != null) servicio.setSituacionActual(dto.getEstadoGuia());
         if (dto.getFechaDeEnvio() != null) servicio.setFechaDeEnvio(dto.getFechaDeEnvio());
         if (dto.getFechaLlegada() != null) servicio.setFechaLlegada(dto.getFechaLlegada());
         if (dto.getGuiaDhl() != null) servicio.setGuiaDeEncomienda(dto.getGuiaDhl());
@@ -82,28 +83,14 @@ public class PlaneacionService {
         if (dto.getSupervisor() != null) servicio.setSupervisor(dto.getSupervisor());
         if (dto.getStatusPaqueteria() != null) servicio.setStatusPaqueteria(dto.getStatusPaqueteria());
         //if (dto.getFechaAsignacionReporte() != null) servicio.setFechaReporte(dto.getFechaAsignacionReporte());
+        if (dto.getEjecutivo() != null) adicional.setCerroEnPuntoClave(dto.getEjecutivo());
+
         // NUEVOS CAMPOS AGREGADOS EN TU DTO
 
         // ==========================================
         // 2. ACTUALIZACIÓN DE DATOS ADICIONALES (EQUIPOS)
         // ==========================================
-        
-        // Verificamos si hay datos de equipos para actualizar
-        if (dto.getEquipoReportado() != null || dto.getEquipoEnviado() != null) {
-            Adicional adicional = ticket.getAdicionales();
-
-            // CRÍTICO: Si no existe la entidad Adicional, la creamos
-            if (adicional == null) {
-                adicional = new Adicional();
-                // Aquí deberías setear cualquier relación inversa si es necesaria, o guardar 'adicional' primero si no hay cascade.
-                // Asumiendo que Tickets tiene CascadeType.ALL sobre Adicionales:
-                ticket.setAdicionales(adicional); 
-            }
-
-            if (dto.getEquipoReportado() != null) adicional.setSerieFisicaSale(dto.getEquipoReportado());
-            if (dto.getEquipoEnviado() != null) adicional.setSerieFisicaEntra(dto.getEquipoEnviado());
-        }
-
+      
         // Guardamos el ticket (y por cascada el servicio y adicionales)
         ticketsRepository.save(ticket);
 
@@ -115,13 +102,14 @@ public class PlaneacionService {
 
         PlaneacionDTO dto = new PlaneacionDTO();
         Servicio servicio = ticket.getServicios();
+        Adicional adicional = ticket.getAdicionales();
 
         if (servicio != null) {
 
             dto.setFechaAsignacion(servicio.getFechaDeAsignacion());
             dto.setIncidencia(servicio.getIncidencia());
             dto.setCliente(servicio.getNombreDeEss());
-            dto.setEstadoGuia(servicio.getEstadoGuia());
+            dto.setEstadoGuia(servicio.getSituacionActual());
             dto.setStatusPaqueteria(servicio.getStatusPaqueteria());
             dto.setFechaDeEnvio(servicio.getFechaDeEnvio());
             dto.setMerchantId(servicio.getIdMerchant());
@@ -138,7 +126,8 @@ public class PlaneacionService {
             dto.setObservacionArjus(servicio.getObservacionesEspeciales());
             dto.setEquipoEnviado(servicio.getEquipoEnviado());
             dto.setEquipoReportado(servicio.getModeloReportado());
-
+            dto.setEjecutivo(adicional.getCerroEnPuntoClave());
+            
             Estaciones estacion = servicio.getEstaciones();
             if (estacion != null) {
                 dto.setColonia(estacion.getColoniaAsentamiento());
